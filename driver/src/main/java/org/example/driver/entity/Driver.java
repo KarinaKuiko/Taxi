@@ -9,14 +9,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.example.driver.entity.enumeration.Gender;
-
-import java.util.UUID;
 
 @Entity
 @Table(name = "drivers")
 @Data
-public class Driver extends AuditingEntity{
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
+public class Driver extends AuditingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

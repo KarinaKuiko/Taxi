@@ -1,6 +1,7 @@
 package org.example.driver.entity;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -9,21 +10,24 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
-import java.util.UUID;
+
 
 @Entity
 @Table(name = "cars")
 @Data
-public class Car extends AuditingEntity{
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
+public class Car extends AuditingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String color;
 
-    private String brand; // enum?
+    private String brand;
 
     private String number;
 

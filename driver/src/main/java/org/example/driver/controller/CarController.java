@@ -1,65 +1,57 @@
 package org.example.driver.controller;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.example.driver.dto.create.CarCreateEditDto;
 import org.example.driver.dto.read.CarReadDto;
-import org.example.driver.dto.read.DriverReadDto;
+import org.example.driver.dto.read.PageResponse;
 import org.example.driver.service.CarService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.UUID;
-
-import static org.springframework.http.ResponseEntity.noContent;
-import static org.springframework.http.ResponseEntity.notFound;
-import static org.springframework.http.ResponseEntity.ok;
-
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/cars")
+@RequestMapping("/api/v1/cars")
 public class CarController {
     private final CarService carService;
 
     @GetMapping
-    public ResponseEntity<List<CarReadDto>> findAll() {
-        return ok().body(carService.findAll());
+    public PageResponse<CarReadDto> findAll(@RequestParam(defaultValue = "0") Integer page,
+                                            @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer limit) {
+        return PageResponse.of(carService.findAll(page, limit));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CarReadDto> findById(@PathVariable("id") Long id) {
-        return carService.findById(id)
-                .map(obj -> ok()
-                        .body(obj))
-                .orElseGet(notFound()::build);
+    public CarReadDto findById(@PathVariable("id") Long id) {
+        return carService.findById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<CarReadDto> create(@RequestBody CarCreateEditDto dto) {
-        return ok().body(carService.create(dto));
+    public CarReadDto create(@RequestBody @Valid CarCreateEditDto dto) {
+        return carService.create(dto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CarReadDto> update(@PathVariable("id")Long id,
-                                             @RequestBody CarCreateEditDto dto) {
-        return carService.update(id, dto)
-                .map(obj -> ok().body(obj))
-                .orElseGet(notFound()::build);
+    public CarReadDto update(@PathVariable("id") Long id,
+                             @RequestBody @Valid CarCreateEditDto dto) {
+        return carService.update(id, dto);
     }
 
-    @PostMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
-        return carService.safeDelete(id)
-                ? noContent().build()
-                : notFound().build();
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable("id") Long id) {
+        carService.safeDelete(id);
     }
 }

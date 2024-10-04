@@ -1,19 +1,24 @@
 package org.example.driver.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.driver.constants.AppConstants;
 import org.example.driver.dto.create.DriverCreateEditDto;
 import org.example.driver.dto.read.DriverReadDto;
 import org.example.driver.entity.Car;
-import org.example.driver.exception.CarIsDeletedException;
+import org.example.driver.entity.Driver;
+import org.example.driver.exception.car.CarNotFoundException;
+import org.example.driver.exception.driver.DriverNotFoundException;
+import org.example.driver.exception.driver.DuplicatedDriverEmailException;
 import org.example.driver.mapper.DriverMapper;
 import org.example.driver.repository.CarRepository;
 import org.example.driver.repository.DriverRepository;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,58 +26,96 @@ public class DriverService {
     private final DriverRepository driverRepository;
     private final DriverMapper driverMapper;
     private final CarRepository carRepository;
+    private final MessageSource messageSource;
 
+    @Transactional
     public DriverReadDto create(DriverCreateEditDto driverDto) {
+        driverRepository.findByEmailAndIsDeletedFalse(driverDto.email())
+                .ifPresent(driver -> {
+                    throw new DuplicatedDriverEmailException(messageSource.getMessage(
+                                                             AppConstants.DRIVER_DUPLICATED_EMAIL,
+                                                             new Object[]{driverDto.email()},
+                                                             LocaleContextHolder.getLocale()), HttpStatus.BAD_REQUEST);
+                });
 
-        return Optional.of(driverDto)
-                .map(driverMapper::toDriver)
-                .map(driver -> {
-                    Optional<Car> car = carRepository.findByIdAndIsDeletedIsFalse(driverDto.car_id());
-                    if (car.isEmpty()) {
-                        throw new CarIsDeletedException("Car has been deleted", HttpStatus.NOT_FOUND);
-                    }
-                    driver.setCar(car.get());
-                    return driver;
-                })
-                .map(driverRepository::save)
-                .map(driverMapper::toReadDto)
-                .orElseThrow();
+        Driver driver = driverMapper.toDriver(driverDto);
+
+        Car car = carRepository.findByIdAndIsDeletedFalse(driverDto.carId())
+                .orElseThrow(() -> new CarNotFoundException(messageSource.getMessage(
+                                                            AppConstants.CAR_NOT_FOUND,
+                                                            new Object[]{driverDto.carId()},
+                                                            LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND));
+
+        driver.setCar(car);
+
+        return driverMapper.toReadDto(driverRepository.save(driver));
+
     }
 
-    public Optional<DriverReadDto> update(Long id, DriverCreateEditDto driverDto) {
-        return driverRepository.findById(id)
+    @Transactional
+    public DriverReadDto update(Long id, DriverCreateEditDto driverDto) {
+        driverRepository.findByEmailAndIsDeletedFalse(driverDto.email())
+                .ifPresent(driver -> {
+                    throw new DuplicatedDriverEmailException(messageSource.getMessage(
+                                                             AppConstants.DRIVER_DUPLICATED_EMAIL,
+                                                             new Object[]{driverDto.email()},
+                                                             LocaleContextHolder.getLocale()), HttpStatus.BAD_REQUEST);
+                });
+
+        return driverRepository.findByIdAndIsDeletedFalse(id)
                 .map(driver -> {
                     driverMapper.map(driver, driverDto);
-                    Optional<Car> car = carRepository.findByIdAndIsDeletedIsFalse(driverDto.car_id());
-                    if (car.isEmpty()) {
-                        throw new CarIsDeletedException("Car has been deleted", HttpStatus.NOT_FOUND);
-                    }
-                    driver.setCar(car.get());
+                    Car car = carRepository.findByIdAndIsDeletedFalse(driverDto.carId())
+                            .orElseThrow(() -> new CarNotFoundException(messageSource.getMessage(
+                                                                        AppConstants.CAR_NOT_FOUND,
+                                                                        new Object[]{driverDto.carId()},
+                                                                        LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND));
+                    driver.setCar(car);
                     return driver;
                 })
                 .map(driverRepository::save)
-                .map(driverMapper::toReadDto);
-    }
-
-    public boolean safeDelete(Long id) {
-        return driverRepository.findByIdAndIsDeletedIsFalse(id)
-                .map(driver -> {
-                    driver.setDeleted(true);
-                    driverRepository.save(driver);
-                    return true;
-                })
-                .orElse(false);
-    }
-
-    public List<DriverReadDto> findAll() {
-        return driverRepository.findAll()
-                .stream()
                 .map(driverMapper::toReadDto)
-                .toList();
+                .orElseThrow(() -> new DriverNotFoundException(messageSource.getMessage(
+                                                               AppConstants.DRIVER_NOT_FOUND,
+                                                               new Object[]{id},
+                                                               LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND));
     }
 
-    public Optional<DriverReadDto> findById(Long id) {
-        return driverRepository.findById(id)
+    @Transactional
+    public void safeDelete(Long id) {
+        do {
+            try {
+                driverRepository.findByIdAndIsDeletedFalse(id)
+                        .map(driver -> {
+                            driver.setDeleted(true);
+                            driverRepository.save(driver);
+                            return driver;
+                        })
+                        .orElseThrow(() -> new DriverNotFoundException(messageSource.getMessage(
+                                                                       AppConstants.DRIVER_NOT_FOUND,
+                                                                       new Object[]{id},
+                                                                       LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND));
+            } catch (DriverNotFoundException e) {
+                break;
+            }
+        } while (true);
+    }
+
+    public Page<DriverReadDto> findAll(Integer page, Integer limit) {
+        PageRequest request = PageRequest.of(page, limit);
+        return driverRepository.findByIsDeletedFalse(request)
                 .map(driverMapper::toReadDto);
+    }
+
+    public Page<DriverReadDto> findAllWithDeleted(Integer page, Integer limit) {
+        PageRequest request = PageRequest.of(page, limit);
+        return driverRepository.findAll(request)
+                .map(driverMapper::toReadDto);
+    }
+
+    public DriverReadDto findById(Long id) {
+        return driverRepository.findByIdAndIsDeletedFalse(id)
+                .map(driverMapper::toReadDto)
+                .orElseThrow();
     }
 }
