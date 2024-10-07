@@ -116,6 +116,10 @@ public class DriverService {
     public DriverReadDto findById(Long id) {
         return driverRepository.findByIdAndIsDeletedFalse(id)
                 .map(driverMapper::toReadDto)
-                .orElseThrow();
+                .orElseThrow(() -> new DriverNotFoundException(messageSource.getMessage(
+                        AppConstants.DRIVER_NOT_FOUND,
+                        new Object[]{id},
+                        LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND
+                ));
     }
 }

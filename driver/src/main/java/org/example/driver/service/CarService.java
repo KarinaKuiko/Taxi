@@ -103,6 +103,10 @@ public class CarService {
     public CarReadDto findById(Long id) {
         return carRepository.findByIdAndIsDeletedFalse(id)
                 .map(carMapper::toReadDto)
-                .orElseThrow();
+                .orElseThrow(() -> new CarNotFoundException(messageSource.getMessage(
+                        AppConstants.CAR_NOT_FOUND,
+                        new Object[]{id},
+                        LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND
+                ));
     }
 }
