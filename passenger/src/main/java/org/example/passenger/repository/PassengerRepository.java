@@ -14,4 +14,6 @@ public interface PassengerRepository extends JpaRepository<Passenger,Long> {
     Page<Passenger> findByIsDeletedFalse(Pageable pageable);
 
     Optional<Passenger> findByIdAndIsDeletedFalse(Long id);
+
+    Optional<Passenger> findByEmailAndIsDeletedFalse(String email);
 }

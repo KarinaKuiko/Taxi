@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
 @Table(name = "passengers")
 @Data
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
-public class Passenger {
+public class Passenger extends AuditingEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

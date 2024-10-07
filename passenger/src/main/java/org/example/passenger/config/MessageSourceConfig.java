@@ -15,18 +15,15 @@ public class MessageSourceConfig {
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
 
-        messageSource.setBasenames("classpath:messages/validation/messages.properties", "classpath:messages/exception/messages.properties");
+        messageSource.setBasenames("classpath:messages/validation/messages", "classpath:messages/exception/messages");
         messageSource.setDefaultEncoding("UTF-8");
-
         return messageSource;
     }
 
     @Bean
     public LocalValidatorFactoryBean getValidator() {
         LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
-
         bean.setValidationMessageSource(messageSource());
-
         return bean;
     }
 }
