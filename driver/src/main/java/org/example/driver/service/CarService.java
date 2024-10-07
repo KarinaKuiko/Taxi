@@ -1,7 +1,6 @@
 package org.example.driver.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.example.driver.constants.AppConstants;
 import org.example.driver.dto.create.CarCreateEditDto;
 import org.example.driver.dto.read.CarReadDto;
@@ -21,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class CarService {
     private final CarRepository carRepository;
     private final CarMapper carMapper;
