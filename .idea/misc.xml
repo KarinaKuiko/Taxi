@@ -5,7 +5,15 @@
     <option name="originalFiles">
       <list>
         <option value="D:/Taxi/pom.xml" />
+        <option value="D:/Taxi/driver/pom.xml" />
+        <option value="D:/Taxi/Passenger/pom.xml" />
+        <option value="D:/Taxi/passenger/pom.xml" />
       </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="D:/Taxi/Passenger/pom.xml" />
+      </set>
     </option>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_21" default="true" project-jdk-name="openjdk-21" project-jdk-type="JavaSDK">
