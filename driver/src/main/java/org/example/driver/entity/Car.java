@@ -24,7 +24,6 @@ public class Car extends AuditingEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String color;
 
     private String brand;
