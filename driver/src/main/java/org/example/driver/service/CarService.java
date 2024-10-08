@@ -30,9 +30,9 @@ public class CarService {
         carRepository.findByNumberAndIsDeletedFalse(carDto.number())
                 .ifPresent(car -> {
                     throw new DuplicatedCarNumberException(messageSource.getMessage(
-                                                           AppConstants.CAR_DUPLICATED_NUMBER,
-                                                           new Object[]{carDto.number()},
-                                                           LocaleContextHolder.getLocale()), HttpStatus.BAD_REQUEST);
+                            AppConstants.CAR_DUPLICATED_NUMBER,
+                            new Object[]{carDto.number()},
+                            LocaleContextHolder.getLocale()), HttpStatus.BAD_REQUEST);
                 });
 
         Car car = carMapper.toCar(carDto);
@@ -46,9 +46,9 @@ public class CarService {
                 .ifPresent(car -> {
                     if (!car.getId().equals(id)) {
                         throw new DuplicatedCarNumberException(messageSource.getMessage(
-                                                               AppConstants.CAR_DUPLICATED_NUMBER,
-                                                               new Object[]{carDto.number()},
-                                                               LocaleContextHolder.getLocale()), HttpStatus.BAD_REQUEST);
+                                AppConstants.CAR_DUPLICATED_NUMBER,
+                                new Object[]{carDto.number()},
+                                LocaleContextHolder.getLocale()), HttpStatus.BAD_REQUEST);
                     }
                 });
 
@@ -60,29 +60,24 @@ public class CarService {
                 .map(carRepository::save)
                 .map(carMapper::toReadDto)
                 .orElseThrow(() -> new CarNotFoundException(messageSource.getMessage(
-                                                            AppConstants.CAR_NOT_FOUND,
-                                                            new Object[]{id},
-                                                            LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND));
+                        AppConstants.CAR_NOT_FOUND,
+                        new Object[]{id},
+                        LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND));
     }
 
     @Transactional
     public void safeDelete(Long id) {
-        do {
-            try {
-                carRepository.findByIdAndIsDeletedFalse(id)
-                        .map(car -> {
-                            car.setDeleted(true);
-                            carRepository.save(car);
-                            return car;
-                        })
-                        .orElseThrow(() -> new CarNotFoundException(messageSource.getMessage(
-                                                                    AppConstants.CAR_NOT_FOUND,
-                                                                    new Object[]{id},
-                                                                    LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND));
-            } catch (CarNotFoundException e) {
-                break;
-            }
-        } while (true);
+        carRepository.findByIdAndIsDeletedFalse(id)
+                .map(car -> {
+                    car.setDeleted(true);
+                    carRepository.save(car);
+                    return car;
+                })
+                .orElseThrow(() -> new CarNotFoundException(messageSource.getMessage(
+                                                            AppConstants.CAR_NOT_FOUND,
+                                                            new Object[]{id},
+                                                            LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND));
+
     }
 
     public Page<CarReadDto> findAll(Integer page, Integer limit) {
