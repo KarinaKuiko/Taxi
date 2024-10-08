@@ -31,6 +31,13 @@
         <mapstruct.version>1.6.2</mapstruct.version>
         <swagger.version>2.6.0</swagger.version>
         <liqubase.plugin.version>4.29.2</liqubase.plugin.version>
+        <liquibase.url>${env.DB_URL}</liquibase.url>
+        <liquibase.username>${env.DB_USERNAME}</liquibase.username>
+        <liquibase.password>${env.DB_PASSWORD}</liquibase.password>
+        <default.liquibase.url>jdbc:postgresql://localhost:5432/taxi</default.liquibase.url>
+        <default.liquibase.username>postgres</default.liquibase.username>
+        <default.liquibase.password>postgres</default.liquibase.password>
+
     </properties>
     <dependencies>
         <dependency>
@@ -110,9 +117,42 @@
                 <artifactId>liquibase-maven-plugin</artifactId>
                 <version>${liqubase.plugin.version}</version>
                 <configuration>
-                    <propertyFile>src/main/resources/liquibase.properties</propertyFile>
+                    <changeLogFile>db/changelog/db.changelog-master.xml</changeLogFile>
+                    <url>${liquibase.url}</url>
+                    <username>${liquibase.username}</username>
+                    <password>${liquibase.password}</password>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <property name="liquibase.url" value="${liquibase.url}" />
+                                <property name="liquibase.username" value="${liquibase.username}" />
+                                <property name="liquibase.password" value="${liquibase.password}" />
+                                <condition property="liquibase.url" value="${default.liquibase.url}">
+                                    <isset property="liquibase.url" />
+                                </condition>
+                                <condition property="liquibase.username" value="${default.liquibase.username}">
+                                    <isset property="liquibase.username" />
+                                </condition>
+                                <condition property="liquibase.password" value="${default.liquibase.password}">
+                                    <isset property="liquibase.password" />
+                                </condition>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 
