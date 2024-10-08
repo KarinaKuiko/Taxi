@@ -30,6 +30,7 @@
         <java.version>21</java.version>
         <mapstruct.version>1.6.2</mapstruct.version>
         <swagger.version>2.6.0</swagger.version>
+        <liqubase.plugin.version>4.29.2</liqubase.plugin.version>
     </properties>
     <dependencies>
         <dependency>
@@ -97,6 +98,14 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <version>${liqubase.plugin.version}</version>
+                <configuration>
+                    <propertyFile>src/main/resources/liquibase.properties</propertyFile>
                 </configuration>
             </plugin>
         </plugins>

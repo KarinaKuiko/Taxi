@@ -93,8 +93,6 @@ public class PassengerService {
 
     @Transactional
     public void safeDelete(Long id) {
-        do {
-            try {
                 passengerRepository.findByIdAndIsDeletedFalse(id)
                         .map(passenger -> {
                             passenger.setDeleted(true);
@@ -106,9 +104,5 @@ public class PassengerService {
                                 new Object[]{id},
                                 LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND
                         ));
-            } catch (PassengerNotFoundException e) {
-                break;
-            }
-        } while (true);
     }
 }
