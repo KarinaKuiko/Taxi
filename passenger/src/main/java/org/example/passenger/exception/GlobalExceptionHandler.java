@@ -4,6 +4,8 @@ import jakarta.validation.ConstraintViolationException;
 import org.example.passenger.constants.AppConstants;
 import org.example.passenger.dto.read.ExceptionDto;
 import org.example.passenger.dto.read.ValidationResponse;
+import org.example.passenger.exception.passenger.DuplicatedPassengerEmailException;
+import org.example.passenger.exception.passenger.PassengerNotFoundException;
 import org.example.passenger.exception.violation.Violation;
 import org.springframework.http.HttpStatus;
 
@@ -18,15 +20,22 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(BaseException.class)
-    public ExceptionDto handle(BaseException exception) {
-        return new ExceptionDto(exception.getStatus(), exception.getMessage(), LocalDateTime.now());
+    @ExceptionHandler(DuplicatedPassengerEmailException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionDto handleDuplicatedPassengerEmailException(DuplicatedPassengerEmailException exception) {
+        return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
     }
 
-    @ExceptionHandler({RuntimeException.class})
+    @ExceptionHandler(PassengerNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ExceptionDto handlePassengerNotFoundException(PassengerNotFoundException exception) {
+        return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionDto handleRuntimeException(RuntimeException exception) {
-        return new ExceptionDto(HttpStatus.INTERNAL_SERVER_ERROR, AppConstants.INTERNAL_SERVER_ERROR, LocalDateTime.now());
+        return new ExceptionDto(AppConstants.INTERNAL_SERVER_ERROR, LocalDateTime.now());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

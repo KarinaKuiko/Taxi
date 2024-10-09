@@ -45,8 +45,7 @@ public class PassengerService {
                 .orElseThrow(() -> new PassengerNotFoundException(messageSource.getMessage(
                         AppConstants.PASSENGER_NOT_FOUND,
                         new Object[]{id},
-                        LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND
-                ));
+                        LocaleContextHolder.getLocale())));
     }
 
     @Transactional
@@ -56,9 +55,8 @@ public class PassengerService {
                             throw new DuplicatedPassengerEmailException(messageSource.getMessage(
                                     AppConstants.PASSENGER_DUPlICATED_EMAIL,
                                     new Object[]{passengerDto.email()},
-                                    LocaleContextHolder.getLocale()), HttpStatus.BAD_REQUEST);
-                        }
-                    );
+                                    LocaleContextHolder.getLocale()));
+                        });
 
         Passenger passenger = passengerMapper.toPassenger(passengerDto);
 
@@ -73,7 +71,7 @@ public class PassengerService {
                         throw new DuplicatedPassengerEmailException(messageSource.getMessage(
                                 AppConstants.PASSENGER_DUPlICATED_EMAIL,
                                 new Object[]{passengerDto.email()},
-                                LocaleContextHolder.getLocale()), HttpStatus.BAD_REQUEST);
+                                LocaleContextHolder.getLocale()));
                     }
                 });
 
@@ -87,8 +85,7 @@ public class PassengerService {
                 .orElseThrow(() -> new PassengerNotFoundException(messageSource.getMessage(
                         AppConstants.PASSENGER_NOT_FOUND,
                         new Object[]{id},
-                        LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND
-                ));
+                        LocaleContextHolder.getLocale())));
     }
 
     @Transactional
@@ -102,7 +99,6 @@ public class PassengerService {
                         .orElseThrow(() -> new PassengerNotFoundException(messageSource.getMessage(
                                 AppConstants.PASSENGER_NOT_FOUND,
                                 new Object[]{id},
-                                LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND
-                        ));
+                                LocaleContextHolder.getLocale())));
     }
 }
