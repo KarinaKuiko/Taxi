@@ -6,6 +6,7 @@ import org.example.ride.dto.create.RideCreateEditDto;
 import org.example.ride.dto.read.RideReadDto;
 import org.example.ride.dto.read.RideStatusDto;
 import org.example.ride.entity.Ride;
+import org.example.ride.exception.param.InvalidCountParametersException;
 import org.example.ride.exception.ride.RideNotFoundException;
 import org.example.ride.mapper.RideMapper;
 import org.example.ride.repository.RideRepository;
@@ -28,6 +29,20 @@ public class RideService {
     private final RideMapper rideMapper;
     private final PriceGenerator priceGenerator;
     private final RideStatusValidation rideStatusValidation;
+
+    public Page<RideReadDto> findRides(Long driverId, Long passengerId, Integer page, Integer limit) {
+        if (driverId != null && passengerId != null) {
+            throw new InvalidCountParametersException(messageSource.getMessage(
+                    AppConstants.INVALID_COUNT_PARAMETERS,
+                    new Object[]{},
+                    LocaleContextHolder.getLocale()), HttpStatus.BAD_REQUEST);
+        }
+
+        if (driverId != null) return findByDriverId(driverId, page, limit);
+        if (passengerId != null) return findByPassengerId(passengerId, page, limit);
+
+        return findAll(page, limit);
+    }
 
     public Page<RideReadDto> findAll(Integer page, Integer limit) {
         Pageable request = PageRequest.of(page, limit);
