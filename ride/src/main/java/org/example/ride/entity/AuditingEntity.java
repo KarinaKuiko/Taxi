@@ -17,5 +17,4 @@ public abstract class AuditingEntity {
     private Instant createdAt;
     @LastModifiedDate
     private Instant modifiedAt;
-    private boolean isDeleted;
 }

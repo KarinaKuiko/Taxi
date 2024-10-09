@@ -2,6 +2,8 @@ package org.example.ride.dto.read;
 
 import org.example.ride.entity.enumeration.RideStatus;
 
+import java.math.BigDecimal;
+
 public record RideReadDto(
         Long id,
         Long driverId,
@@ -9,6 +11,6 @@ public record RideReadDto(
         String addressFrom,
         String addressTo,
         RideStatus rideStatus,
-        Long cost
+        BigDecimal cost
 ) {
 }

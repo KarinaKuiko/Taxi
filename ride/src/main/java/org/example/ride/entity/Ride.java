@@ -1,5 +1,6 @@
 package org.example.ride.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -8,6 +9,8 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.example.ride.entity.enumeration.RideStatus;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "rides")
@@ -28,5 +31,6 @@ public class Ride extends AuditingEntity {
 
     private RideStatus rideStatus;
 
-    private Long cost;
+    @Column(precision = 6, scale = 2)
+    private BigDecimal cost;
 }
