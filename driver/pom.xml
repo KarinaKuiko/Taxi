@@ -37,6 +37,7 @@
         <default.liquibase.url>jdbc:postgresql://localhost:5432/taxi</default.liquibase.url>
         <default.liquibase.username>postgres</default.liquibase.username>
         <default.liquibase.password>postgres</default.liquibase.password>
+        <antrun.version>1.8</antrun.version>
 
     </properties>
     <dependencies>
@@ -126,7 +127,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.8</version>
+                <version>${antrun.version}</version>
                 <executions>
                     <execution>
                         <phase>validate</phase>

@@ -4,6 +4,10 @@ import jakarta.validation.ConstraintViolationException;
 import org.example.driver.constants.AppConstants;
 import org.example.driver.dto.read.ExceptionDto;
 import org.example.driver.dto.read.ValidationResponse;
+import org.example.driver.exception.car.CarNotFoundException;
+import org.example.driver.exception.car.DuplicatedCarNumberException;
+import org.example.driver.exception.driver.DriverNotFoundException;
+import org.example.driver.exception.driver.DuplicatedDriverEmailException;
 import org.example.driver.exception.violation.Violation;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,15 +17,30 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(BaseException.class)
-    public ExceptionDto handle(BaseException exception) {
+    @ExceptionHandler(CarNotFoundException.class)
+    public ExceptionDto handleCarNotFoundException(CarNotFoundException exception) {
         return new ExceptionDto(exception.getStatus(), exception.getMessage(), LocalDateTime.now());
     }
+
+    @ExceptionHandler(DuplicatedCarNumberException.class)
+    public ExceptionDto handleDuplicatedCarNumberException(DuplicatedCarNumberException exception) {
+        return new ExceptionDto(exception.getStatus(), exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(DriverNotFoundException.class)
+    public ExceptionDto handleDriverNotFoundException(DriverNotFoundException exception) {
+        return new ExceptionDto(exception.getStatus(), exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(DuplicatedDriverEmailException.class)
+    public ExceptionDto handleDuplicatedDriverEmailException(DuplicatedDriverEmailException exception) {
+        return new ExceptionDto(exception.getStatus(), exception.getMessage(), LocalDateTime.now());
+    }
+
     @ExceptionHandler({RuntimeException.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionDto handleRuntimeException(RuntimeException exception) {
