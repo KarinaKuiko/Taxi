@@ -2,6 +2,8 @@ package org.example.ride.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -29,6 +31,7 @@ public class Ride extends AuditingEntity {
 
     private String addressTo;
 
+    @Enumerated(EnumType.STRING)
     private RideStatus rideStatus;
 
     @Column(precision = 6, scale = 2)

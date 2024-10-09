@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.ride.dto.create.RideCreateEditDto;
 import org.example.ride.dto.read.PageResponse;
 import org.example.ride.dto.read.RideReadDto;
-import org.example.ride.dto.read.RideStatusDto;
+import org.example.ride.dto.create.RideStatusDto;
 import org.example.ride.service.RideService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,8 +27,8 @@ public class RideController {
     private final RideService rideService;
 
     @GetMapping
-    public PageResponse<RideReadDto> findAll(@RequestParam(required = false) Long driverId,
-                                             @RequestParam(required = false) Long passengerId,
+    public PageResponse<RideReadDto> findAll(@RequestParam(name = "driverId", required = false) Long driverId,
+                                             @RequestParam(name = "passengerId", required = false) Long passengerId,
                                              @RequestParam(defaultValue = "0") Integer page,
                                              @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer limit) {
         return PageResponse.of(rideService.findRides(driverId, passengerId, page, limit));
@@ -54,5 +54,4 @@ public class RideController {
     public RideReadDto updateStatus(@PathVariable("id") Long id, @RequestBody RideStatusDto rideStatusDto) {
         return rideService.updateStatus(id, rideStatusDto);
     }
-
 }

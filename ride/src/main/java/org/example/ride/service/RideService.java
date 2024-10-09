@@ -4,8 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.example.ride.constants.AppConstants;
 import org.example.ride.dto.create.RideCreateEditDto;
 import org.example.ride.dto.read.RideReadDto;
-import org.example.ride.dto.read.RideStatusDto;
+import org.example.ride.dto.create.RideStatusDto;
 import org.example.ride.entity.Ride;
+import org.example.ride.entity.enumeration.RideStatus;
 import org.example.ride.exception.param.InvalidCountParametersException;
 import org.example.ride.exception.ride.RideNotFoundException;
 import org.example.ride.mapper.RideMapper;
@@ -76,6 +77,7 @@ public class RideService {
         priceGenerator.generateRandomCost();
 
         Ride ride = rideMapper.toRide(rideDto);
+        ride.setRideStatus(RideStatus.CREATED);
         ride.setCost(priceGenerator.generateRandomCost());
 
         return rideMapper.toReadDto(rideRepository.save(ride));
@@ -85,7 +87,7 @@ public class RideService {
     public RideReadDto update(Long id, RideCreateEditDto rideDto) {
         return rideRepository.findById(id)
                 .map(ride -> {
-                    rideMapper.map(ride, rideDto); //TODO: check
+                    rideMapper.map(ride, rideDto);
                     return ride;
                 })
                 .map(rideRepository::save)

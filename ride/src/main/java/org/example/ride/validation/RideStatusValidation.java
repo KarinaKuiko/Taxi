@@ -2,7 +2,7 @@ package org.example.ride.validation;
 
 import lombok.RequiredArgsConstructor;
 import org.example.ride.constants.AppConstants;
-import org.example.ride.dto.read.RideStatusDto;
+import org.example.ride.dto.create.RideStatusDto;
 import org.example.ride.entity.Ride;
 import org.example.ride.entity.enumeration.RideStatus;
 import org.example.ride.exception.ride.CanceledRideStatusException;

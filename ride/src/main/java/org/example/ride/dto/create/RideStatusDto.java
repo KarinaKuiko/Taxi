@@ -1,4 +1,4 @@
-package org.example.ride.dto.read;
+package org.example.ride.dto.create;
 
 import org.example.ride.entity.enumeration.RideStatus;
 

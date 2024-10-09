@@ -3,7 +3,7 @@ package org.example.ride.mapper;
 import org.example.ride.config.MapperConfiguration;
 import org.example.ride.dto.create.RideCreateEditDto;
 import org.example.ride.dto.read.RideReadDto;
-import org.example.ride.dto.read.RideStatusDto;
+import org.example.ride.dto.create.RideStatusDto;
 import org.example.ride.entity.Ride;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
