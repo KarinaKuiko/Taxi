@@ -5,7 +5,6 @@ import org.example.rating.constants.AppConstants;
 import org.example.rating.dto.create.RateCreateEditDto;
 import org.example.rating.dto.read.RateReadDto;
 import org.example.rating.entity.Rate;
-import org.example.rating.exception.param.InvalidCountParametersException;
 import org.example.rating.exception.rate.RateNotFoundException;
 import org.example.rating.mapper.RateMapper;
 import org.example.rating.repository.RateRepository;
