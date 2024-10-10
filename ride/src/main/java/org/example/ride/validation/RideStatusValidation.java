@@ -9,7 +9,6 @@ import org.example.ride.exception.ride.CanceledRideStatusException;
 import org.example.ride.exception.ride.InvalidRideStatusForChangingException;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,7 +21,7 @@ public class RideStatusValidation {
             throw new InvalidRideStatusForChangingException(messageSource.getMessage(
                     AppConstants.INVALID_PROPOSED_STATUS,
                     new Object[]{current, proposed},
-                    LocaleContextHolder.getLocale()), HttpStatus.BAD_REQUEST);
+                    LocaleContextHolder.getLocale()));
         }
     }
 
@@ -31,7 +30,7 @@ public class RideStatusValidation {
             throw new CanceledRideStatusException(messageSource.getMessage(
                     AppConstants.CANCELED_STATUS,
                     new Object[]{},
-                    LocaleContextHolder.getLocale()), HttpStatus.BAD_REQUEST);
+                    LocaleContextHolder.getLocale()));
         }
     }
 

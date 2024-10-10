@@ -24,31 +24,31 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidCountParametersException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionDto handleInvalidCountParametersException(InvalidCountParametersException exception) {
-        return new ExceptionDto(exception.getStatus(), exception.getMessage(), LocalDateTime.now());
+        return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(CanceledRideStatusException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionDto handleCanceledRideStatusException(CanceledRideStatusException exception) {
-        return new ExceptionDto(exception.getStatus(), exception.getMessage(), LocalDateTime.now());
+        return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(RideNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ExceptionDto handleRideNotFoundException(RideNotFoundException exception) {
-        return new ExceptionDto(exception.getStatus(), exception.getMessage(), LocalDateTime.now());
+        return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(InvalidRideStatusForChangingException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionDto handleInvalidRideStatusForChangingException(InvalidRideStatusForChangingException exception) {
-        return new ExceptionDto(exception.getStatus(), exception.getMessage(), LocalDateTime.now());
+        return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionDto handleRuntimeException(RuntimeException exception) {
-        return new ExceptionDto(HttpStatus.INTERNAL_SERVER_ERROR, AppConstants.INTERNAL_SERVER_ERROR, LocalDateTime.now());
+        return new ExceptionDto(AppConstants.INTERNAL_SERVER_ERROR, LocalDateTime.now());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

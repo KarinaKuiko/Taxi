@@ -3,8 +3,8 @@ package org.example.ride.service;
 import lombok.RequiredArgsConstructor;
 import org.example.ride.constants.AppConstants;
 import org.example.ride.dto.create.RideCreateEditDto;
-import org.example.ride.dto.read.RideReadDto;
 import org.example.ride.dto.create.RideStatusDto;
+import org.example.ride.dto.read.RideReadDto;
 import org.example.ride.entity.Ride;
 import org.example.ride.entity.enumeration.RideStatus;
 import org.example.ride.exception.param.InvalidCountParametersException;
@@ -18,7 +18,6 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +35,7 @@ public class RideService {
             throw new InvalidCountParametersException(messageSource.getMessage(
                     AppConstants.INVALID_COUNT_PARAMETERS,
                     new Object[]{},
-                    LocaleContextHolder.getLocale()), HttpStatus.BAD_REQUEST);
+                    LocaleContextHolder.getLocale()));
         }
 
         if (driverId != null) return findByDriverId(driverId, page, limit);
@@ -57,7 +56,7 @@ public class RideService {
                 .orElseThrow(() -> new RideNotFoundException(messageSource.getMessage(
                         AppConstants.RIDE_NOT_FOUND_EXCEPTION,
                         new Object[]{id},
-                        LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND));
+                        LocaleContextHolder.getLocale())));
     }
 
     public Page<RideReadDto> findByPassengerId(Long id, Integer page, Integer limit) {
@@ -95,7 +94,7 @@ public class RideService {
                 .orElseThrow(() -> new RideNotFoundException(messageSource.getMessage(
                         AppConstants.RIDE_NOT_FOUND_EXCEPTION,
                         new Object[]{id},
-                        LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND));
+                        LocaleContextHolder.getLocale())));
     }
 
     @Transactional
@@ -104,7 +103,7 @@ public class RideService {
                 .orElseThrow(() -> new RideNotFoundException(messageSource.getMessage(
                         AppConstants.RIDE_NOT_FOUND_EXCEPTION,
                         new Object[]{id},
-                        LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND));
+                        LocaleContextHolder.getLocale())));
 
         rideStatusValidation.validateUpdatingStatus(ride, rideStatusDto);
         rideMapper.mapStatus(ride, rideStatusDto);
