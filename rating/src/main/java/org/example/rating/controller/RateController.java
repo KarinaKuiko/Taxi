@@ -20,13 +20,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/rates")
+@RequestMapping("/api/v1/rating")
 @RequiredArgsConstructor
 public class RateController {
     public final RateService rateService;
 
     @GetMapping
-    public PageResponse<RateReadDto> findAll(@RequestParam(defaultValue = "1") Integer page,
+    public PageResponse<RateReadDto> findAll(@RequestParam(defaultValue = "0") Integer page,
                                              @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer limit) {
         return PageResponse.of(rateService.findAll(page, limit));
     }

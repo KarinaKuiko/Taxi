@@ -15,7 +15,7 @@ import org.example.rating.entity.enumeration.UserType;
 @Table(name = "rating")
 @Data
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
-public class Rate {
+public class Rate extends AuditingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,7 +24,7 @@ public class Rate {
 
     private String comment;
 
-    private Integer rate;
+    private Integer rating;
 
     private Long userId;
 

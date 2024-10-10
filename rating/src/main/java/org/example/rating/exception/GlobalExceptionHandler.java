@@ -4,6 +4,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.example.rating.constants.AppConstants;
 import org.example.rating.dto.read.ExceptionDto;
 import org.example.rating.dto.read.ValidationResponse;
+import org.example.rating.exception.rate.RateNotFoundException;
 import org.example.rating.exception.ride.RideNotFoundException;
 import org.example.rating.exception.violation.Violation;
 import org.springframework.http.HttpStatus;
@@ -18,9 +19,9 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(RideNotFoundException.class)
+    @ExceptionHandler(RateNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ExceptionDto handleRideNotFoundException(RideNotFoundException exception) {
+    public ExceptionDto handleRateNotFoundException(RateNotFoundException exception) {
         return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
     }
 

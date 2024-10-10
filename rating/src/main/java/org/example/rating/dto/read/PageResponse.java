@@ -9,7 +9,7 @@ public record PageResponse<T>(
         Metadata metadata
 ) {
     public static <T> PageResponse<T> of(Page<T> page) {
-        Metadata metadata = new Metadata(page.getNumber(), page.getSize(), page.getTotalElements(), page.hasNext());
+        Metadata metadata = new Metadata(page.getNumber() + 1, page.getSize(), page.getTotalElements(), page.hasNext());
         return new PageResponse<>(page.getContent(), metadata);
     }
 

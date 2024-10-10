@@ -9,8 +9,8 @@ public record RateCreateEditDto(
         Long rideId,
         String comment,
 
-        @Min(value = 1, message = "{rate.range}")
-        @Max(value = 5, message = "{rate.range}")
-        Integer rate
+        @Min(value = 1, message = "{rating.range}")
+        @Max(value = 5, message = "{rating.range}")
+        Integer rating
 ) {
 }

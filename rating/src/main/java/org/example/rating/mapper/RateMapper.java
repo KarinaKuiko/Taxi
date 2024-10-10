@@ -11,6 +11,8 @@ import org.mapstruct.MappingTarget;
 @Mapper(config = MapperConfiguration.class)
 public interface RateMapper {
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "userId", ignore = true)
+    @Mapping(target = "userType", ignore = true)
     Rate toRate(RateCreateEditDto dto);
 
     RateReadDto toReadDto(Rate rate);
