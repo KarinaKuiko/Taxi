@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvalidRideStatusForChangingException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionDto handleInvalidRideStatusForChangingException(InvalidRideStatusForChangingException exception) {
         return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
     }

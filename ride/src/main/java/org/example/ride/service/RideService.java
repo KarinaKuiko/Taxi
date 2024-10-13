@@ -73,8 +73,6 @@ public class RideService {
 
     @Transactional
     public RideReadDto create(RideCreateEditDto rideDto) {
-        priceGenerator.generateRandomCost();
-
         Ride ride = rideMapper.toRide(rideDto);
         ride.setRideStatus(RideStatus.CREATED);
         ride.setCost(priceGenerator.generateRandomCost());
