@@ -5,18 +5,21 @@ import org.example.driver.constants.AppConstants;
 import org.example.driver.dto.create.CarCreateEditDto;
 import org.example.driver.dto.read.CarReadDto;
 import org.example.driver.entity.Car;
+import org.example.driver.entity.Driver;
 import org.example.driver.exception.car.CarNotFoundException;
 import org.example.driver.exception.car.DuplicatedCarNumberException;
 import org.example.driver.mapper.CarMapper;
 import org.example.driver.repository.CarRepository;
+import org.example.driver.repository.DriverRepository;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +27,7 @@ public class CarService {
     private final CarRepository carRepository;
     private final CarMapper carMapper;
     private final MessageSource messageSource;
+    private final DriverRepository driverRepository;
 
     @Transactional
     public CarReadDto create(CarCreateEditDto carDto) {
@@ -32,7 +36,7 @@ public class CarService {
                     throw new DuplicatedCarNumberException(messageSource.getMessage(
                             AppConstants.CAR_DUPLICATED_NUMBER,
                             new Object[]{carDto.number()},
-                            LocaleContextHolder.getLocale()), HttpStatus.BAD_REQUEST);
+                            LocaleContextHolder.getLocale()));
                 });
 
         Car car = carMapper.toCar(carDto);
@@ -48,7 +52,7 @@ public class CarService {
                         throw new DuplicatedCarNumberException(messageSource.getMessage(
                                 AppConstants.CAR_DUPLICATED_NUMBER,
                                 new Object[]{carDto.number()},
-                                LocaleContextHolder.getLocale()), HttpStatus.BAD_REQUEST);
+                                LocaleContextHolder.getLocale()));
                     }
                 });
 
@@ -62,7 +66,7 @@ public class CarService {
                 .orElseThrow(() -> new CarNotFoundException(messageSource.getMessage(
                         AppConstants.CAR_NOT_FOUND,
                         new Object[]{id},
-                        LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND));
+                        LocaleContextHolder.getLocale())));
     }
 
     @Transactional
@@ -71,12 +75,17 @@ public class CarService {
                 .map(car -> {
                     car.setDeleted(true);
                     carRepository.save(car);
+                    List<Driver> drivers = driverRepository.findByCarIdAndIsDeletedFalse(id);
+                    for (Driver driver : drivers) {
+                        driver.setCar(null);
+                        driverRepository.save(driver);
+                    }
                     return car;
                 })
                 .orElseThrow(() -> new CarNotFoundException(messageSource.getMessage(
                                                             AppConstants.CAR_NOT_FOUND,
                                                             new Object[]{id},
-                                                            LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND));
+                                                            LocaleContextHolder.getLocale())));
 
     }
 
@@ -99,7 +108,6 @@ public class CarService {
                 .orElseThrow(() -> new CarNotFoundException(messageSource.getMessage(
                         AppConstants.CAR_NOT_FOUND,
                         new Object[]{id},
-                        LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND
-                ));
+                        LocaleContextHolder.getLocale())));
     }
 }
