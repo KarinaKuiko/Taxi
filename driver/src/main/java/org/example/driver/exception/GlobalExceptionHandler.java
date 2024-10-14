@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DuplicatedCarNumberException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionDto handleDuplicatedCarNumberException(DuplicatedCarNumberException exception) {
         return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
     }
@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DuplicatedDriverEmailException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionDto handleDuplicatedDriverEmailException(DuplicatedDriverEmailException exception) {
         return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
     }

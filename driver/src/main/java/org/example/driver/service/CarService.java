@@ -46,18 +46,18 @@ public class CarService {
 
     @Transactional
     public CarReadDto update(Long id, CarCreateEditDto carDto) {
-        carRepository.findByNumberAndIsDeletedFalse(carDto.number())
-                .ifPresent(car -> {
-                    if (!car.getId().equals(id)) {
-                        throw new DuplicatedCarNumberException(messageSource.getMessage(
-                                AppConstants.CAR_DUPLICATED_NUMBER,
-                                new Object[]{carDto.number()},
-                                LocaleContextHolder.getLocale()));
-                    }
-                });
-
         return carRepository.findByIdAndIsDeletedFalse(id)
                 .map(car -> {
+                    carRepository.findByNumberAndIsDeletedFalse(carDto.number())
+                            .ifPresent(carCheck -> {
+                                if (!carCheck.getId().equals(id)) {
+                                    throw new DuplicatedCarNumberException(messageSource.getMessage(
+                                            AppConstants.CAR_DUPLICATED_NUMBER,
+                                            new Object[]{carDto.number()},
+                                            LocaleContextHolder.getLocale()));
+                                }
+                            });
+
                     carMapper.map(car, carDto);
                     return car;
                 })

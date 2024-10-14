@@ -65,18 +65,17 @@ public class PassengerService {
 
     @Transactional
     public PassengerReadDto update(Long id, PassengerCreateEditDto passengerDto) {
-        passengerRepository.findByEmailAndIsDeletedFalse(passengerDto.email())
-                .ifPresent(passenger -> {
-                    if(!passenger.getId().equals(id)) {
-                        throw new DuplicatedPassengerEmailException(messageSource.getMessage(
-                                AppConstants.PASSENGER_DUPlICATED_EMAIL,
-                                new Object[]{passengerDto.email()},
-                                LocaleContextHolder.getLocale()));
-                    }
-                });
-
         return passengerRepository.findByIdAndIsDeletedFalse(id)
                 .map(passenger -> {
+                    passengerRepository.findByEmailAndIsDeletedFalse(passengerDto.email())
+                            .ifPresent(passengerCheck -> {
+                                if(!passengerCheck.getId().equals(id)) {
+                                    throw new DuplicatedPassengerEmailException(messageSource.getMessage(
+                                            AppConstants.PASSENGER_DUPlICATED_EMAIL,
+                                            new Object[]{passengerDto.email()},
+                                            LocaleContextHolder.getLocale()));
+                                }
+                            });
                     passengerMapper.map(passenger, passengerDto);
                     return passenger;
                 })
