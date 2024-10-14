@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class AppConstants {
+public final class AppConstants {
     public static final String PASSENGER_NOT_FOUND = "passenger.not.found";
     public static final String PASSENGER_DUPlICATED_EMAIL = "passenger.email.duplicated";
 

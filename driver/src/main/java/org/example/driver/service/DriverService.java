@@ -56,18 +56,17 @@ public class DriverService {
 
     @Transactional
     public DriverReadDto update(Long id, DriverCreateEditDto driverDto) {
-        driverRepository.findByEmailAndIsDeletedFalse(driverDto.email())
-                .ifPresent(driver -> {
-                    if (!driver.getId().equals(id)) {
-                        throw new DuplicatedDriverEmailException(messageSource.getMessage(
-                                AppConstants.DRIVER_DUPLICATED_EMAIL,
-                                new Object[]{driverDto.email()},
-                                LocaleContextHolder.getLocale()));
-                    }
-                });
-
         return driverRepository.findByIdAndIsDeletedFalse(id)
                 .map(driver -> {
+                    driverRepository.findByEmailAndIsDeletedFalse(driverDto.email())
+                            .ifPresent(driverCheck -> {
+                                if (!driverCheck.getId().equals(id)) {
+                                    throw new DuplicatedDriverEmailException(messageSource.getMessage(
+                                            AppConstants.DRIVER_DUPLICATED_EMAIL,
+                                            new Object[]{driverDto.email()},
+                                            LocaleContextHolder.getLocale()));
+                                }
+                            });
                     driverMapper.map(driver, driverDto);
                     Car car = carRepository.findByIdAndIsDeletedFalse(driverDto.carId())
                             .orElseThrow(() -> new CarNotFoundException(messageSource.getMessage(

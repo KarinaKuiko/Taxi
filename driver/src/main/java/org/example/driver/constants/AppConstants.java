@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class AppConstants {
+public final class AppConstants {
     public static final String CAR_NOT_FOUND = "car.not.found";
     public static final String CAR_DUPLICATED_NUMBER = "car.number.duplicated";
     public static final String DRIVER_NOT_FOUND="driver.not.found";

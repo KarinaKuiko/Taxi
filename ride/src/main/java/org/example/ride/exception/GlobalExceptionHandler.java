@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(CanceledRideStatusException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionDto handleCanceledRideStatusException(CanceledRideStatusException exception) {
         return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
     }

@@ -21,7 +21,7 @@ import java.util.List;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(DuplicatedPassengerEmailException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionDto handleDuplicatedPassengerEmailException(DuplicatedPassengerEmailException exception) {
         return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
     }

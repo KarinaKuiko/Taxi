@@ -1,5 +1,7 @@
 package org.example.ride.utils;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.example.ride.constants.AppConstants;
 import org.springframework.stereotype.Component;
 
@@ -8,7 +10,8 @@ import java.math.RoundingMode;
 import java.util.Random;
 
 @Component
-public class PriceGenerator {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class PriceGenerator {
 
     public BigDecimal generateRandomCost() {
         Random random = new Random();
