@@ -38,6 +38,7 @@
         <default.liquibase.username>postgres</default.liquibase.username>
         <default.liquibase.password>postgres</default.liquibase.password>
         <antrun.version>1.8</antrun.version>
+        <lombok.mapstruct.version>0.2.0</lombok.mapstruct.version>
     </properties>
     <dependencies>
         <dependency>
@@ -85,6 +86,11 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok-mapstruct-binding</artifactId>
+            <version>${lombok.mapstruct.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
