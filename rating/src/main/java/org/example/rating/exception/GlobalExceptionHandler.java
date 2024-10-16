@@ -5,7 +5,7 @@ import org.example.rating.constants.AppConstants;
 import org.example.rating.dto.read.ExceptionDto;
 import org.example.rating.dto.read.ValidationResponse;
 import org.example.rating.exception.rate.RateNotFoundException;
-import org.example.rating.exception.ride.RideNotFoundException;
+import org.example.rating.exception.ride.RideException;
 import org.example.rating.exception.violation.Violation;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,16 +19,23 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(RideException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionDto handleRideException(RideException e) {
+        ExceptionDto exception = e.getExceptionDto();
+        return new ExceptionDto(exception.status(), exception.message(), exception.time());
+    }
+
     @ExceptionHandler(RateNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ExceptionDto handleRateNotFoundException(RateNotFoundException exception) {
-        return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
+        return new ExceptionDto(HttpStatus.NOT_FOUND, exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionDto handleRuntimeException(RuntimeException exception) {
-        return new ExceptionDto(AppConstants.INTERNAL_SERVER_ERROR, LocalDateTime.now());
+        return new ExceptionDto(HttpStatus.INTERNAL_SERVER_ERROR, AppConstants.INTERNAL_SERVER_ERROR, LocalDateTime.now());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

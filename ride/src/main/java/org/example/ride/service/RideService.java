@@ -1,6 +1,8 @@
 package org.example.ride.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.ride.client.DriverClient;
+import org.example.ride.client.PassengerClient;
 import org.example.ride.constants.AppConstants;
 import org.example.ride.dto.create.RideCreateEditDto;
 import org.example.ride.dto.create.RideStatusDto;
@@ -29,6 +31,8 @@ public class RideService {
     private final RideMapper rideMapper;
     private final PriceGenerator priceGenerator;
     private final RideStatusValidation rideStatusValidation;
+    private final PassengerClient passengerClient;
+    private final DriverClient driverClient;
 
     public Page<RideReadDto> findRides(Long driverId, Long passengerId, Integer page, Integer limit) {
         if (driverId != null && passengerId != null) {
@@ -73,6 +77,9 @@ public class RideService {
 
     @Transactional
     public RideReadDto create(RideCreateEditDto rideDto) {
+        checkExistingDriver(rideDto.driverId());
+        checkExistingPassenger(rideDto.passengerId());
+
         Ride ride = rideMapper.toRide(rideDto);
         ride.setRideStatus(RideStatus.CREATED);
         ride.setCost(priceGenerator.generateRandomCost());
@@ -84,6 +91,8 @@ public class RideService {
     public RideReadDto update(Long id, RideCreateEditDto rideDto) {
         return rideRepository.findById(id)
                 .map(ride -> {
+                    checkExistingDriver(rideDto.driverId());
+                    checkExistingPassenger(rideDto.passengerId());
                     rideMapper.map(ride, rideDto);
                     return ride;
                 })
@@ -107,5 +116,13 @@ public class RideService {
         rideMapper.mapStatus(ride, rideStatusDto);
 
         return rideMapper.toReadDto(rideRepository.save(ride));
+    }
+
+    private void checkExistingDriver(Long id) {
+        driverClient.findById(id);
+    }
+
+    private void checkExistingPassenger(Long id) {
+        passengerClient.findById(id);
     }
 }

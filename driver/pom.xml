@@ -34,7 +34,7 @@
         <liquibase.url>${env.DB_URL}</liquibase.url>
         <liquibase.username>${env.DB_USERNAME}</liquibase.username>
         <liquibase.password>${env.DB_PASSWORD}</liquibase.password>
-        <default.liquibase.url>jdbc:postgresql://localhost:5432/taxi</default.liquibase.url>
+        <default.liquibase.url>jdbc:postgresql://localhost:5436/drivers</default.liquibase.url>
         <default.liquibase.username>postgres</default.liquibase.username>
         <default.liquibase.password>postgres</default.liquibase.password>
         <antrun.version>1.8</antrun.version>
