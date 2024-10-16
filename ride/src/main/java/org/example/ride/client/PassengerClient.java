@@ -8,5 +8,5 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "passenger", url = "http://localhost:8082/api/v1/passengers")
 public interface PassengerClient {
     @GetMapping("/{id}")
-    public PassengerReadDto findById(@PathVariable("id") Long id);
+    PassengerReadDto findById(@PathVariable("id") Long id);
 }

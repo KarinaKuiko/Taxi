@@ -9,5 +9,5 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface RideClient {
 
     @GetMapping("/{id}")
-    public RideReadDto findById(@PathVariable("id") Long id);
+    RideReadDto findById(@PathVariable("id") Long id);
 }
