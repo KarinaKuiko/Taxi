@@ -20,6 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class DriverService {
@@ -35,7 +37,7 @@ public class DriverService {
                     throw new DuplicatedDriverEmailException(messageSource.getMessage(
                             AppConstants.DRIVER_DUPLICATED_EMAIL,
                             new Object[]{driverDto.email()},
-                            LocaleContextHolder.getLocale()), HttpStatus.BAD_REQUEST);
+                            LocaleContextHolder.getLocale()));
                 });
 
         Driver driver = driverMapper.toDriver(driverDto);
@@ -44,7 +46,7 @@ public class DriverService {
                 .orElseThrow(() -> new CarNotFoundException(messageSource.getMessage(
                         AppConstants.CAR_NOT_FOUND,
                         new Object[]{driverDto.carId()},
-                        LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND));
+                        LocaleContextHolder.getLocale())));
 
         driver.setCar(car);
 
@@ -54,22 +56,23 @@ public class DriverService {
 
     @Transactional
     public DriverReadDto update(Long id, DriverCreateEditDto driverDto) {
-        driverRepository.findByEmailAndIsDeletedFalse(driverDto.email())
-                .ifPresent(driver -> {
-                    throw new DuplicatedDriverEmailException(messageSource.getMessage(
-                            AppConstants.DRIVER_DUPLICATED_EMAIL,
-                            new Object[]{driverDto.email()},
-                            LocaleContextHolder.getLocale()), HttpStatus.BAD_REQUEST);
-                });
-
         return driverRepository.findByIdAndIsDeletedFalse(id)
                 .map(driver -> {
+                    driverRepository.findByEmailAndIsDeletedFalse(driverDto.email())
+                            .ifPresent(driverCheck -> {
+                                if (!driverCheck.getId().equals(id)) {
+                                    throw new DuplicatedDriverEmailException(messageSource.getMessage(
+                                            AppConstants.DRIVER_DUPLICATED_EMAIL,
+                                            new Object[]{driverDto.email()},
+                                            LocaleContextHolder.getLocale()));
+                                }
+                            });
                     driverMapper.map(driver, driverDto);
                     Car car = carRepository.findByIdAndIsDeletedFalse(driverDto.carId())
                             .orElseThrow(() -> new CarNotFoundException(messageSource.getMessage(
                                     AppConstants.CAR_NOT_FOUND,
                                     new Object[]{driverDto.carId()},
-                                    LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND));
+                                    LocaleContextHolder.getLocale())));
                     driver.setCar(car);
                     return driver;
                 })
@@ -78,7 +81,7 @@ public class DriverService {
                 .orElseThrow(() -> new DriverNotFoundException(messageSource.getMessage(
                         AppConstants.DRIVER_NOT_FOUND,
                         new Object[]{id},
-                        LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND));
+                        LocaleContextHolder.getLocale())));
     }
 
     @Transactional
@@ -86,13 +89,14 @@ public class DriverService {
         driverRepository.findByIdAndIsDeletedFalse(id)
                 .map(driver -> {
                     driver.setDeleted(true);
+                    driver.setCar(null);
                     driverRepository.save(driver);
                     return driver;
                 })
                 .orElseThrow(() -> new DriverNotFoundException(messageSource.getMessage(
                         AppConstants.DRIVER_NOT_FOUND,
                         new Object[]{id},
-                        LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND));
+                        LocaleContextHolder.getLocale())));
     }
 
     public Page<DriverReadDto> findAll(Integer page, Integer limit) {
@@ -113,7 +117,6 @@ public class DriverService {
                 .orElseThrow(() -> new DriverNotFoundException(messageSource.getMessage(
                         AppConstants.DRIVER_NOT_FOUND,
                         new Object[]{id},
-                        LocaleContextHolder.getLocale()), HttpStatus.NOT_FOUND
-                ));
+                        LocaleContextHolder.getLocale())));
     }
 }

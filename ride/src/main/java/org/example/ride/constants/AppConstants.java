@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class AppConstants {
+public final class AppConstants {
 
     //Exception message
     public static final String RIDE_NOT_FOUND_EXCEPTION = "ride.not.found";
