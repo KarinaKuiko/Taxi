@@ -15,40 +15,54 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(CommonClientException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionDto handleDriverException(CommonClientException e) {
+        ExceptionDto exception = e.getExceptionDto();
+        return new ExceptionDto(exception.status(), exception.message(), exception.time());
+    }
+
     @ExceptionHandler(InvalidCountParametersException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionDto handleInvalidCountParametersException(InvalidCountParametersException exception) {
-        return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
+        return new ExceptionDto(HttpStatus.BAD_REQUEST, exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(CanceledRideStatusException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionDto handleCanceledRideStatusException(CanceledRideStatusException exception) {
-        return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
+        return new ExceptionDto(HttpStatus.CONFLICT, exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(RideNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ExceptionDto handleRideNotFoundException(RideNotFoundException exception) {
-        return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
+        return new ExceptionDto(HttpStatus.NOT_FOUND, exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(InvalidRideStatusForChangingException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionDto handleInvalidRideStatusForChangingException(InvalidRideStatusForChangingException exception) {
-        return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
+        return new ExceptionDto(HttpStatus.CONFLICT, exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(IOException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ExceptionDto handleIOException(IOException exception) {
+        return new ExceptionDto(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionDto handleRuntimeException(RuntimeException exception) {
-        return new ExceptionDto(AppConstants.INTERNAL_SERVER_ERROR, LocalDateTime.now());
+        return new ExceptionDto(HttpStatus.INTERNAL_SERVER_ERROR, AppConstants.INTERNAL_SERVER_ERROR, LocalDateTime.now());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

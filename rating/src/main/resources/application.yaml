@@ -1,6 +1,8 @@
 spring:
+  application:
+    name: rating-service
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/rating}
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/rating}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
@@ -17,3 +19,6 @@ spring:
     open-in-view: false
   liquibase:
     change-log: db/changelog/db.changelog-master.xml
+
+server:
+  port: 8084

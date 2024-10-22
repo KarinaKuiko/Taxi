@@ -1,6 +1,8 @@
 spring:
+  application:
+    name: passenger
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/passengers}
+    url: ${DB_URL:jdbc:postgresql://localhost:5435/passengers}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
@@ -17,3 +19,6 @@ spring:
     open-in-view: false
   liquibase:
     change-log: db/changelog/db.changelog-master.xml
+
+server:
+  port: 8082

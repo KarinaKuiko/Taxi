@@ -23,19 +23,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicatedPassengerEmailException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionDto handleDuplicatedPassengerEmailException(DuplicatedPassengerEmailException exception) {
-        return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
+        return new ExceptionDto(HttpStatus.CONFLICT, exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(PassengerNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ExceptionDto handlePassengerNotFoundException(PassengerNotFoundException exception) {
-        return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
+        return new ExceptionDto(HttpStatus.NOT_FOUND, exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionDto handleRuntimeException(RuntimeException exception) {
-        return new ExceptionDto(AppConstants.INTERNAL_SERVER_ERROR, LocalDateTime.now());
+        return new ExceptionDto(HttpStatus.INTERNAL_SERVER_ERROR, AppConstants.INTERNAL_SERVER_ERROR, LocalDateTime.now());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
