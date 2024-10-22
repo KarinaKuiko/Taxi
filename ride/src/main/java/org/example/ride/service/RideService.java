@@ -8,9 +8,10 @@ import org.example.ride.dto.create.RideCreateEditDto;
 import org.example.ride.dto.create.RideStatusDto;
 import org.example.ride.dto.read.RideReadDto;
 import org.example.ride.entity.Ride;
-import org.example.ride.entity.enumeration.RideStatus;
+import org.example.ride.entity.enumeration.DriverRideStatus;
 import org.example.ride.exception.param.InvalidCountParametersException;
 import org.example.ride.exception.ride.RideNotFoundException;
+import org.example.ride.kafka.KafkaProducer;
 import org.example.ride.mapper.RideMapper;
 import org.example.ride.repository.RideRepository;
 import org.example.ride.utils.PriceGenerator;
@@ -33,6 +34,7 @@ public class RideService {
     private final RideStatusValidation rideStatusValidation;
     private final PassengerClient passengerClient;
     private final DriverClient driverClient;
+    private final KafkaProducer kafkaProducer;
 
     public Page<RideReadDto> findRides(Long driverId, Long passengerId, Integer page, Integer limit) {
         if (driverId != null && passengerId != null) {
@@ -81,7 +83,7 @@ public class RideService {
         checkExistingPassenger(rideDto.passengerId());
 
         Ride ride = rideMapper.toRide(rideDto);
-        ride.setRideStatus(RideStatus.CREATED);
+        ride.setDriverRideStatus(DriverRideStatus.CREATED);
         ride.setCost(priceGenerator.generateRandomCost());
 
         return rideMapper.toReadDto(rideRepository.save(ride));
@@ -114,8 +116,11 @@ public class RideService {
 
         rideStatusValidation.validateUpdatingStatus(ride, rideStatusDto);
         rideMapper.mapStatus(ride, rideStatusDto);
+        RideReadDto rideRead = rideMapper.toReadDto(rideRepository.save(ride));
+        System.out.println("save ride");
+        kafkaProducer.notifyPassenger(rideRead);
 
-        return rideMapper.toReadDto(rideRepository.save(ride));
+        return rideRead;
     }
 
     private void checkExistingDriver(Long id) {

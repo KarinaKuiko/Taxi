@@ -19,4 +19,7 @@ public final class AppConstants {
     public static final int SCALE = 2;
     public static final BigDecimal MAX_VALUE = new BigDecimal("9999.99");
 
+    //Kafka
+    public static final String BOOTSTRAP_SERVERS_CONFIG = "localhost:9092";
+    public static final String PASSENGER_NOTIFICATION_TOPIC = "passenger-notification-topic";
 }

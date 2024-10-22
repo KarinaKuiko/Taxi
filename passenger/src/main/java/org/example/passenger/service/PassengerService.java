@@ -4,11 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.example.passenger.constants.AppConstants;
 import org.example.passenger.dto.create.PassengerCreateEditDto;
 import org.example.passenger.dto.read.PassengerReadDto;
+import org.example.passenger.dto.read.RideReadDto;
 import org.example.passenger.entity.Passenger;
 import org.example.passenger.exception.passenger.DuplicatedPassengerEmailException;
 import org.example.passenger.exception.passenger.PassengerNotFoundException;
 import org.example.passenger.mapper.PassengerMapper;
 import org.example.passenger.repository.PassengerRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -24,6 +27,8 @@ public class PassengerService {
     private final PassengerRepository passengerRepository;
     private final PassengerMapper passengerMapper;
     private final MessageSource messageSource;
+
+    private final static Logger logger = LoggerFactory.getLogger(PassengerService.class);
 
     public Page<PassengerReadDto> findAll(Integer page, Integer limit) {
         Pageable request = PageRequest.of(page, limit);
@@ -99,5 +104,9 @@ public class PassengerService {
                                 AppConstants.PASSENGER_NOT_FOUND,
                                 new Object[]{id},
                                 LocaleContextHolder.getLocale())));
+    }
+
+    public void notifyPassenger(RideReadDto rideReadDto) {
+        logger.info(rideReadDto.toString());
     }
 }
