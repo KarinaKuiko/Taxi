@@ -1,7 +1,7 @@
 package org.example.ride.validation;
 
 import lombok.RequiredArgsConstructor;
-import org.example.ride.constants.AppConstants;
+import org.example.ride.constants.ExceptionConstants;
 import org.example.ride.dto.create.RideStatusDto;
 import org.example.ride.entity.Ride;
 import org.example.ride.entity.enumeration.DriverRideStatus;
@@ -19,7 +19,7 @@ public class RideStatusValidation {
     private void checkLogicUpdatingStatus(DriverRideStatus current, DriverRideStatus proposed, DriverRideStatus potential) {
         if (proposed != potential && proposed != DriverRideStatus.CANCELED) {
             throw new InvalidRideStatusForChangingException(messageSource.getMessage(
-                    AppConstants.INVALID_PROPOSED_STATUS,
+                    ExceptionConstants.INVALID_PROPOSED_STATUS_MESSAGE,
                     new Object[]{current, proposed},
                     LocaleContextHolder.getLocale()));
         }
@@ -28,7 +28,7 @@ public class RideStatusValidation {
     private void checkCanceledStatus(DriverRideStatus status) {
         if (status == DriverRideStatus.CANCELED) {
             throw new CanceledRideStatusException(messageSource.getMessage(
-                    AppConstants.CANCELED_STATUS,
+                    ExceptionConstants.CANCELED_STATUS_MESSAGE,
                     new Object[]{},
                     LocaleContextHolder.getLocale()));
         }

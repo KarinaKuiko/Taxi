@@ -3,7 +3,7 @@ package org.example.ride.service;
 import lombok.RequiredArgsConstructor;
 import org.example.ride.client.DriverClient;
 import org.example.ride.client.PassengerClient;
-import org.example.ride.constants.AppConstants;
+import org.example.ride.constants.ExceptionConstants;
 import org.example.ride.dto.create.RideCreateEditDto;
 import org.example.ride.dto.create.RideStatusDto;
 import org.example.ride.dto.read.RideReadDto;
@@ -39,7 +39,7 @@ public class RideService {
     public Page<RideReadDto> findRides(Long driverId, Long passengerId, Integer page, Integer limit) {
         if (driverId != null && passengerId != null) {
             throw new InvalidCountParametersException(messageSource.getMessage(
-                    AppConstants.INVALID_COUNT_PARAMETERS,
+                    ExceptionConstants.INVALID_COUNT_PARAMETERS_MESSAGE,
                     new Object[]{},
                     LocaleContextHolder.getLocale()));
         }
@@ -60,7 +60,7 @@ public class RideService {
         return rideRepository.findById(id)
                 .map(rideMapper::toReadDto)
                 .orElseThrow(() -> new RideNotFoundException(messageSource.getMessage(
-                        AppConstants.RIDE_NOT_FOUND_EXCEPTION,
+                        ExceptionConstants.RIDE_NOT_FOUND_EXCEPTION_MESSAGE,
                         new Object[]{id},
                         LocaleContextHolder.getLocale())));
     }
@@ -101,7 +101,7 @@ public class RideService {
                 .map(rideRepository::save)
                 .map(rideMapper::toReadDto)
                 .orElseThrow(() -> new RideNotFoundException(messageSource.getMessage(
-                        AppConstants.RIDE_NOT_FOUND_EXCEPTION,
+                        ExceptionConstants.RIDE_NOT_FOUND_EXCEPTION_MESSAGE,
                         new Object[]{id},
                         LocaleContextHolder.getLocale())));
     }
@@ -110,7 +110,7 @@ public class RideService {
     public RideReadDto updateStatus(Long id, RideStatusDto rideStatusDto) {
         Ride ride = rideRepository.findById(id)
                 .orElseThrow(() -> new RideNotFoundException(messageSource.getMessage(
-                        AppConstants.RIDE_NOT_FOUND_EXCEPTION,
+                        ExceptionConstants.RIDE_NOT_FOUND_EXCEPTION_MESSAGE,
                         new Object[]{id},
                         LocaleContextHolder.getLocale())));
 

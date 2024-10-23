@@ -1,7 +1,8 @@
 package org.example.passenger.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.passenger.constants.AppConstants;
+import lombok.extern.slf4j.Slf4j;
+import org.example.passenger.constants.ExceptionConstants;
 import org.example.passenger.dto.create.PassengerCreateEditDto;
 import org.example.passenger.dto.read.PassengerReadDto;
 import org.example.passenger.dto.read.RideReadDto;
@@ -10,25 +11,21 @@ import org.example.passenger.exception.passenger.DuplicatedPassengerEmailExcepti
 import org.example.passenger.exception.passenger.PassengerNotFoundException;
 import org.example.passenger.mapper.PassengerMapper;
 import org.example.passenger.repository.PassengerRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PassengerService {
     private final PassengerRepository passengerRepository;
     private final PassengerMapper passengerMapper;
     private final MessageSource messageSource;
-
-    private final static Logger logger = LoggerFactory.getLogger(PassengerService.class);
 
     public Page<PassengerReadDto> findAll(Integer page, Integer limit) {
         Pageable request = PageRequest.of(page, limit);
@@ -48,7 +45,7 @@ public class PassengerService {
         return passengerRepository.findByIdAndIsDeletedFalse(id)
                 .map(passengerMapper::toReadDto)
                 .orElseThrow(() -> new PassengerNotFoundException(messageSource.getMessage(
-                        AppConstants.PASSENGER_NOT_FOUND,
+                        ExceptionConstants.PASSENGER_NOT_FOUND_MESSAGE,
                         new Object[]{id},
                         LocaleContextHolder.getLocale())));
     }
@@ -58,7 +55,7 @@ public class PassengerService {
         passengerRepository.findByEmailAndIsDeletedFalse(passengerDto.email())
                 .ifPresent(passenger -> {
                             throw new DuplicatedPassengerEmailException(messageSource.getMessage(
-                                    AppConstants.PASSENGER_DUPlICATED_EMAIL,
+                                    ExceptionConstants.PASSENGER_DUPlICATED_EMAIL_MESSAGE,
                                     new Object[]{passengerDto.email()},
                                     LocaleContextHolder.getLocale()));
                         });
@@ -76,7 +73,7 @@ public class PassengerService {
                             .ifPresent(passengerCheck -> {
                                 if(!passengerCheck.getId().equals(id)) {
                                     throw new DuplicatedPassengerEmailException(messageSource.getMessage(
-                                            AppConstants.PASSENGER_DUPlICATED_EMAIL,
+                                            ExceptionConstants.PASSENGER_DUPlICATED_EMAIL_MESSAGE,
                                             new Object[]{passengerDto.email()},
                                             LocaleContextHolder.getLocale()));
                                 }
@@ -87,7 +84,7 @@ public class PassengerService {
                 .map(passengerRepository::save)
                 .map(passengerMapper::toReadDto)
                 .orElseThrow(() -> new PassengerNotFoundException(messageSource.getMessage(
-                        AppConstants.PASSENGER_NOT_FOUND,
+                        ExceptionConstants.PASSENGER_NOT_FOUND_MESSAGE,
                         new Object[]{id},
                         LocaleContextHolder.getLocale())));
     }
@@ -101,12 +98,12 @@ public class PassengerService {
                             return passenger;
                         })
                         .orElseThrow(() -> new PassengerNotFoundException(messageSource.getMessage(
-                                AppConstants.PASSENGER_NOT_FOUND,
+                                ExceptionConstants.PASSENGER_NOT_FOUND_MESSAGE,
                                 new Object[]{id},
                                 LocaleContextHolder.getLocale())));
     }
 
     public void notifyPassenger(RideReadDto rideReadDto) {
-        logger.info(rideReadDto.toString());
+        log.info(rideReadDto.toString());
     }
 }

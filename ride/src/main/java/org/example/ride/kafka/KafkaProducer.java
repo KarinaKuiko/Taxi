@@ -1,10 +1,9 @@
 package org.example.ride.kafka;
 
 import lombok.RequiredArgsConstructor;
-import org.example.ride.constants.AppConstants;
+import lombok.extern.slf4j.Slf4j;
+import org.example.ride.constants.KafkaConstants;
 import org.example.ride.dto.read.RideReadDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
@@ -14,12 +13,12 @@ import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class KafkaProducer {
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    private final static Logger logger = LoggerFactory.getLogger(KafkaProducer.class);
 
     public void notifyPassenger(RideReadDto rideReadDto) {
-        sendMessage(AppConstants.PASSENGER_NOTIFICATION_TOPIC, generateTransactionalKey(), rideReadDto);
+        sendMessage(KafkaConstants.PASSENGER_NOTIFICATION_TOPIC, generateTransactionalKey(), rideReadDto);
     }
 
     private void sendMessage(String topic, String key, Object message) {
@@ -27,11 +26,11 @@ public class KafkaProducer {
                 kafkaTemplate.send(topic, key, message);
         future.whenComplete((result, ex) -> {
             if (ex == null) {
-                logger.info("Sent message successfully {} with offset {}",
+                log.info("Sent message successfully {} with offset {}",
                         message.toString(),
                         result.getRecordMetadata().offset());
             } else {
-                logger.error(ex.getMessage());
+                log.error(ex.getMessage());
             }
         });
     }
