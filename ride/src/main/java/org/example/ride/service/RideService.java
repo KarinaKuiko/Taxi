@@ -1,6 +1,8 @@
 package org.example.ride.service;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.ride.client.DriverClient;
 import org.example.ride.client.PassengerClient;
 import org.example.ride.constants.AppConstants;
@@ -25,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RideService {
     private final RideRepository rideRepository;
     private final MessageSource messageSource;
@@ -76,6 +79,7 @@ public class RideService {
     }
 
     @Transactional
+    @CircuitBreaker(name = "ride", fallbackMethod = "fallbackMethod")
     public RideReadDto create(RideCreateEditDto rideDto) {
         checkExistingDriver(rideDto.driverId());
         checkExistingPassenger(rideDto.passengerId());
@@ -88,6 +92,7 @@ public class RideService {
     }
 
     @Transactional
+    @CircuitBreaker(name = "ride", fallbackMethod = "fallbackMethod")
     public RideReadDto update(Long id, RideCreateEditDto rideDto) {
         return rideRepository.findById(id)
                 .map(ride -> {
@@ -124,5 +129,10 @@ public class RideService {
 
     private void checkExistingPassenger(Long id) {
         passengerClient.findById(id);
+    }
+
+    private RideReadDto fallbackMethod(RuntimeException e) throws RuntimeException {
+        log.info(e.getMessage());
+        throw e;
     }
 }
