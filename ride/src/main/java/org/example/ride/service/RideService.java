@@ -3,13 +3,17 @@ package org.example.ride.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.ride.constants.AppConstants;
+import org.example.ride.client.DriverClient;
+import org.example.ride.client.PassengerClient;
+import org.example.ride.constants.ExceptionConstants;
 import org.example.ride.dto.create.RideCreateEditDto;
 import org.example.ride.dto.create.RideStatusDto;
 import org.example.ride.dto.read.RideReadDto;
 import org.example.ride.entity.Ride;
-import org.example.ride.entity.enumeration.RideStatus;
+import org.example.ride.entity.enumeration.DriverRideStatus;
 import org.example.ride.exception.param.InvalidCountParametersException;
 import org.example.ride.exception.ride.RideNotFoundException;
+import org.example.ride.kafka.KafkaProducer;
 import org.example.ride.mapper.RideMapper;
 import org.example.ride.repository.RideRepository;
 import org.example.ride.utils.PriceGenerator;
@@ -33,11 +37,12 @@ public class RideService {
     private final RideStatusValidation rideStatusValidation;
     private final PassengerClientService passengerClient;
     private final DriverClientService driverClient;
+    private final KafkaProducer kafkaProducer;
 
     public Page<RideReadDto> findRides(Long driverId, Long passengerId, Integer page, Integer limit) {
         if (driverId != null && passengerId != null) {
             throw new InvalidCountParametersException(messageSource.getMessage(
-                    AppConstants.INVALID_COUNT_PARAMETERS,
+                    ExceptionConstants.INVALID_COUNT_PARAMETERS_MESSAGE,
                     new Object[]{},
                     LocaleContextHolder.getLocale()));
         }
@@ -58,7 +63,7 @@ public class RideService {
         return rideRepository.findById(id)
                 .map(rideMapper::toReadDto)
                 .orElseThrow(() -> new RideNotFoundException(messageSource.getMessage(
-                        AppConstants.RIDE_NOT_FOUND_EXCEPTION,
+                        ExceptionConstants.RIDE_NOT_FOUND_EXCEPTION_MESSAGE,
                         new Object[]{id},
                         LocaleContextHolder.getLocale())));
     }
@@ -76,20 +81,18 @@ public class RideService {
     }
 
     @Transactional
-//    @CircuitBreaker(name = "ride", fallbackMethod = "fallbackMethod")
     public RideReadDto create(RideCreateEditDto rideDto) {
         driverClient.checkExistingDriver(rideDto.driverId());
         passengerClient.checkExistingPassenger(rideDto.passengerId());
 
         Ride ride = rideMapper.toRide(rideDto);
-        ride.setRideStatus(RideStatus.CREATED);
+        ride.setDriverRideStatus(DriverRideStatus.CREATED);
         ride.setCost(priceGenerator.generateRandomCost());
 
         return rideMapper.toReadDto(rideRepository.save(ride));
     }
 
     @Transactional
-//    @CircuitBreaker(name = "ride", fallbackMethod = "fallbackMethod")
     public RideReadDto update(Long id, RideCreateEditDto rideDto) {
         return rideRepository.findById(id)
                 .map(ride -> {
@@ -101,7 +104,7 @@ public class RideService {
                 .map(rideRepository::save)
                 .map(rideMapper::toReadDto)
                 .orElseThrow(() -> new RideNotFoundException(messageSource.getMessage(
-                        AppConstants.RIDE_NOT_FOUND_EXCEPTION,
+                        ExceptionConstants.RIDE_NOT_FOUND_EXCEPTION_MESSAGE,
                         new Object[]{id},
                         LocaleContextHolder.getLocale())));
     }
@@ -110,13 +113,16 @@ public class RideService {
     public RideReadDto updateStatus(Long id, RideStatusDto rideStatusDto) {
         Ride ride = rideRepository.findById(id)
                 .orElseThrow(() -> new RideNotFoundException(messageSource.getMessage(
-                        AppConstants.RIDE_NOT_FOUND_EXCEPTION,
+                        ExceptionConstants.RIDE_NOT_FOUND_EXCEPTION_MESSAGE,
                         new Object[]{id},
                         LocaleContextHolder.getLocale())));
 
         rideStatusValidation.validateUpdatingStatus(ride, rideStatusDto);
         rideMapper.mapStatus(ride, rideStatusDto);
+        RideReadDto rideRead = rideMapper.toReadDto(rideRepository.save(ride));
+        System.out.println("save ride");
+        kafkaProducer.notifyPassenger(rideRead);
 
-        return rideMapper.toReadDto(rideRepository.save(ride));
+        return rideRead;
     }
 }

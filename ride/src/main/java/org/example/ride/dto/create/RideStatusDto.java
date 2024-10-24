@@ -1,8 +1,8 @@
 package org.example.ride.dto.create;
 
-import org.example.ride.entity.enumeration.RideStatus;
+import org.example.ride.entity.enumeration.DriverRideStatus;
 
 public record RideStatusDto(
-        RideStatus rideStatus
+        DriverRideStatus driverRideStatus
 ) {
 }

@@ -1,10 +1,10 @@
 package org.example.ride.validation;
 
 import lombok.RequiredArgsConstructor;
-import org.example.ride.constants.AppConstants;
+import org.example.ride.constants.ExceptionConstants;
 import org.example.ride.dto.create.RideStatusDto;
 import org.example.ride.entity.Ride;
-import org.example.ride.entity.enumeration.RideStatus;
+import org.example.ride.entity.enumeration.DriverRideStatus;
 import org.example.ride.exception.ride.CanceledRideStatusException;
 import org.example.ride.exception.ride.InvalidRideStatusForChangingException;
 import org.springframework.context.MessageSource;
@@ -16,42 +16,42 @@ import org.springframework.stereotype.Component;
 public class RideStatusValidation {
     private final MessageSource messageSource;
 
-    private void checkLogicUpdatingStatus(RideStatus current, RideStatus proposed, RideStatus potential) {
-        if (proposed != potential && proposed != RideStatus.CANCELED) {
+    private void checkLogicUpdatingStatus(DriverRideStatus current, DriverRideStatus proposed, DriverRideStatus potential) {
+        if (proposed != potential && proposed != DriverRideStatus.CANCELED) {
             throw new InvalidRideStatusForChangingException(messageSource.getMessage(
-                    AppConstants.INVALID_PROPOSED_STATUS,
+                    ExceptionConstants.INVALID_PROPOSED_STATUS_MESSAGE,
                     new Object[]{current, proposed},
                     LocaleContextHolder.getLocale()));
         }
     }
 
-    private void checkCanceledStatus(RideStatus status) {
-        if (status == RideStatus.CANCELED) {
+    private void checkCanceledStatus(DriverRideStatus status) {
+        if (status == DriverRideStatus.CANCELED) {
             throw new CanceledRideStatusException(messageSource.getMessage(
-                    AppConstants.CANCELED_STATUS,
+                    ExceptionConstants.CANCELED_STATUS_MESSAGE,
                     new Object[]{},
                     LocaleContextHolder.getLocale()));
         }
     }
 
     public void validateUpdatingStatus(Ride ride, RideStatusDto rideStatusDto) {
-        RideStatus current = ride.getRideStatus();
+        DriverRideStatus current = ride.getDriverRideStatus();
         checkCanceledStatus(current);
 
-        RideStatus proposed = rideStatusDto.rideStatus();
+        DriverRideStatus proposed = rideStatusDto.driverRideStatus();
 
         switch (current) {
             case CREATED:
-                checkLogicUpdatingStatus(current, proposed, RideStatus.ACCEPTED);
+                checkLogicUpdatingStatus(current, proposed, DriverRideStatus.ACCEPTED);
                 break;
             case ACCEPTED:
-                checkLogicUpdatingStatus(current, proposed, RideStatus.ON_WAY_FOR_PASSENGER);
+                checkLogicUpdatingStatus(current, proposed, DriverRideStatus.ON_WAY_FOR_PASSENGER);
                 break;
             case ON_WAY_FOR_PASSENGER:
-                checkLogicUpdatingStatus(current, proposed, RideStatus.ON_WAY_TO_DESTINATION);
+                checkLogicUpdatingStatus(current, proposed, DriverRideStatus.ON_WAY_TO_DESTINATION);
                 break;
             case ON_WAY_TO_DESTINATION:
-                checkLogicUpdatingStatus(current, proposed, RideStatus.COMPLETED);
+                checkLogicUpdatingStatus(current, proposed, DriverRideStatus.COMPLETED);
         }
     }
 }
