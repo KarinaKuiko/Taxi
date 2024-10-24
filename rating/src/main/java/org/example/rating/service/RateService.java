@@ -1,7 +1,6 @@
 package org.example.rating.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.rating.client.RideClient;
 import org.example.rating.constants.AppConstants;
 import org.example.rating.dto.create.RateCreateEditDto;
 import org.example.rating.dto.read.RateReadDto;
@@ -23,7 +22,7 @@ public class RateService {
     public final RateRepository rateRepository;
     public final RateMapper rateMapper;
     public final MessageSource messageSource;
-    public final RideClient rideClient;
+    public final RideClientService rideClient;
 
     public Page<RateReadDto> findAll(Integer page, Integer limit) {
         Pageable request = PageRequest.of(page, limit);
@@ -44,7 +43,7 @@ public class RateService {
     @Transactional
     public RateReadDto create(RateCreateEditDto rateDto) {
         Rate rate = rateMapper.toRate(rateDto); //TODO: fill field userId
-        checkExistingRide(rate.getRideId());
+        rideClient.checkExistingRide(rate.getRideId());
         return rateMapper.toReadDto(rateRepository.save(rate));
     }
 
@@ -52,7 +51,7 @@ public class RateService {
     public RateReadDto update(Long id, RateCreateEditDto rateDto) {
         return rateRepository.findById(id)
                 .map(rate -> {
-                    checkExistingRide(rateDto.rideId());
+                    rideClient.checkExistingRide(rateDto.rideId());
                     rateMapper.map(rate, rateDto);
                     return rate;
                 })
@@ -64,7 +63,4 @@ public class RateService {
                         LocaleContextHolder.getLocale())));
     }
 
-    private void checkExistingRide(Long rideId) {
-        rideClient.findById(rideId);
-    }
 }
