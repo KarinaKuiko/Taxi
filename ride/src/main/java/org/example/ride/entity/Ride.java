@@ -10,7 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.example.ride.entity.enumeration.RideStatus;
+import org.example.ride.entity.enumeration.DriverRideStatus;
 
 import java.math.BigDecimal;
 
@@ -32,7 +32,7 @@ public class Ride extends AuditingEntity {
     private String addressTo;
 
     @Enumerated(EnumType.STRING)
-    private RideStatus rideStatus;
+    private DriverRideStatus driverRideStatus;
 
     @Column(precision = 6, scale = 2)
     private BigDecimal cost;

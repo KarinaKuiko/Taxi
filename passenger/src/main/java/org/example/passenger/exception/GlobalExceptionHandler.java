@@ -1,7 +1,7 @@
 package org.example.passenger.exception;
 
 import jakarta.validation.ConstraintViolationException;
-import org.example.passenger.constants.AppConstants;
+import org.example.passenger.constants.ExceptionConstants;
 import org.example.passenger.dto.read.ExceptionDto;
 import org.example.passenger.dto.read.ValidationResponse;
 import org.example.passenger.exception.passenger.DuplicatedPassengerEmailException;
@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionDto handleRuntimeException(RuntimeException exception) {
-        return new ExceptionDto(HttpStatus.INTERNAL_SERVER_ERROR, AppConstants.INTERNAL_SERVER_ERROR, LocalDateTime.now());
+        return new ExceptionDto(HttpStatus.INTERNAL_SERVER_ERROR, ExceptionConstants.INTERNAL_SERVER_ERROR_MESSAGE, LocalDateTime.now());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

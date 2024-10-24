@@ -1,6 +1,6 @@
-package org.example.ride.entity.enumeration;
+package org.example.passenger.entity.enumeration;
 
-public enum RideStatus {
+public enum DriverRideStatus {
     CREATED,
     ACCEPTED,
     ON_WAY_FOR_PASSENGER,

@@ -3,7 +3,7 @@ package org.example.passenger.dto.create;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import org.example.passenger.constants.AppConstants;
+import org.example.passenger.constants.ExceptionConstants;
 
 public record PassengerCreateEditDto (
 
@@ -15,7 +15,7 @@ public record PassengerCreateEditDto (
         String email,
 
         @Pattern(message = "{phone.invalid}",
-                regexp = AppConstants.PHONE_PATTERN)
+                regexp = ExceptionConstants.PHONE_PATTERN)
         @NotBlank(message = "{phone.blank}")
         String phone
 ) {
