@@ -1,6 +1,8 @@
 package org.example.ride.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.example.ride.constants.AppConstants;
 import org.example.ride.client.DriverClient;
 import org.example.ride.client.PassengerClient;
 import org.example.ride.constants.ExceptionConstants;
@@ -26,14 +28,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RideService {
     private final RideRepository rideRepository;
     private final MessageSource messageSource;
     private final RideMapper rideMapper;
     private final PriceGenerator priceGenerator;
     private final RideStatusValidation rideStatusValidation;
-    private final PassengerClient passengerClient;
-    private final DriverClient driverClient;
+    private final PassengerClientService passengerClient;
+    private final DriverClientService driverClient;
     private final KafkaProducer kafkaProducer;
 
     public Page<RideReadDto> findRides(Long driverId, Long passengerId, Integer page, Integer limit) {
@@ -79,8 +82,8 @@ public class RideService {
 
     @Transactional
     public RideReadDto create(RideCreateEditDto rideDto) {
-        checkExistingDriver(rideDto.driverId());
-        checkExistingPassenger(rideDto.passengerId());
+        driverClient.checkExistingDriver(rideDto.driverId());
+        passengerClient.checkExistingPassenger(rideDto.passengerId());
 
         Ride ride = rideMapper.toRide(rideDto);
         ride.setDriverRideStatus(DriverRideStatus.CREATED);
@@ -93,8 +96,8 @@ public class RideService {
     public RideReadDto update(Long id, RideCreateEditDto rideDto) {
         return rideRepository.findById(id)
                 .map(ride -> {
-                    checkExistingDriver(rideDto.driverId());
-                    checkExistingPassenger(rideDto.passengerId());
+                    driverClient.checkExistingDriver(rideDto.driverId());
+                    passengerClient.checkExistingPassenger(rideDto.passengerId());
                     rideMapper.map(ride, rideDto);
                     return ride;
                 })
@@ -121,13 +124,5 @@ public class RideService {
         kafkaProducer.notifyPassenger(rideRead);
 
         return rideRead;
-    }
-
-    private void checkExistingDriver(Long id) {
-        driverClient.findById(id);
-    }
-
-    private void checkExistingPassenger(Long id) {
-        passengerClient.findById(id);
     }
 }
