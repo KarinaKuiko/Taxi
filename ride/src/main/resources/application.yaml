@@ -26,7 +26,6 @@ spring:
         alphanumeric-ids:
           enabled: true
 
-
 management:
   endpoint:
     health:
@@ -40,8 +39,8 @@ management:
       enabled: true
 resilience4j:
   circuitbreaker:
-    instances:
-      ride:
+    configs:
+      default:
         sliding-window-type: COUNT_BASED
         failure-rate-threshold: 50
         minimum-number-of-calls: 5
@@ -50,8 +49,11 @@ resilience4j:
         permitted-number-of-calls-in-half-open-state: 3
         sliding-window-size: 10
         register-health-indicator: true
-
-
+    instances:
+      passenger-client:
+        base-config: default
+      driver-client:
+        base-config: default
 
 server:
   port: 8083

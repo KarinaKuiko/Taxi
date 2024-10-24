@@ -1,10 +1,7 @@
 package org.example.ride.service;
 
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.ride.client.DriverClient;
-import org.example.ride.client.PassengerClient;
 import org.example.ride.constants.AppConstants;
 import org.example.ride.dto.create.RideCreateEditDto;
 import org.example.ride.dto.create.RideStatusDto;
@@ -34,8 +31,8 @@ public class RideService {
     private final RideMapper rideMapper;
     private final PriceGenerator priceGenerator;
     private final RideStatusValidation rideStatusValidation;
-    private final PassengerClient passengerClient;
-    private final DriverClient driverClient;
+    private final PassengerClientService passengerClient;
+    private final DriverClientService driverClient;
 
     public Page<RideReadDto> findRides(Long driverId, Long passengerId, Integer page, Integer limit) {
         if (driverId != null && passengerId != null) {
@@ -79,10 +76,10 @@ public class RideService {
     }
 
     @Transactional
-    @CircuitBreaker(name = "ride", fallbackMethod = "fallbackMethod")
+//    @CircuitBreaker(name = "ride", fallbackMethod = "fallbackMethod")
     public RideReadDto create(RideCreateEditDto rideDto) {
-        checkExistingDriver(rideDto.driverId());
-        checkExistingPassenger(rideDto.passengerId());
+        driverClient.checkExistingDriver(rideDto.driverId());
+        passengerClient.checkExistingPassenger(rideDto.passengerId());
 
         Ride ride = rideMapper.toRide(rideDto);
         ride.setRideStatus(RideStatus.CREATED);
@@ -92,12 +89,12 @@ public class RideService {
     }
 
     @Transactional
-    @CircuitBreaker(name = "ride", fallbackMethod = "fallbackMethod")
+//    @CircuitBreaker(name = "ride", fallbackMethod = "fallbackMethod")
     public RideReadDto update(Long id, RideCreateEditDto rideDto) {
         return rideRepository.findById(id)
                 .map(ride -> {
-                    checkExistingDriver(rideDto.driverId());
-                    checkExistingPassenger(rideDto.passengerId());
+                    driverClient.checkExistingDriver(rideDto.driverId());
+                    passengerClient.checkExistingPassenger(rideDto.passengerId());
                     rideMapper.map(ride, rideDto);
                     return ride;
                 })
@@ -121,18 +118,5 @@ public class RideService {
         rideMapper.mapStatus(ride, rideStatusDto);
 
         return rideMapper.toReadDto(rideRepository.save(ride));
-    }
-
-    private void checkExistingDriver(Long id) {
-        driverClient.findById(id);
-    }
-
-    private void checkExistingPassenger(Long id) {
-        passengerClient.findById(id);
-    }
-
-    private RideReadDto fallbackMethod(RuntimeException e) throws RuntimeException {
-        log.info(e.getMessage());
-        throw e;
     }
 }
