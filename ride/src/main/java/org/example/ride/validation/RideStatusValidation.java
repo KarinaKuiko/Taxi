@@ -60,7 +60,6 @@ public class RideStatusValidation {
     public void validateUpdatingPassengerStatus(Ride ride) {
         DriverRideStatus current = ride.getDriverRideStatus();
         checkWaitingStatus(current);
-
     }
 
     private void checkWaitingStatus(DriverRideStatus status) {

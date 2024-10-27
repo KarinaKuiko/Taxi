@@ -19,11 +19,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -129,6 +126,7 @@ public class DriverService {
         log.info(rideReadDto.toString());
     }
 
+    @Transactional
     public void updateRating(UserRateDto userRateDto) {
         Driver driver = driverRepository.findById(userRateDto.userId()).get();
         driver.setRating(userRateDto.averageRate());

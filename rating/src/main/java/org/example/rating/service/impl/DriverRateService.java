@@ -92,7 +92,6 @@ public class DriverRateService implements RateService {
         List<RateReadDto> rateReadDtoList = findByUserId(userId);
         Double averageRating = rateCounterService.countRating(rateReadDtoList);
         UserRateDto userRatingDto = new UserRateDto(userId, averageRating);
-        System.out.println(userRatingDto.averageRate());
         kafkaProducer.notifyDriver(userRatingDto);
     }
 }

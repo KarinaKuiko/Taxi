@@ -109,6 +109,7 @@ public class PassengerService {
         log.info(rideReadDto.toString());
     }
 
+    @Transactional
     public void updateRating(UserRateDto userRateDto) {
         Passenger passenger = passengerRepository.findById(userRateDto.userId()).get();
         passenger.setRating(userRateDto.averageRate());

@@ -92,7 +92,6 @@ public class PassengerRateService implements RateService {
         List<RateReadDto> rateReadDtoList = findByUserId(userId);
         Double averageRating = rateCounterService.countRating(rateReadDtoList);
         UserRateDto userRatingDto = new UserRateDto(userId, averageRating);
-        System.out.println(userRatingDto.averageRate());
         kafkaProducer.notifyPassenger(userRatingDto);
     }
 }
