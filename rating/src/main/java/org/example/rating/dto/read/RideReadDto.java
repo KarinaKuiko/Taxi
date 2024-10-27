@@ -8,7 +8,8 @@ public record RideReadDto(
         Long passengerId,
         String addressFrom,
         String addressTo,
-        String rideStatus,
+        String driverRideStatus,
+        String passengerRideStatus,
         BigDecimal cost
 ) {
 }
