@@ -1,9 +1,11 @@
 package org.example.driver.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.driver.constants.AppConstants;
 import org.example.driver.dto.create.DriverCreateEditDto;
 import org.example.driver.dto.read.DriverReadDto;
+import org.example.driver.dto.read.RideReadDto;
 import org.example.driver.entity.Car;
 import org.example.driver.entity.Driver;
 import org.example.driver.exception.car.CarNotFoundException;
@@ -24,6 +26,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DriverService {
     private final DriverRepository driverRepository;
     private final DriverMapper driverMapper;
@@ -118,5 +121,9 @@ public class DriverService {
                         AppConstants.DRIVER_NOT_FOUND,
                         new Object[]{id},
                         LocaleContextHolder.getLocale())));
+    }
+
+    public void notifyDriver(RideReadDto rideReadDto) {
+        log.info(rideReadDto.toString());
     }
 }

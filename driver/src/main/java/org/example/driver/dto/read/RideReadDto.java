@@ -1,7 +1,7 @@
-package org.example.ride.dto.read;
+package org.example.driver.dto.read;
 
-import org.example.ride.entity.enumeration.DriverRideStatus;
-import org.example.ride.entity.enumeration.PassengerRideStatus;
+import org.example.driver.entity.enumeration.DriverRideStatus;
+import org.example.driver.entity.enumeration.PassengerRideStatus;
 
 import java.math.BigDecimal;
 

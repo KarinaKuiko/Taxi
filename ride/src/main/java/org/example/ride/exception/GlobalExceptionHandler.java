@@ -7,6 +7,7 @@ import org.example.ride.dto.read.ValidationResponse;
 import org.example.ride.exception.param.InvalidCountParametersException;
 import org.example.ride.exception.ride.CanceledRideStatusException;
 import org.example.ride.exception.ride.InvalidRideStatusForChangingException;
+import org.example.ride.exception.ride.IrrelevantDriverStatusException;
 import org.example.ride.exception.ride.RideNotFoundException;
 import org.example.ride.exception.violation.Violation;
 import org.springframework.http.HttpStatus;
@@ -22,9 +23,15 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(IrrelevantDriverStatusException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ExceptionDto handleIrrelevantDriverStatusException(IrrelevantDriverStatusException exception) {
+        return new ExceptionDto(HttpStatus.CONFLICT, exception.getMessage(), LocalDateTime.now());
+    }
+
     @ExceptionHandler(CommonClientException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ExceptionDto handleDriverException(CommonClientException e) {
+    public ExceptionDto handleClientException(CommonClientException e) {
         ExceptionDto exception = e.getExceptionDto();
         return new ExceptionDto(exception.status(), exception.message(), exception.time());
     }

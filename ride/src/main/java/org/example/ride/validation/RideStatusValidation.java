@@ -2,11 +2,11 @@ package org.example.ride.validation;
 
 import lombok.RequiredArgsConstructor;
 import org.example.ride.constants.ExceptionConstants;
-import org.example.ride.dto.create.RideStatusDto;
 import org.example.ride.entity.Ride;
 import org.example.ride.entity.enumeration.DriverRideStatus;
 import org.example.ride.exception.ride.CanceledRideStatusException;
 import org.example.ride.exception.ride.InvalidRideStatusForChangingException;
+import org.example.ride.exception.ride.IrrelevantDriverStatusException;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
@@ -34,11 +34,9 @@ public class RideStatusValidation {
         }
     }
 
-    public void validateUpdatingStatus(Ride ride, RideStatusDto rideStatusDto) {
+    public void validateUpdatingDriverStatus(Ride ride, DriverRideStatus proposed) {
         DriverRideStatus current = ride.getDriverRideStatus();
         checkCanceledStatus(current);
-
-        DriverRideStatus proposed = rideStatusDto.driverRideStatus();
 
         switch (current) {
             case CREATED:
@@ -48,10 +46,29 @@ public class RideStatusValidation {
                 checkLogicUpdatingStatus(current, proposed, DriverRideStatus.ON_WAY_FOR_PASSENGER);
                 break;
             case ON_WAY_FOR_PASSENGER:
-                checkLogicUpdatingStatus(current, proposed, DriverRideStatus.ON_WAY_TO_DESTINATION);
+                checkLogicUpdatingStatus(current, proposed, DriverRideStatus.WAITING);
+                break;
+            case WAITING:
+                checkLogicUpdatingStatus(current, proposed,DriverRideStatus.ON_WAY_TO_DESTINATION);
                 break;
             case ON_WAY_TO_DESTINATION:
                 checkLogicUpdatingStatus(current, proposed, DriverRideStatus.COMPLETED);
+                break;
+        }
+    }
+
+    public void validateUpdatingPassengerStatus(Ride ride) {
+        DriverRideStatus current = ride.getDriverRideStatus();
+        checkWaitingStatus(current);
+
+    }
+
+    private void checkWaitingStatus(DriverRideStatus status) {
+        if (status != DriverRideStatus.WAITING) {
+            throw new IrrelevantDriverStatusException(messageSource.getMessage(
+                    ExceptionConstants.IRRELEVANT_DRIVER_STATUS,
+                    new Object[]{},
+                    LocaleContextHolder.getLocale()));
         }
     }
 }

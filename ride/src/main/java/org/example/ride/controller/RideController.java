@@ -4,10 +4,11 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.example.ride.dto.create.PassengerRideStatusDto;
 import org.example.ride.dto.create.RideCreateEditDto;
 import org.example.ride.dto.read.PageResponse;
 import org.example.ride.dto.read.RideReadDto;
-import org.example.ride.dto.create.RideStatusDto;
+import org.example.ride.dto.create.DriverRideStatusDto;
 import org.example.ride.service.RideService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,8 +51,13 @@ public class RideController {
         return rideService.update(id, dto);
     }
 
-    @PutMapping("/{id}/status")
-    public RideReadDto updateStatus(@PathVariable("id") Long id, @RequestBody RideStatusDto rideStatusDto) {
-        return rideService.updateStatus(id, rideStatusDto);
+    @PutMapping("/{id}/driverStatus")
+    public RideReadDto updateDriverStatus(@PathVariable("id") Long id, @RequestBody DriverRideStatusDto driverRideStatusDto) {
+        return rideService.updateDriverStatus(id, driverRideStatusDto);
+    }
+
+    @PutMapping("/{id}/passengerStatus")
+    public RideReadDto updatePassengerStatus(@PathVariable("id") Long id, @RequestBody PassengerRideStatusDto passengerRideStatusDto) {
+        return rideService.updatePassengerStatus(id, passengerRideStatusDto);
     }
 }

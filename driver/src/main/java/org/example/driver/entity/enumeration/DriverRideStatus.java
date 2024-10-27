@@ -1,4 +1,4 @@
-package org.example.passenger.entity.enumeration;
+package org.example.driver.entity.enumeration;
 
 public enum DriverRideStatus {
     CREATED,
