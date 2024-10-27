@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.example.rating.constants.AppConstants;
 import org.example.rating.dto.create.RateCreateEditDto;
 import org.example.rating.dto.read.RateReadDto;
+import org.example.rating.dto.read.RideReadDto;
 import org.example.rating.dto.read.UserRateDto;
 import org.example.rating.entity.DriverRate;
 import org.example.rating.exception.rate.RateNotFoundException;
+import org.example.rating.kafka.KafkaProducer;
 import org.example.rating.mapper.RateMapper;
 import org.example.rating.repository.DriverRateRepository;
 import org.example.rating.service.RateCounterService;
@@ -30,6 +32,7 @@ public class DriverRateService implements RateService {
     public final MessageSource messageSource;
     public final RideClientService rideClient;
     private final RateCounterService rateCounterService;
+    private final KafkaProducer kafkaProducer;
 
     @Override
     public Page<RateReadDto> findAll(Integer page, Integer limit) {
@@ -53,9 +56,10 @@ public class DriverRateService implements RateService {
     @Transactional
     public RateReadDto create(RateCreateEditDto rateDto) {
         DriverRate rate = rateMapper.toDriverRate(rateDto); //TODO: fill field userId
-        rideClient.checkExistingRide(rate.getRideId());
-        updateAverageRating(rate.getUserId());
-        return rateMapper.toReadDto(driverRateRepository.save(rate));
+        RideReadDto rideReadDto = rideClient.checkExistingRide(rate.getRideId());
+        rate = driverRateRepository.save(rate);
+        updateAverageRating(rideReadDto.driverId());
+        return rateMapper.toReadDto(rate);
     }
 
     @Override
@@ -63,12 +67,12 @@ public class DriverRateService implements RateService {
     public RateReadDto update(Long id, RateCreateEditDto rateDto) {
         return driverRateRepository.findById(id)
                 .map(rate -> {
-                    rideClient.checkExistingRide(rateDto.rideId());
+                    RideReadDto rideReadDto = rideClient.checkExistingRide(rateDto.rideId());
                     rateMapper.map(rate, rateDto);
-                    updateAverageRating(rateDto.userId());
+                    driverRateRepository.save(rate);
+                    updateAverageRating(rideReadDto.driverId());
                     return rate;
                 })
-                .map(driverRateRepository::save)
                 .map(rateMapper::toReadDto)
                 .orElseThrow(() -> new RateNotFoundException(messageSource.getMessage(
                         AppConstants.RATE_NOT_FOUND,
@@ -89,6 +93,6 @@ public class DriverRateService implements RateService {
         Double averageRating = rateCounterService.countRating(rateReadDtoList);
         UserRateDto userRatingDto = new UserRateDto(userId, averageRating);
         System.out.println(userRatingDto.averageRate());
-        //rabbitService.sendMessage(EXCHANGE_NAME,DRIVER_ROUTING_KEY, userRatingDto);
+        kafkaProducer.notifyDriver(userRatingDto);
     }
 }

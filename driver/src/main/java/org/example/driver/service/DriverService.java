@@ -6,6 +6,7 @@ import org.example.driver.constants.AppConstants;
 import org.example.driver.dto.create.DriverCreateEditDto;
 import org.example.driver.dto.read.DriverReadDto;
 import org.example.driver.dto.read.RideReadDto;
+import org.example.driver.dto.read.UserRateDto;
 import org.example.driver.entity.Car;
 import org.example.driver.entity.Driver;
 import org.example.driver.exception.car.CarNotFoundException;
@@ -52,6 +53,7 @@ public class DriverService {
                         LocaleContextHolder.getLocale())));
 
         driver.setCar(car);
+        driver.setRating(5.);
 
         return driverMapper.toReadDto(driverRepository.save(driver));
 
@@ -125,5 +127,12 @@ public class DriverService {
 
     public void notifyDriver(RideReadDto rideReadDto) {
         log.info(rideReadDto.toString());
+    }
+
+    public void updateRating(UserRateDto userRateDto) {
+        Driver driver = driverRepository.findById(userRateDto.userId()).get();
+        driver.setRating(userRateDto.averageRate());
+        log.info("Update rating to {}, driver's id {}", userRateDto.averageRate(), userRateDto.userId());
+        driverRepository.save(driver);
     }
 }

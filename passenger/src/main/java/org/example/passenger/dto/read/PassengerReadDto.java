@@ -5,6 +5,7 @@ public record PassengerReadDto(
 
         String email,
 
-        String phone
+        String phone,
+        Double rating
 ) {
 }

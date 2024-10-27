@@ -11,7 +11,7 @@ public class RateCounterService {
         if (ratings == null || ratings.isEmpty()) {
             return 0D;
         }
-        double sum = 0D;
+        Double sum = 0D;
         for (RateReadDto rating : ratings) {
             sum += rating.rating();
         }

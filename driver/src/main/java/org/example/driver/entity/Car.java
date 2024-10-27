@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -40,5 +41,5 @@ public class Car extends AuditingEntity {
                     CascadeType.REMOVE},
             orphanRemoval = true,
             fetch = FetchType.EAGER)
-    private List<Driver> drivers;
+    private List<Driver> drivers = new ArrayList<>();
 }
