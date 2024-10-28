@@ -21,7 +21,7 @@ import java.util.List;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(RideException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ExceptionDto handleRideException(RideException e) {
         ExceptionDto exception = e.getExceptionDto();
         return new ExceptionDto(exception.status(), exception.message(), exception.time());
