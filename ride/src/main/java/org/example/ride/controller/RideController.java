@@ -11,6 +11,7 @@ import org.example.ride.dto.read.RideReadDto;
 import org.example.ride.dto.create.DriverRideStatusDto;
 import org.example.ride.service.RideService;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/rides")
 @RequiredArgsConstructor
+@Validated
 public class RideController {
     private final RideService rideService;
 

@@ -1,12 +1,12 @@
-package org.example.driver.unit.controller;
+package org.example.passenger.unit.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.driver.controller.CarController;
-import org.example.driver.dto.create.CarCreateEditDto;
-import org.example.driver.dto.read.CarReadDto;
-import org.example.driver.dto.read.ValidationResponse;
-import org.example.driver.exception.violation.Violation;
-import org.example.driver.service.CarService;
+import org.example.passenger.controller.PassengerController;
+import org.example.passenger.dto.create.PassengerCreateEditDto;
+import org.example.passenger.dto.read.PassengerReadDto;
+import org.example.passenger.dto.read.ValidationResponse;
+import org.example.passenger.exception.violation.Violation;
+import org.example.passenger.service.PassengerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -32,9 +32,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = CarController.class)
-public class CarControllerTest {
-    private static final String URL = "/api/v1/cars";
+@WebMvcTest(controllers = PassengerController.class)
+public class PassengerControllerTest {
+    private static final String URL = "/api/v1/passengers";
     private static final Long DEFAULT_ID = 1L;
 
     @Autowired
@@ -44,23 +44,23 @@ public class CarControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private CarService carService;
+    private PassengerService passengerService;
 
-    private List<CarReadDto> carList;
-    private Page<CarReadDto> carPage;
-    private CarReadDto defaultCar;
+    private List<PassengerReadDto> passengerList;
+    private Page<PassengerReadDto> passengerPage;
+    private PassengerReadDto defaultPassenger;
 
     @BeforeEach
     void init() {
-        defaultCar = new CarReadDto(DEFAULT_ID, "red", "BMW", "AB123CD", 2023, List.of());
-        CarReadDto car2 = new CarReadDto(2L, "white", "Peugeot", "CD321AB", 2023, List.of());
-        carList = List.of(defaultCar, car2);
-        carPage = new PageImpl<>(carList, PageRequest.of(0, 10), 2);
+        defaultPassenger = new PassengerReadDto(DEFAULT_ID, "passenger", "passenger@gmail.com", "+375441234567", 5.);
+        PassengerReadDto passenger2 = new PassengerReadDto(2L, "Ignat", "ignat@gmail.com", "+375299876541", 3.);
+        passengerList = List.of(defaultPassenger, passenger2);
+        passengerPage = new PageImpl<>(passengerList, PageRequest.of(0, 10), 2);
     }
 
     @Test
     void findAll_whenVerifyingRequestMatchingWithoutParams_thenReturn200() throws Exception {
-        when(carService.findAll(0, 10)).thenReturn(carPage);
+        when(passengerService.findAll(0, 10)).thenReturn(passengerPage);
 
         mockMvc.perform(get(URL))
                 .andExpect(status().isOk());
@@ -68,7 +68,7 @@ public class CarControllerTest {
 
     @Test
     void findAll_whenCorrectParams_thenReturn200() throws Exception {
-        when(carService.findAll(0, 10)).thenReturn(carPage);
+        when(passengerService.findAll(0, 10)).thenReturn(passengerPage);
 
         mockMvc.perform(get(URL)
                         .param("page", "0")
@@ -109,7 +109,7 @@ public class CarControllerTest {
 
     @Test
     void findById_whenValidInput_thenReturn200() throws Exception {
-        when(carService.findById(DEFAULT_ID)).thenReturn(carList.get(0));
+        when(passengerService.findById(DEFAULT_ID)).thenReturn(passengerList.get(0));
 
         MvcResult mvcResult = mockMvc.perform(get(URL + "/{id}", DEFAULT_ID))
                 .andExpect(status().isOk())
@@ -118,12 +118,12 @@ public class CarControllerTest {
         String actual = mvcResult.getResponse().getContentAsString();
 
         assertThat(actual).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(defaultCar));
+                objectMapper.writeValueAsString(defaultPassenger));
     }
 
     @Test
     void findById_whenVerifyingRequestMatching_thenReturn200() throws Exception {
-        when(carService.findById(DEFAULT_ID)).thenReturn(carList.get(0));
+        when(passengerService.findById(DEFAULT_ID)).thenReturn(passengerList.get(0));
 
         MvcResult mvcResult = mockMvc.perform(get(URL + "/1"))
                 .andExpect(status().isOk())
@@ -132,72 +132,70 @@ public class CarControllerTest {
         String actual = mvcResult.getResponse().getContentAsString();
 
         assertThat(actual).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(defaultCar));
+                objectMapper.writeValueAsString(defaultPassenger));
     }
 
     @Test
     void create_whenVerifyingRequestMatching_thenReturn200() throws Exception {
-        CarCreateEditDto createCar = new CarCreateEditDto("yellow", "Peugeot", "LK124AS", 2014);
+        PassengerCreateEditDto passengerCreate = new PassengerCreateEditDto("test", "test@gmail.com", "+375331122339");
 
         mockMvc.perform(post(URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createCar)))
+                        .content(objectMapper.writeValueAsString(passengerCreate)))
                 .andExpect(status().isCreated())
                 .andReturn();
     }
 
     @Test
     void create_whenValidInput_thenMapsToBusinessModel() throws Exception {
-        CarCreateEditDto createCar = new CarCreateEditDto("yellow", "Peugeot", "LK124AS", 2014);
+        PassengerCreateEditDto passengerCreate = new PassengerCreateEditDto("test", "test@gmail.com", "+375331122339");
 
         mockMvc.perform(post(URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createCar)))
+                        .content(objectMapper.writeValueAsString(passengerCreate)))
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        ArgumentCaptor<CarCreateEditDto> carCaptor = ArgumentCaptor.forClass(CarCreateEditDto.class);
+        ArgumentCaptor<PassengerCreateEditDto> carCaptor = ArgumentCaptor.forClass(PassengerCreateEditDto.class);
 
-        verify(carService, times(1)).create(carCaptor.capture());
-        assertThat(carCaptor.getValue().color()).isEqualTo("yellow");
-        assertThat(carCaptor.getValue().brand()).isEqualTo("Peugeot");
-        assertThat(carCaptor.getValue().number()).isEqualTo("LK124AS");
-        assertThat(carCaptor.getValue().year()).isEqualTo(2014);
+        verify(passengerService, times(1)).create(carCaptor.capture());
+        assertThat(carCaptor.getValue().name()).isEqualTo("test");
+        assertThat(carCaptor.getValue().email()).isEqualTo("test@gmail.com");
+        assertThat(carCaptor.getValue().phone()).isEqualTo("+375331122339");
     }
 
     @Test
     void create_whenValidInput_thenReturn201AndCarReadDto() throws Exception {
-        CarCreateEditDto createCar = new CarCreateEditDto("yellow", "Peugeot", "LK124AS", 2014);
-        CarReadDto readCar = new CarReadDto(3L, "yellow", "Peugeot", "LK124AS", 2014, List.of());
+        PassengerCreateEditDto passengerCreate = new PassengerCreateEditDto("test", "test@gmail.com", "+375331122339");
+        PassengerReadDto passengerRead = new PassengerReadDto(3L, "test", "test@gmail.com", "+375331122339", 5.);
 
-        when(carService.create(createCar)).thenReturn(readCar);
+        when(passengerService.create(passengerCreate)).thenReturn(passengerRead);
 
         MvcResult mvcResult = mockMvc.perform(post(URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createCar)))
+                        .content(objectMapper.writeValueAsString(passengerCreate)))
                 .andExpect(status().isCreated())
                 .andReturn();
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString();
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(readCar));
+                objectMapper.writeValueAsString(passengerRead));
     }
 
     @Test
     void create_whenInvalidInput_thenReturn400AndValidationResponse() throws Exception {
-        CarCreateEditDto createCar = new CarCreateEditDto(null, null, null, 2026);
+        PassengerCreateEditDto passengerCreate = new PassengerCreateEditDto(null, null, null);
 
         MvcResult mvcResult = mockMvc.perform(post(URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createCar)))
+                        .content(objectMapper.writeValueAsString(passengerCreate)))
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
         ValidationResponse expectedValidationResponse = new ValidationResponse(
-                List.of(new Violation("color", "{color.blank}"),
-                        new Violation("brand", "{brand.blank}"),
-                        new Violation("number", "{number.blank}"),
-                        new Violation("year", "{year.invalid}")));
+                List.of(new Violation("name", "{name.blank}"),
+                        new Violation("email", "{email.blank}"),
+                        new Violation("phone", "{phone.blank}")));
         ValidationResponse actualResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
         assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(expectedValidationResponse.violations());
@@ -205,19 +203,18 @@ public class CarControllerTest {
 
     @Test
     void create_whenInvalidInputWithPattern_thenReturn400AndValidationResponse() throws Exception {
-        CarCreateEditDto createCar = new CarCreateEditDto(null, null, "45sdsaassa", 1900);
+        PassengerCreateEditDto passengerCreate = new PassengerCreateEditDto(null, "test.gmail", "+45619");
 
         MvcResult mvcResult = mockMvc.perform(post(URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createCar)))
+                        .content(objectMapper.writeValueAsString(passengerCreate)))
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
         ValidationResponse expectedValidationResponse = new ValidationResponse(
-                List.of(new Violation("color", "{color.blank}"),
-                        new Violation("brand", "{brand.blank}"),
-                        new Violation("number", "{number.invalid}"),
-                        new Violation("year", "{year.invalid}")));
+                List.of(new Violation("name", "{name.blank}"),
+                        new Violation("email", "{email.invalid}"),
+                        new Violation("phone", "{phone.invalid}")));
         ValidationResponse actualResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
         assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(expectedValidationResponse.violations());
@@ -225,77 +222,75 @@ public class CarControllerTest {
 
     @Test
     void update_whenVerifyingRequestMatching_thenReturn200() throws Exception {
-        CarCreateEditDto updateCar = new CarCreateEditDto("white", "BMW", "AB123CD", 2023);
+        PassengerCreateEditDto updatePassenger = new PassengerCreateEditDto("test", "test@gmail.com", "+375331122339");
 
         mockMvc.perform(put(URL + "/{id}", DEFAULT_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateCar)))
+                        .content(objectMapper.writeValueAsString(updatePassenger)))
                 .andExpect(status().isOk());
     }
 
     @Test
     void update_whenValidInput_thenReturn200() throws Exception {
-        CarCreateEditDto updateCar = new CarCreateEditDto("white", "BMW", "AB123CD", 2023);
+        PassengerCreateEditDto updatePassenger = new PassengerCreateEditDto("test", "test@gmail.com", "+375331122339");
 
         mockMvc.perform(put(URL + "/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateCar)))
+                        .content(objectMapper.writeValueAsString(updatePassenger)))
                 .andExpect(status().isOk());
     }
 
     @Test
     void update_whenValidInput_thenMapsToBusinessModel() throws Exception {
-        CarCreateEditDto updateCar = new CarCreateEditDto("white", "BMW", "AB123CD", 2023);
+        PassengerCreateEditDto updatePassenger = new PassengerCreateEditDto("test", "test@gmail.com", "+375331122339");
 
         mockMvc.perform(put(URL + "/{id}", DEFAULT_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateCar)))
+                        .content(objectMapper.writeValueAsString(updatePassenger)))
                 .andExpect(status().isOk());
 
-        ArgumentCaptor<CarCreateEditDto> carCaptor = ArgumentCaptor.forClass(CarCreateEditDto.class);
+        ArgumentCaptor<PassengerCreateEditDto> passengerCaptor = ArgumentCaptor.forClass(PassengerCreateEditDto.class);
         ArgumentCaptor<Long> idCaptor = ArgumentCaptor.forClass(Long.class);
 
-        verify(carService, times(1)).update(idCaptor.capture(), carCaptor.capture());
+        verify(passengerService, times(1)).update(idCaptor.capture(), passengerCaptor.capture());
         assertThat(idCaptor.getValue()).isEqualTo(DEFAULT_ID);
-        assertThat(carCaptor.getValue().color()).isEqualTo("white");
-        assertThat(carCaptor.getValue().brand()).isEqualTo("BMW");
-        assertThat(carCaptor.getValue().number()).isEqualTo("AB123CD");
-        assertThat(carCaptor.getValue().year()).isEqualTo(2023);
+        assertThat(passengerCaptor.getValue().name()).isEqualTo("test");
+        assertThat(passengerCaptor.getValue().email()).isEqualTo("test@gmail.com");
+        assertThat(passengerCaptor.getValue().phone()).isEqualTo("+375331122339");
     }
 
     @Test
     void update_whenValidInput_thenReturn200AndCarReadDto() throws Exception {
-        CarCreateEditDto updateCar = new CarCreateEditDto("yellow", "Peugeot", "LK124AS", 2014);
-        CarReadDto readCar = new CarReadDto(DEFAULT_ID, "yellow", "Peugeot", "LK124AS", 2014, List.of());
+        PassengerCreateEditDto updatePassenger = new PassengerCreateEditDto("test", "test@gmail.com", "+375331122339");
+        PassengerReadDto readPassenger = new PassengerReadDto(DEFAULT_ID, "test", "test@gmail.com", "+375331122339", 5.);
 
-        when(carService.update(DEFAULT_ID, updateCar)).thenReturn(readCar);
+        when(passengerService.update(DEFAULT_ID, updatePassenger)).thenReturn(readPassenger);
 
         MvcResult mvcResult = mockMvc.perform(put(URL + "/{id}", DEFAULT_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateCar)))
+                        .content(objectMapper.writeValueAsString(updatePassenger)))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString();
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(readCar));
+                objectMapper.writeValueAsString(readPassenger));
     }
 
     @Test
     void update_whenInvalidInput_thenReturn400AndValidationResponse() throws Exception {
-        CarCreateEditDto updateCar = new CarCreateEditDto(null, null, null, 2026);
+        PassengerCreateEditDto updatePassenger = new PassengerCreateEditDto(null, null, null);
 
         MvcResult mvcResult = mockMvc.perform(put(URL + "/{id}", DEFAULT_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateCar)))
+                        .content(objectMapper.writeValueAsString(updatePassenger)))
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
         ValidationResponse expectedValidationResponse = new ValidationResponse(
-                List.of(new Violation("color", "{color.blank}"),
-                        new Violation("brand", "{brand.blank}"),
-                        new Violation("number", "{number.blank}"),
-                        new Violation("year", "{year.invalid}")));
+                List.of(new Violation("name", "{name.blank}"),
+                        new Violation("email", "{email.blank}"),
+                        new Violation("phone", "{phone.blank}")));
         ValidationResponse actualResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
         assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(expectedValidationResponse.violations());
@@ -303,19 +298,18 @@ public class CarControllerTest {
 
     @Test
     void update_whenInvalidInputWithPattern_thenReturn400AndValidationResponse() throws Exception {
-        CarCreateEditDto updateCar = new CarCreateEditDto(null, null, "45sdsaassa", 1900);
+        PassengerCreateEditDto updatePassenger = new PassengerCreateEditDto(null, "test.gmail", "+45619");
 
         MvcResult mvcResult = mockMvc.perform(put(URL + "/{id}", DEFAULT_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateCar)))
+                        .content(objectMapper.writeValueAsString(updatePassenger)))
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
         ValidationResponse expectedValidationResponse = new ValidationResponse(
-                List.of(new Violation("color", "{color.blank}"),
-                        new Violation("brand", "{brand.blank}"),
-                        new Violation("number", "{number.invalid}"),
-                        new Violation("year", "{year.invalid}")));
+                List.of(new Violation("name", "{name.blank}"),
+                        new Violation("email", "{email.invalid}"),
+                        new Violation("phone", "{phone.invalid}")));
         ValidationResponse actualResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
         assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(expectedValidationResponse.violations());
