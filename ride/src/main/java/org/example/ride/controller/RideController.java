@@ -51,12 +51,12 @@ public class RideController {
         return rideService.update(id, dto);
     }
 
-    @PutMapping("/{id}/driverStatus")
+    @PutMapping("/{id}/driver-status")
     public RideReadDto updateDriverStatus(@PathVariable("id") Long id, @RequestBody DriverRideStatusDto driverRideStatusDto) {
         return rideService.updateDriverStatus(id, driverRideStatusDto);
     }
 
-    @PutMapping("/{id}/passengerStatus")
+    @PutMapping("/{id}/passenger-status")
     public RideReadDto updatePassengerStatus(@PathVariable("id") Long id, @RequestBody PassengerRideStatusDto passengerRideStatusDto) {
         return rideService.updatePassengerStatus(id, passengerRideStatusDto);
     }

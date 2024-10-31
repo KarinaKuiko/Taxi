@@ -1,7 +1,7 @@
 package org.example.driver.exception;
 
 import jakarta.validation.ConstraintViolationException;
-import org.example.driver.constants.AppConstants;
+import org.example.driver.constants.ExceptionConstants;
 import org.example.driver.dto.read.ExceptionDto;
 import org.example.driver.dto.read.ValidationResponse;
 import org.example.driver.exception.car.CarNotFoundException;
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionDto handleRuntimeException(RuntimeException exception) {
-        return new ExceptionDto(AppConstants.INTERNAL_SERVER_ERROR, LocalDateTime.now());
+        return new ExceptionDto(ExceptionConstants.INTERNAL_SERVER_ERROR, LocalDateTime.now());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

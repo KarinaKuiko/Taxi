@@ -5,6 +5,11 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
-    <include file="01-changeset-rating-table.xml" relativeToChangelogFile="true"/>
+    <changeSet id="30" author="KarinaIhorevna@gmail.com">
+        <sqlFile path="30-add-rating-column.sql" relativeToChangelogFile="true"/>
+        <rollback>
+            <sqlFile path="30-drop-rating-column.sql" relativeToChangelogFile="true"/>
+        </rollback>
+    </changeSet>
 
 </databaseChangeLog>

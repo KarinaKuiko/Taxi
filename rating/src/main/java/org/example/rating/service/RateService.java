@@ -11,6 +11,6 @@ public interface RateService {
     RateReadDto findById(Long id);
     RateReadDto create(RateCreateEditDto rateDto);
     RateReadDto update(Long id, RateCreateEditDto rateDto);
-    List<RateReadDto> findByUserId(Long id); //TODO
+    List<RateReadDto> findByUserId(Long id);
 
 }

@@ -2,6 +2,7 @@ package org.example.passenger.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.passenger.constants.CommonConstants;
 import org.example.passenger.constants.ExceptionConstants;
 import org.example.passenger.dto.create.PassengerCreateEditDto;
 import org.example.passenger.dto.read.PassengerReadDto;
@@ -62,7 +63,7 @@ public class PassengerService {
                         });
 
         Passenger passenger = passengerMapper.toPassenger(passengerDto);
-        passenger.setRating(5.);
+        passenger.setRating(CommonConstants.DEFAULT_RATING);
 
         return passengerMapper.toReadDto(passengerRepository.save(passenger));
     }

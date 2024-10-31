@@ -1,1 +1,0 @@
-DROP TABLE driver_rates;

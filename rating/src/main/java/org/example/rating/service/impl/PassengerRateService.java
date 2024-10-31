@@ -55,7 +55,7 @@ public class PassengerRateService implements RateService {
     @Override
     @Transactional
     public RateReadDto create(RateCreateEditDto rateDto) {
-        PassengerRate rate = rateMapper.toPassengerRate(rateDto); //TODO: fill field userId
+        PassengerRate rate = rateMapper.toPassengerRate(rateDto);
         RideReadDto rideReadDto = rideClient.checkExistingRide(rate.getRideId());
         rate = passengerRateRepository.save(rate);
         updateAverageRating(rideReadDto.passengerId());
@@ -90,7 +90,7 @@ public class PassengerRateService implements RateService {
 
     private void updateAverageRating(Long userId) {
         List<RateReadDto> rateReadDtoList = findByUserId(userId);
-        Double averageRating = rateCounterService.countRating(rateReadDtoList);
+        double averageRating = rateCounterService.countRating(rateReadDtoList);
         UserRateDto userRatingDto = new UserRateDto(userId, averageRating);
         kafkaProducer.notifyPassenger(userRatingDto);
     }

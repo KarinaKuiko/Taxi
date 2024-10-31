@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS driver_rates (
+CREATE TABLE IF NOT EXISTS rating (
     id            BIGSERIAL      PRIMARY KEY,
     ride_id       BIGINT         NOT NULL,
     comment       VARCHAR(64),

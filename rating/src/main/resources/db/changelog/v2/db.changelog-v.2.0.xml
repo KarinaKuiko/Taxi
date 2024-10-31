@@ -5,6 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
-    <include file="01-changeset-rating-table.xml" relativeToChangelogFile="true"/>
+    <include file="10-changeset-passenger-rating-table.xml" relativeToChangelogFile="true"/>
+    <include file="30-changeset-driver-rating-table.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

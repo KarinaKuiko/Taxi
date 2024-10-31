@@ -41,12 +41,12 @@ public class RateController {
     }
 
     @GetMapping("/driver/{id}")
-    public RateReadDto findByDriverId(@PathVariable("id") Long id) {
+    public RateReadDto driverRateFindById(@PathVariable("id") Long id) {
         return driverRateService.findById(id);
     }
 
     @GetMapping("/passenger/{id}")
-    public RateReadDto findByPassengerId(@PathVariable("id") Long id) {
+    public RateReadDto passengerRateFindById(@PathVariable("id") Long id) {
         return passengerRateService.findById(id);
     }
 

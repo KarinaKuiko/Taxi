@@ -7,11 +7,11 @@ import java.util.List;
 
 @Service
 public class RateCounterService {
-    public Double countRating(List<RateReadDto> ratings) {
+    public double countRating(List<RateReadDto> ratings) {
         if (ratings == null || ratings.isEmpty()) {
             return 0D;
         }
-        Double sum = 0D;
+        double sum = 0D;
         for (RateReadDto rating : ratings) {
             sum += rating.rating();
         }
