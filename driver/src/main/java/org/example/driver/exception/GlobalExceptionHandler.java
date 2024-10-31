@@ -24,31 +24,31 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CarNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ExceptionDto handleCarNotFoundException(CarNotFoundException exception) {
-        return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
+        return new ExceptionDto(HttpStatus.NOT_FOUND, exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(DuplicatedCarNumberException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionDto handleDuplicatedCarNumberException(DuplicatedCarNumberException exception) {
-        return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
+        return new ExceptionDto(HttpStatus.CONFLICT, exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(DriverNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ExceptionDto handleDriverNotFoundException(DriverNotFoundException exception) {
-        return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
+        return new ExceptionDto(HttpStatus.NOT_FOUND, exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(DuplicatedDriverEmailException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionDto handleDuplicatedDriverEmailException(DuplicatedDriverEmailException exception) {
-        return new ExceptionDto(exception.getMessage(), LocalDateTime.now());
+        return new ExceptionDto(HttpStatus.CONFLICT, exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionDto handleRuntimeException(RuntimeException exception) {
-        return new ExceptionDto(AppConstants.INTERNAL_SERVER_ERROR, LocalDateTime.now());
+        return new ExceptionDto(HttpStatus.INTERNAL_SERVER_ERROR, AppConstants.INTERNAL_SERVER_ERROR, LocalDateTime.now());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
