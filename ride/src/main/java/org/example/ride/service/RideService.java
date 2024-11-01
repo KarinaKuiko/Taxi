@@ -120,10 +120,12 @@ public class RideService {
         DriverRideStatus driverRideStatus = driverRideStatusDto.rideStatus();
 
         rideStatusValidation.validateUpdatingDriverStatus(ride, driverRideStatus);
-        if(driverRideStatus == DriverRideStatus.ON_WAY_TO_DESTINATION) {
+        rideMapper.mapDriverStatus(ride, driverRideStatus);
+
+        if (driverRideStatus == DriverRideStatus.ON_WAY_TO_DESTINATION) {
             updatePassengerStatus(id, new PassengerRideStatusDto(PassengerRideStatus.IN_CAR));
         }
-        rideMapper.mapDriverStatus(ride, driverRideStatus);
+
         RideReadDto rideRead = rideMapper.toReadDto(rideRepository.save(ride));
         kafkaProducer.notifyPassenger(rideRead);
 

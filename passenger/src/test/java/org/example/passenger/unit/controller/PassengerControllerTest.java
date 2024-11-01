@@ -52,8 +52,10 @@ public class PassengerControllerTest {
 
     @BeforeEach
     void init() {
-        defaultPassenger = new PassengerReadDto(DEFAULT_ID, "passenger", "passenger@gmail.com", "+375441234567", 5.);
-        PassengerReadDto passenger2 = new PassengerReadDto(2L, "Ignat", "ignat@gmail.com", "+375299876541", 3.);
+        defaultPassenger = new PassengerReadDto(DEFAULT_ID, "passenger",
+                "passenger@gmail.com", "+375441234567", 5.0);
+        PassengerReadDto passenger2 = new PassengerReadDto(2L, "Ignat",
+                "ignat@gmail.com", "+375299876541", 3.0);
         passengerList = List.of(defaultPassenger, passenger2);
         passengerPage = new PageImpl<>(passengerList, PageRequest.of(0, 10), 2);
     }
@@ -88,7 +90,8 @@ public class PassengerControllerTest {
                 List.of(new Violation("limit", "must be less than or equal to 100")));
         String actualResponse = mvcResult.getResponse().getContentAsString();
 
-        assertThat(actualResponse).isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(expextedValidationResponse));
+        assertThat(actualResponse).isEqualToIgnoringWhitespace(
+                objectMapper.writeValueAsString(expextedValidationResponse));
     }
 
     @Test
@@ -137,7 +140,8 @@ public class PassengerControllerTest {
 
     @Test
     void create_whenVerifyingRequestMatching_thenReturn200() throws Exception {
-        PassengerCreateEditDto passengerCreate = new PassengerCreateEditDto("test", "test@gmail.com", "+375331122339");
+        PassengerCreateEditDto passengerCreate = new PassengerCreateEditDto("test",
+                "test@gmail.com", "+375331122339");
 
         mockMvc.perform(post(URL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -148,7 +152,8 @@ public class PassengerControllerTest {
 
     @Test
     void create_whenValidInput_thenMapsToBusinessModel() throws Exception {
-        PassengerCreateEditDto passengerCreate = new PassengerCreateEditDto("test", "test@gmail.com", "+375331122339");
+        PassengerCreateEditDto passengerCreate = new PassengerCreateEditDto("test",
+                "test@gmail.com", "+375331122339");
 
         mockMvc.perform(post(URL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -166,8 +171,10 @@ public class PassengerControllerTest {
 
     @Test
     void create_whenValidInput_thenReturn201AndCarReadDto() throws Exception {
-        PassengerCreateEditDto passengerCreate = new PassengerCreateEditDto("test", "test@gmail.com", "+375331122339");
-        PassengerReadDto passengerRead = new PassengerReadDto(3L, "test", "test@gmail.com", "+375331122339", 5.);
+        PassengerCreateEditDto passengerCreate = new PassengerCreateEditDto("test",
+                "test@gmail.com", "+375331122339");
+        PassengerReadDto passengerRead = new PassengerReadDto(3L, "test",
+                "test@gmail.com", "+375331122339", 5.);
 
         when(passengerService.create(passengerCreate)).thenReturn(passengerRead);
 
@@ -196,14 +203,17 @@ public class PassengerControllerTest {
                 List.of(new Violation("name", "{name.blank}"),
                         new Violation("email", "{email.blank}"),
                         new Violation("phone", "{phone.blank}")));
-        ValidationResponse actualResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
+        ValidationResponse actualResponse = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
-        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(expectedValidationResponse.violations());
+        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(
+                expectedValidationResponse.violations());
     }
 
     @Test
     void create_whenInvalidInputWithPattern_thenReturn400AndValidationResponse() throws Exception {
-        PassengerCreateEditDto passengerCreate = new PassengerCreateEditDto(null, "test.gmail", "+45619");
+        PassengerCreateEditDto passengerCreate = new PassengerCreateEditDto(null,
+                "test.gmail", "+45619");
 
         MvcResult mvcResult = mockMvc.perform(post(URL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -215,14 +225,17 @@ public class PassengerControllerTest {
                 List.of(new Violation("name", "{name.blank}"),
                         new Violation("email", "{email.invalid}"),
                         new Violation("phone", "{phone.invalid}")));
-        ValidationResponse actualResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
+        ValidationResponse actualResponse = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
-        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(expectedValidationResponse.violations());
+        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(
+                expectedValidationResponse.violations());
     }
 
     @Test
     void update_whenVerifyingRequestMatching_thenReturn200() throws Exception {
-        PassengerCreateEditDto updatePassenger = new PassengerCreateEditDto("test", "test@gmail.com", "+375331122339");
+        PassengerCreateEditDto updatePassenger = new PassengerCreateEditDto("test",
+                "test@gmail.com", "+375331122339");
 
         mockMvc.perform(put(URL + "/{id}", DEFAULT_ID)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -232,7 +245,8 @@ public class PassengerControllerTest {
 
     @Test
     void update_whenValidInput_thenReturn200() throws Exception {
-        PassengerCreateEditDto updatePassenger = new PassengerCreateEditDto("test", "test@gmail.com", "+375331122339");
+        PassengerCreateEditDto updatePassenger = new PassengerCreateEditDto("test",
+                "test@gmail.com", "+375331122339");
 
         mockMvc.perform(put(URL + "/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -242,7 +256,8 @@ public class PassengerControllerTest {
 
     @Test
     void update_whenValidInput_thenMapsToBusinessModel() throws Exception {
-        PassengerCreateEditDto updatePassenger = new PassengerCreateEditDto("test", "test@gmail.com", "+375331122339");
+        PassengerCreateEditDto updatePassenger = new PassengerCreateEditDto("test",
+                "test@gmail.com", "+375331122339");
 
         mockMvc.perform(put(URL + "/{id}", DEFAULT_ID)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -261,8 +276,10 @@ public class PassengerControllerTest {
 
     @Test
     void update_whenValidInput_thenReturn200AndCarReadDto() throws Exception {
-        PassengerCreateEditDto updatePassenger = new PassengerCreateEditDto("test", "test@gmail.com", "+375331122339");
-        PassengerReadDto readPassenger = new PassengerReadDto(DEFAULT_ID, "test", "test@gmail.com", "+375331122339", 5.);
+        PassengerCreateEditDto updatePassenger = new PassengerCreateEditDto("test",
+                "test@gmail.com", "+375331122339");
+        PassengerReadDto readPassenger = new PassengerReadDto(DEFAULT_ID, "test",
+                "test@gmail.com", "+375331122339", 5.);
 
         when(passengerService.update(DEFAULT_ID, updatePassenger)).thenReturn(readPassenger);
 
@@ -291,9 +308,11 @@ public class PassengerControllerTest {
                 List.of(new Violation("name", "{name.blank}"),
                         new Violation("email", "{email.blank}"),
                         new Violation("phone", "{phone.blank}")));
-        ValidationResponse actualResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
+        ValidationResponse actualResponse = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
-        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(expectedValidationResponse.violations());
+        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(
+                expectedValidationResponse.violations());
     }
 
     @Test
@@ -310,9 +329,11 @@ public class PassengerControllerTest {
                 List.of(new Violation("name", "{name.blank}"),
                         new Violation("email", "{email.invalid}"),
                         new Violation("phone", "{phone.invalid}")));
-        ValidationResponse actualResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
+        ValidationResponse actualResponse = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
-        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(expectedValidationResponse.violations());
+        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(
+                expectedValidationResponse.violations());
     }
 
     @Test

@@ -56,8 +56,10 @@ public class RideControllerTest {
 
     @BeforeEach
     void init() {
-        defaultRide = new RideReadDto(DEFAULT_ID, 1L, 1L, "From", "To", DriverRideStatus.ACCEPTED, PassengerRideStatus.WAITING, new BigDecimal(123.43));
-        RideReadDto car2 = new RideReadDto(2L, 2L, 2L, "From", "To", DriverRideStatus.ON_WAY_FOR_PASSENGER, PassengerRideStatus.WAITING, new BigDecimal(789.55));
+        defaultRide = new RideReadDto(DEFAULT_ID, DEFAULT_ID, DEFAULT_ID, "From", "To",
+                DriverRideStatus.ACCEPTED, PassengerRideStatus.WAITING, new BigDecimal("123.43"));
+        RideReadDto car2 = new RideReadDto(2L, 2L, 2L, "From", "To",
+                DriverRideStatus.ON_WAY_FOR_PASSENGER, PassengerRideStatus.WAITING, new BigDecimal("789.55"));
         rideList = List.of(defaultRide, car2);
         ridePage = new PageImpl<>(rideList, PageRequest.of(0, 10), 2);
     }
@@ -114,7 +116,8 @@ public class RideControllerTest {
                 List.of(new Violation("limit", "must be less than or equal to 100")));
         String actualResponse = mvcResult.getResponse().getContentAsString();
 
-        assertThat(actualResponse).isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(expextedValidationResponse));
+        assertThat(actualResponse).isEqualToIgnoringWhitespace(
+                objectMapper.writeValueAsString(expextedValidationResponse));
     }
 
     @Test
@@ -194,7 +197,8 @@ public class RideControllerTest {
     @Test
     void create_whenValidInput_thenReturn201AndCarReadDto() throws Exception {
         RideCreateEditDto createRide = new RideCreateEditDto(1L, 1L, "Test", "Test");
-        RideReadDto readRide = new RideReadDto(3L, 1L, 1L, "Test", "Test", DriverRideStatus.CREATED, PassengerRideStatus.WAITING, new BigDecimal(555.10));
+        RideReadDto readRide = new RideReadDto(3L, 1L, 1L, "Test", "Test",
+                DriverRideStatus.CREATED, PassengerRideStatus.WAITING, new BigDecimal("555.10"));
 
         when(rideService.create(createRide)).thenReturn(readRide);
 
@@ -224,9 +228,11 @@ public class RideControllerTest {
                         new Violation("passengerId", "{id.min}"),
                         new Violation("addressFrom", "{address.from.blank}"),
                         new Violation("addressTo", "{address.from.blank}")));
-        ValidationResponse actualResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
+        ValidationResponse actualResponse = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
-        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(expectedValidationResponse.violations());
+        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(
+                expectedValidationResponse.violations());
     }
 
     @Test
@@ -243,9 +249,11 @@ public class RideControllerTest {
                 List.of(new Violation("passengerId", "{passenger.null}"),
                         new Violation("addressFrom", "{address.from.blank}"),
                         new Violation("addressTo", "{address.from.blank}")));
-        ValidationResponse actualResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
+        ValidationResponse actualResponse = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
-        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(expectedValidationResponse.violations());
+        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(
+                expectedValidationResponse.violations());
     }
 
     @Test
@@ -291,7 +299,8 @@ public class RideControllerTest {
     @Test
     void update_whenValidInput_thenReturn200AndCarReadDto() throws Exception {
         RideCreateEditDto updateRide = new RideCreateEditDto(1L, 1L, "Test", "Test");
-        RideReadDto readRide = new RideReadDto(DEFAULT_ID, 1L, 1L, "Test", "Test", DriverRideStatus.ACCEPTED, PassengerRideStatus.WAITING, new BigDecimal(123.43));
+        RideReadDto readRide = new RideReadDto(DEFAULT_ID, 1L, 1L, "Test", "Test",
+                DriverRideStatus.ACCEPTED, PassengerRideStatus.WAITING, new BigDecimal("123.43"));
 
         when(rideService.update(DEFAULT_ID, updateRide)).thenReturn(readRide);
 
@@ -321,9 +330,11 @@ public class RideControllerTest {
                         new Violation("passengerId", "{id.min}"),
                         new Violation("addressFrom", "{address.from.blank}"),
                         new Violation("addressTo", "{address.from.blank}")));
-        ValidationResponse actualResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
+        ValidationResponse actualResponse = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
-        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(expectedValidationResponse.violations());
+        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(
+                expectedValidationResponse.violations());
     }
 
     @Test
@@ -340,16 +351,18 @@ public class RideControllerTest {
                 List.of(new Violation("passengerId", "{passenger.null}"),
                         new Violation("addressFrom", "{address.from.blank}"),
                         new Violation("addressTo", "{address.from.blank}")));
-        ValidationResponse actualResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
+        ValidationResponse actualResponse = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
-        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(expectedValidationResponse.violations());
+        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(
+                expectedValidationResponse.violations());
     }
 
     @Test
     void updateDriverStatus_whenVerifyingRequestMatching_thenReturn200() throws Exception {
         DriverRideStatusDto driverRideStatusDto = new DriverRideStatusDto(DriverRideStatus.ON_WAY_FOR_PASSENGER);
 
-        mockMvc.perform(put(URL + "/{id}/driverStatus", DEFAULT_ID)
+        mockMvc.perform(put(URL + "/{id}/driver-status", DEFAULT_ID)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(driverRideStatusDto)))
                 .andExpect(status().isOk());
@@ -359,7 +372,7 @@ public class RideControllerTest {
     void updateDriverStatus_whenValidInput_thenReturn200() throws Exception {
         DriverRideStatusDto driverRideStatusDto = new DriverRideStatusDto(DriverRideStatus.ON_WAY_FOR_PASSENGER);
 
-        mockMvc.perform(put(URL + "/1/driverStatus")
+        mockMvc.perform(put(URL + "/1/driver-status")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(driverRideStatusDto)))
                 .andExpect(status().isOk());
@@ -369,7 +382,7 @@ public class RideControllerTest {
     void updateDriverStatus_whenValidInput_thenMapsToBusinessModel() throws Exception {
         DriverRideStatusDto driverRideStatusDto = new DriverRideStatusDto(DriverRideStatus.ON_WAY_FOR_PASSENGER);
 
-        mockMvc.perform(put(URL + "/{id}/driverStatus", DEFAULT_ID)
+        mockMvc.perform(put(URL + "/{id}/driver-status", DEFAULT_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(driverRideStatusDto)))
                 .andExpect(status().isOk());
@@ -377,19 +390,22 @@ public class RideControllerTest {
         ArgumentCaptor<DriverRideStatusDto> driverStatusCaptor = ArgumentCaptor.forClass(DriverRideStatusDto.class);
         ArgumentCaptor<Long> idCaptor = ArgumentCaptor.forClass(Long.class);
 
-        verify(rideService, times(1)).updateDriverStatus(idCaptor.capture(), driverStatusCaptor.capture());
+        verify(rideService, times(1)).updateDriverStatus(
+                idCaptor.capture(), driverStatusCaptor.capture());
         assertThat(idCaptor.getValue()).isEqualTo(DEFAULT_ID);
-        assertThat(driverStatusCaptor.getValue().rideStatus()).isEqualTo(DriverRideStatus.ON_WAY_FOR_PASSENGER);
+        assertThat(driverStatusCaptor.getValue().rideStatus())
+                .isEqualTo(DriverRideStatus.ON_WAY_FOR_PASSENGER);
     }
 
     @Test
     void updateDriverStatus_whenValidInput_thenReturn200AndCarReadDto() throws Exception {
         DriverRideStatusDto driverRideStatusDto = new DriverRideStatusDto(DriverRideStatus.ON_WAY_FOR_PASSENGER);
-        RideReadDto readRide = new RideReadDto(DEFAULT_ID, 1L, 1L, "From", "To", DriverRideStatus.ON_WAY_FOR_PASSENGER, PassengerRideStatus.WAITING, new BigDecimal(123.43));
+        RideReadDto readRide = new RideReadDto(DEFAULT_ID, 1L, 1L, "From", "To",
+                DriverRideStatus.ON_WAY_FOR_PASSENGER, PassengerRideStatus.WAITING, new BigDecimal("123.43"));
 
         when(rideService.updateDriverStatus(DEFAULT_ID, driverRideStatusDto)).thenReturn(readRide);
 
-        MvcResult mvcResult = mockMvc.perform(put(URL + "/{id}/driverStatus", DEFAULT_ID)
+        MvcResult mvcResult = mockMvc.perform(put(URL + "/{id}/driver-status", DEFAULT_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(driverRideStatusDto)))
                 .andExpect(status().isOk())
@@ -404,7 +420,7 @@ public class RideControllerTest {
     void updatePassengerStatus_whenVerifyingRequestMatching_thenReturn200() throws Exception {
         PassengerRideStatusDto passengerRideStatusDto = new PassengerRideStatusDto(PassengerRideStatus.GETTING_OUT);
 
-        mockMvc.perform(put(URL + "/{id}/passengerStatus", DEFAULT_ID)
+        mockMvc.perform(put(URL + "/{id}/passenger-status", DEFAULT_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(passengerRideStatusDto)))
                 .andExpect(status().isOk());
@@ -414,7 +430,7 @@ public class RideControllerTest {
     void updatePassengerStatus_whenValidInput_thenReturn200() throws Exception {
         PassengerRideStatusDto passengerRideStatusDto = new PassengerRideStatusDto(PassengerRideStatus.GETTING_OUT);
 
-        mockMvc.perform(put(URL + "/1/passengerStatus")
+        mockMvc.perform(put(URL + "/1/passenger-status")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(passengerRideStatusDto)))
                 .andExpect(status().isOk());
@@ -424,7 +440,7 @@ public class RideControllerTest {
     void updatePassengerStatus_whenValidInput_thenMapsToBusinessModel() throws Exception {
         PassengerRideStatusDto passengerRideStatusDto = new PassengerRideStatusDto(PassengerRideStatus.GETTING_OUT);
 
-        mockMvc.perform(put(URL + "/{id}/passengerStatus", DEFAULT_ID)
+        mockMvc.perform(put(URL + "/{id}/passenger-status", DEFAULT_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(passengerRideStatusDto)))
                 .andExpect(status().isOk());
@@ -432,19 +448,22 @@ public class RideControllerTest {
         ArgumentCaptor<PassengerRideStatusDto> passengerStatusCaptor = ArgumentCaptor.forClass(PassengerRideStatusDto.class);
         ArgumentCaptor<Long> idCaptor = ArgumentCaptor.forClass(Long.class);
 
-        verify(rideService, times(1)).updatePassengerStatus(idCaptor.capture(), passengerStatusCaptor.capture());
+        verify(rideService, times(1))
+                .updatePassengerStatus(idCaptor.capture(), passengerStatusCaptor.capture());
         assertThat(idCaptor.getValue()).isEqualTo(DEFAULT_ID);
-        assertThat(passengerStatusCaptor.getValue().rideStatus()).isEqualTo(PassengerRideStatus.GETTING_OUT);
+        assertThat(passengerStatusCaptor.getValue().rideStatus())
+                .isEqualTo(PassengerRideStatus.GETTING_OUT);
     }
 
     @Test
     void updatePassengerStatus_whenValidInput_thenReturn200AndCarReadDto() throws Exception {
         PassengerRideStatusDto passengerRideStatusDto = new PassengerRideStatusDto(PassengerRideStatus.GETTING_OUT);
-        RideReadDto readRide = new RideReadDto(DEFAULT_ID, 1L, 1L, "From", "To", DriverRideStatus.ACCEPTED, PassengerRideStatus.GETTING_OUT, new BigDecimal(123.43));
+        RideReadDto readRide = new RideReadDto(DEFAULT_ID, 1L, 1L, "From", "To",
+                DriverRideStatus.ACCEPTED, PassengerRideStatus.GETTING_OUT, new BigDecimal("123.43"));
 
         when(rideService.updatePassengerStatus(DEFAULT_ID, passengerRideStatusDto)).thenReturn(readRide);
 
-        MvcResult mvcResult = mockMvc.perform(put(URL + "/{id}/passengerStatus", DEFAULT_ID)
+        MvcResult mvcResult = mockMvc.perform(put(URL + "/{id}/passenger-status", DEFAULT_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(passengerRideStatusDto)))
                 .andExpect(status().isOk())

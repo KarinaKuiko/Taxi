@@ -112,13 +112,6 @@
             <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
-
-<!--        <dependency>-->
-<!--            <groupId>nl.altindag</groupId>-->
-<!--            <artifactId>logcaptor</artifactId>-->
-<!--            <version>2.1.0</version> &lt;!&ndash; Убедитесь, что используете актуальную версию &ndash;&gt;-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
     </dependencies>
 
     <build>

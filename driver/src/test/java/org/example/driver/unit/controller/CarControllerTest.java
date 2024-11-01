@@ -88,7 +88,8 @@ public class CarControllerTest {
                 List.of(new Violation("limit", "must be less than or equal to 100")));
         String actualResponse = mvcResult.getResponse().getContentAsString();
 
-        assertThat(actualResponse).isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(expextedValidationResponse));
+        assertThat(actualResponse).isEqualToIgnoringWhitespace(
+                objectMapper.writeValueAsString(expextedValidationResponse));
     }
 
     @Test
@@ -198,14 +199,16 @@ public class CarControllerTest {
                         new Violation("brand", "{brand.blank}"),
                         new Violation("number", "{number.blank}"),
                         new Violation("year", "{year.invalid}")));
-        ValidationResponse actualResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
+        ValidationResponse actualResponse = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
-        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(expectedValidationResponse.violations());
+        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(
+                expectedValidationResponse.violations());
     }
 
     @Test
     void create_whenInvalidInputWithPattern_thenReturn400AndValidationResponse() throws Exception {
-        CarCreateEditDto createCar = new CarCreateEditDto(null, null, "45sdsaassa", 1900);
+        CarCreateEditDto createCar = new CarCreateEditDto(null, null, "45sssa", 1900);
 
         MvcResult mvcResult = mockMvc.perform(post(URL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -218,9 +221,11 @@ public class CarControllerTest {
                         new Violation("brand", "{brand.blank}"),
                         new Violation("number", "{number.invalid}"),
                         new Violation("year", "{year.invalid}")));
-        ValidationResponse actualResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
+        ValidationResponse actualResponse = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
-        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(expectedValidationResponse.violations());
+        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(
+                expectedValidationResponse.violations());
     }
 
     @Test
@@ -296,14 +301,16 @@ public class CarControllerTest {
                         new Violation("brand", "{brand.blank}"),
                         new Violation("number", "{number.blank}"),
                         new Violation("year", "{year.invalid}")));
-        ValidationResponse actualResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
+        ValidationResponse actualResponse = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
-        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(expectedValidationResponse.violations());
+        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(
+                expectedValidationResponse.violations());
     }
 
     @Test
     void update_whenInvalidInputWithPattern_thenReturn400AndValidationResponse() throws Exception {
-        CarCreateEditDto updateCar = new CarCreateEditDto(null, null, "45sdsaassa", 1900);
+        CarCreateEditDto updateCar = new CarCreateEditDto(null, null, "45sdsa", 1900);
 
         MvcResult mvcResult = mockMvc.perform(put(URL + "/{id}", DEFAULT_ID)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -316,9 +323,11 @@ public class CarControllerTest {
                         new Violation("brand", "{brand.blank}"),
                         new Violation("number", "{number.invalid}"),
                         new Violation("year", "{year.invalid}")));
-        ValidationResponse actualResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
+        ValidationResponse actualResponse = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
-        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(expectedValidationResponse.violations());
+        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(
+                expectedValidationResponse.violations());
     }
 
     @Test

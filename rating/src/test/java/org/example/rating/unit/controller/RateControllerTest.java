@@ -61,8 +61,10 @@ public class RateControllerTest {
 
     @BeforeEach
     void init() {
-        defaultPassengerRate = new RateReadDto(DEFAULT_ID_PASSENGER, DEFAULT_ID_PASSENGER, "comment", 5, DEFAULT_ID_PASSENGER, UserType.DRIVER);
-        defaultDriverRate = new RateReadDto(DEFAULT_ID_DRIVER, DEFAULT_ID_PASSENGER, "comment", 4, DEFAULT_ID_PASSENGER, UserType.PASSENGER);
+        defaultPassengerRate = new RateReadDto(DEFAULT_ID_PASSENGER,
+                DEFAULT_ID_PASSENGER, "comment", 5, DEFAULT_ID_PASSENGER, UserType.DRIVER);
+        defaultDriverRate = new RateReadDto(DEFAULT_ID_DRIVER,
+                DEFAULT_ID_PASSENGER, "comment", 4, DEFAULT_ID_PASSENGER, UserType.PASSENGER);
         rateList = List.of(defaultPassengerRate, defaultDriverRate);
         ratePage = new PageImpl<>(rateList, PageRequest.of(0, 10), 2);
     }
@@ -97,7 +99,8 @@ public class RateControllerTest {
                 List.of(new Violation("limit", "must be less than or equal to 100")));
         String actualResponse = mvcResult.getResponse().getContentAsString();
 
-        assertThat(actualResponse).isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(expextedValidationResponse));
+        assertThat(actualResponse).isEqualToIgnoringWhitespace(
+                objectMapper.writeValueAsString(expextedValidationResponse));
     }
 
     @Test
@@ -146,7 +149,8 @@ public class RateControllerTest {
                 List.of(new Violation("limit", "must be less than or equal to 100")));
         String actualResponse = mvcResult.getResponse().getContentAsString();
 
-        assertThat(actualResponse).isEqualToIgnoringWhitespace(objectMapper.writeValueAsString(expextedValidationResponse));
+        assertThat(actualResponse).isEqualToIgnoringWhitespace(
+                objectMapper.writeValueAsString(expextedValidationResponse));
     }
 
     @Test
@@ -166,7 +170,7 @@ public class RateControllerTest {
     }
 
     @Test
-    void findByDriverId_whenValidInput_thenReturn200() throws Exception {
+    void findDriverRateById_whenValidInput_thenReturn200() throws Exception {
         when(driverRateService.findById(DEFAULT_ID_DRIVER)).thenReturn(rateList.get(1));
 
         MvcResult mvcResult = mockMvc.perform(get(URL + DRIVER_URL + "/{id}", DEFAULT_ID_DRIVER))
@@ -180,7 +184,7 @@ public class RateControllerTest {
     }
 
     @Test
-    void findByDriverId_whenVerifyingRequestMatching_thenReturn200() throws Exception {
+    void findDriverRateById_whenVerifyingRequestMatching_thenReturn200() throws Exception {
         when(driverRateService.findById(DEFAULT_ID_DRIVER)).thenReturn(rateList.get(1));
 
         MvcResult mvcResult = mockMvc.perform(get(URL + DRIVER_URL + "/2"))
@@ -194,7 +198,7 @@ public class RateControllerTest {
     }
 
     @Test
-    void findByPassengerId_whenValidInput_thenReturn200() throws Exception {
+    void findPassengerRateById_whenValidInput_thenReturn200() throws Exception {
         when(passengerRateService.findById(DEFAULT_ID_PASSENGER)).thenReturn(rateList.get(0));
 
         MvcResult mvcResult = mockMvc.perform(get(URL + PASSENGER_URL + "/{id}", DEFAULT_ID_PASSENGER))
@@ -208,7 +212,7 @@ public class RateControllerTest {
     }
 
     @Test
-    void findByPassengerId_whenVerifyingRequestMatching_thenReturn200() throws Exception {
+    void findPassengerRateById_whenVerifyingRequestMatching_thenReturn200() throws Exception {
         when(passengerRateService.findById(DEFAULT_ID_PASSENGER)).thenReturn(rateList.get(0));
 
         MvcResult mvcResult = mockMvc.perform(get(URL + PASSENGER_URL + "/1"))
@@ -321,9 +325,11 @@ public class RateControllerTest {
         ValidationResponse expectedValidationResponse = new ValidationResponse(
                 List.of(new Violation("rideId", "{ride.null}"),
                         new Violation("rating", "{rating.range}")));
-        ValidationResponse actualResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
+        ValidationResponse actualResponse = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
-        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(expectedValidationResponse.violations());
+        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(
+                expectedValidationResponse.violations());
     }
 
     @Test
@@ -339,9 +345,11 @@ public class RateControllerTest {
         ValidationResponse expectedValidationResponse = new ValidationResponse(
                 List.of(new Violation("rideId", "{ride.null}"),
                         new Violation("rating", "{rating.range}")));
-        ValidationResponse actualResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
+        ValidationResponse actualResponse = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
-        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(expectedValidationResponse.violations());
+        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(
+                expectedValidationResponse.violations());
     }
 
     @Test
@@ -455,9 +463,11 @@ public class RateControllerTest {
         ValidationResponse expectedValidationResponse = new ValidationResponse(
                 List.of(new Violation("rideId", "{ride.null}"),
                         new Violation("rating", "{rating.range}")));
-        ValidationResponse actualResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
+        ValidationResponse actualResponse = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
-        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(expectedValidationResponse.violations());
+        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(
+                expectedValidationResponse.violations());
     }
 
     @Test
@@ -473,8 +483,10 @@ public class RateControllerTest {
         ValidationResponse expectedValidationResponse = new ValidationResponse(
                 List.of(new Violation("rideId", "{ride.null}"),
                         new Violation("rating", "{rating.range}")));
-        ValidationResponse actualResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
+        ValidationResponse actualResponse = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
-        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(expectedValidationResponse.violations());
+        assertThat(actualResponse.violations()).containsExactlyInAnyOrderElementsOf(
+                expectedValidationResponse.violations());
     }
 }

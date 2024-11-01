@@ -3,7 +3,6 @@ package org.example.driver.unit.sevice;
 import org.example.driver.constants.ExceptionConstants;
 import org.example.driver.dto.create.DriverCreateEditDto;
 import org.example.driver.dto.read.DriverReadDto;
-import org.example.driver.dto.read.RideReadDto;
 import org.example.driver.dto.read.UserRateDto;
 import org.example.driver.entity.Car;
 import org.example.driver.entity.Driver;
@@ -26,6 +25,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -61,7 +61,6 @@ public class DriverServiceTest {
     private DriverCreateEditDto createDriver;
     private DriverReadDto readDriver;
     private Car car;
-    private RideReadDto readRide;
 
     @BeforeEach
     void init() {
@@ -69,10 +68,7 @@ public class DriverServiceTest {
         car = new Car(DEFAULT_ID, "red", "BMW", "AB123CD", 2023, List.of(defaultDriver));
         createDriver = new DriverCreateEditDto("name", "name@gmail.com", "+375331234567", Gender.MALE, DEFAULT_ID);
         readDriver = new DriverReadDto(DEFAULT_ID, "name", "name@gmail.com", "+375331234567", Gender.MALE, DEFAULT_ID, 5.);
-        readRide = new RideReadDto(DEFAULT_ID, DEFAULT_ID, DEFAULT_ID, "from", "to", "ACCEPTED", "WAITING", 1);
     }
-
-    //TODO create with assertThat for setting fields
 
     @Test
     void create_whenEmailIsNotDuplicatedAndCarIsFound_thenReturnDriverReadDto() {
@@ -271,7 +267,7 @@ public class DriverServiceTest {
     @Test
     void findAll_thenReturnPageDriverReadDto() {
         int page = 0, limit = 10;
-        PageRequest request = PageRequest.of(page, limit);
+        Pageable request = PageRequest.of(page, limit);
 
         when(driverRepository.findByIsDeletedFalse(request)).thenReturn(new PageImpl<>(List.of(defaultDriver), request, 1));
         when(driverMapper.toReadDto(defaultDriver)).thenReturn(readDriver);
@@ -287,7 +283,7 @@ public class DriverServiceTest {
     @Test
     void findAllWithDeleted_thenReturnPageDriverReadDto() {
         int page = 0, limit = 10;
-        PageRequest request = PageRequest.of(page, limit);
+        Pageable request = PageRequest.of(page, limit);
 
         when(driverRepository.findAll(request)).thenReturn(new PageImpl<>(List.of(defaultDriver), request, 1));
         when(driverMapper.toReadDto(defaultDriver)).thenReturn(readDriver);
@@ -329,22 +325,6 @@ public class DriverServiceTest {
                 LocaleContextHolder.getLocale());
         verify(driverMapper, never()).toReadDto(any());
     }
-
-    //TODO
-//    @Test
-//    void notifyDriver_shouldLogRideDetails() {
-//        // Arrange
-//        when(readRide.toString()).thenReturn("Ride details: {id: 1, status: 'completed'}");
-//        LogCaptor logCaptor = LogCaptor.forClass(DriverService.class);
-//        // Act
-//        driverService.notifyDriver(readRide);
-//
-//        // Assert
-//        // Use a logging framework's functionality to verify the logging
-//        // Check if the log has been called with the expected message
-//        // (This part will depend on the logging framework you use)
-//        // For example, with slf4j-test:
-//        assertThat(logCaptor.getInfoLogs()).contains("Ride details: {id: 1, status: 'completed'}");    }
 
     @Test
     void updateRating_thenUpdateRating() {

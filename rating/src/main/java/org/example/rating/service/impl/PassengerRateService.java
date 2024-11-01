@@ -1,7 +1,7 @@
 package org.example.rating.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.example.rating.constants.AppConstants;
+import org.example.rating.constants.ExceptionConstants;
 import org.example.rating.dto.create.RateCreateEditDto;
 import org.example.rating.dto.read.RateReadDto;
 import org.example.rating.dto.read.RideReadDto;
@@ -46,7 +46,7 @@ public class PassengerRateService implements RateService {
         return passengerRateRepository.findById(id)
                 .map(rateMapper::toReadDto)
                 .orElseThrow(() -> new RateNotFoundException(messageSource.getMessage(
-                        AppConstants.RATE_NOT_FOUND,
+                        ExceptionConstants.RATE_NOT_FOUND,
                         new Object[]{id},
                         LocaleContextHolder.getLocale()
                 )));
@@ -75,7 +75,7 @@ public class PassengerRateService implements RateService {
                 })
                 .map(rateMapper::toReadDto)
                 .orElseThrow(() -> new RateNotFoundException(messageSource.getMessage(
-                        AppConstants.RATE_NOT_FOUND,
+                        ExceptionConstants.RATE_NOT_FOUND,
                         new Object[]{id},
                         LocaleContextHolder.getLocale())));
     }
