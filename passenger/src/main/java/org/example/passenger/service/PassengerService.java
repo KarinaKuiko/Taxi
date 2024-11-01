@@ -2,10 +2,12 @@ package org.example.passenger.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.passenger.constants.CommonConstants;
 import org.example.passenger.constants.ExceptionConstants;
 import org.example.passenger.dto.create.PassengerCreateEditDto;
 import org.example.passenger.dto.read.PassengerReadDto;
 import org.example.passenger.dto.read.RideReadDto;
+import org.example.passenger.dto.read.UserRateDto;
 import org.example.passenger.entity.Passenger;
 import org.example.passenger.exception.passenger.DuplicatedPassengerEmailException;
 import org.example.passenger.exception.passenger.PassengerNotFoundException;
@@ -61,6 +63,7 @@ public class PassengerService {
                         });
 
         Passenger passenger = passengerMapper.toPassenger(passengerDto);
+        passenger.setRating(CommonConstants.DEFAULT_RATING);
 
         return passengerMapper.toReadDto(passengerRepository.save(passenger));
     }
@@ -105,5 +108,13 @@ public class PassengerService {
 
     public void notifyPassenger(RideReadDto rideReadDto) {
         log.info(rideReadDto.toString());
+    }
+
+    @Transactional
+    public void updateRating(UserRateDto userRateDto) {
+        Passenger passenger = passengerRepository.findById(userRateDto.userId()).get();
+        passenger.setRating(userRateDto.averageRate());
+        log.info("Update rating to {}, passenger id {}", userRateDto.averageRate(), userRateDto.userId());
+        passengerRepository.save(passenger);
     }
 }

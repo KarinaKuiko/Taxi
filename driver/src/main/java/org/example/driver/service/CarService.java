@@ -1,7 +1,7 @@
 package org.example.driver.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.driver.constants.AppConstants;
+import org.example.driver.constants.ExceptionConstants;
 import org.example.driver.dto.create.CarCreateEditDto;
 import org.example.driver.dto.read.CarReadDto;
 import org.example.driver.entity.Car;
@@ -34,7 +34,7 @@ public class CarService {
         carRepository.findByNumberAndIsDeletedFalse(carDto.number())
                 .ifPresent(car -> {
                     throw new DuplicatedCarNumberException(messageSource.getMessage(
-                            AppConstants.CAR_DUPLICATED_NUMBER,
+                            ExceptionConstants.CAR_DUPLICATED_NUMBER,
                             new Object[]{carDto.number()},
                             LocaleContextHolder.getLocale()));
                 });
@@ -52,7 +52,7 @@ public class CarService {
                             .ifPresent(carCheck -> {
                                 if (!carCheck.getId().equals(id)) {
                                     throw new DuplicatedCarNumberException(messageSource.getMessage(
-                                            AppConstants.CAR_DUPLICATED_NUMBER,
+                                            ExceptionConstants.CAR_DUPLICATED_NUMBER,
                                             new Object[]{carDto.number()},
                                             LocaleContextHolder.getLocale()));
                                 }
@@ -64,7 +64,7 @@ public class CarService {
                 .map(carRepository::save)
                 .map(carMapper::toReadDto)
                 .orElseThrow(() -> new CarNotFoundException(messageSource.getMessage(
-                        AppConstants.CAR_NOT_FOUND,
+                        ExceptionConstants.CAR_NOT_FOUND,
                         new Object[]{id},
                         LocaleContextHolder.getLocale())));
     }
@@ -83,7 +83,7 @@ public class CarService {
                     return car;
                 })
                 .orElseThrow(() -> new CarNotFoundException(messageSource.getMessage(
-                                                            AppConstants.CAR_NOT_FOUND,
+                                                            ExceptionConstants.CAR_NOT_FOUND,
                                                             new Object[]{id},
                                                             LocaleContextHolder.getLocale())));
 
@@ -106,7 +106,7 @@ public class CarService {
         return carRepository.findByIdAndIsDeletedFalse(id)
                 .map(carMapper::toReadDto)
                 .orElseThrow(() -> new CarNotFoundException(messageSource.getMessage(
-                        AppConstants.CAR_NOT_FOUND,
+                        ExceptionConstants.CAR_NOT_FOUND,
                         new Object[]{id},
                         LocaleContextHolder.getLocale())));
     }

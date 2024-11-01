@@ -3,7 +3,7 @@ package org.example.driver.dto.create;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import org.example.driver.constants.AppConstants;
+import org.example.driver.constants.ExceptionConstants;
 import org.example.driver.entity.enumeration.Gender;
 
 public record DriverCreateEditDto(
@@ -16,7 +16,7 @@ public record DriverCreateEditDto(
         String email,
 
         @Pattern(message = "{phone.invalid}",
-                regexp = AppConstants.PHONE_PATTERN)
+                regexp = ExceptionConstants.PHONE_PATTERN)
         @NotBlank(message = "{phone.blank}")
         String phone,
 

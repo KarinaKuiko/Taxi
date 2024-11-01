@@ -1,7 +1,7 @@
 package org.example.driver.exception;
 
 import jakarta.validation.ConstraintViolationException;
-import org.example.driver.constants.AppConstants;
+import org.example.driver.constants.ExceptionConstants;
 import org.example.driver.dto.read.ExceptionDto;
 import org.example.driver.dto.read.ValidationResponse;
 import org.example.driver.exception.car.CarNotFoundException;

@@ -12,4 +12,9 @@ public class KafkaTopicConfig {
     public NewTopic addPassengerTopic() {
         return new NewTopic(KafkaConstants.PASSENGER_NOTIFICATION_TOPIC, KafkaConstants.NUM_PARTITIONS, KafkaConstants.REPLICATION_FACTOR);
     }
+
+    @Bean
+    public NewTopic addDriverTopic() {
+        return new NewTopic(KafkaConstants.DRIVER_NOTIFICATION_TOPIC, KafkaConstants.NUM_PARTITIONS, KafkaConstants.REPLICATION_FACTOR);
+    }
 }

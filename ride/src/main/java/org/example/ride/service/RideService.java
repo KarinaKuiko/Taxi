@@ -2,15 +2,14 @@ package org.example.ride.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.ride.constants.AppConstants;
-import org.example.ride.client.DriverClient;
-import org.example.ride.client.PassengerClient;
 import org.example.ride.constants.ExceptionConstants;
+import org.example.ride.dto.create.PassengerRideStatusDto;
 import org.example.ride.dto.create.RideCreateEditDto;
-import org.example.ride.dto.create.RideStatusDto;
+import org.example.ride.dto.create.DriverRideStatusDto;
 import org.example.ride.dto.read.RideReadDto;
 import org.example.ride.entity.Ride;
 import org.example.ride.entity.enumeration.DriverRideStatus;
+import org.example.ride.entity.enumeration.PassengerRideStatus;
 import org.example.ride.exception.param.InvalidCountParametersException;
 import org.example.ride.exception.ride.RideNotFoundException;
 import org.example.ride.kafka.KafkaProducer;
@@ -87,6 +86,7 @@ public class RideService {
 
         Ride ride = rideMapper.toRide(rideDto);
         ride.setDriverRideStatus(DriverRideStatus.CREATED);
+        ride.setPassengerRideStatus(PassengerRideStatus.WAITING);
         ride.setCost(priceGenerator.generateRandomCost());
 
         return rideMapper.toReadDto(rideRepository.save(ride));
@@ -110,18 +110,39 @@ public class RideService {
     }
 
     @Transactional
-    public RideReadDto updateStatus(Long id, RideStatusDto rideStatusDto) {
+    public RideReadDto updateDriverStatus(Long id, DriverRideStatusDto driverRideStatusDto) {
         Ride ride = rideRepository.findById(id)
                 .orElseThrow(() -> new RideNotFoundException(messageSource.getMessage(
                         ExceptionConstants.RIDE_NOT_FOUND_EXCEPTION_MESSAGE,
                         new Object[]{id},
                         LocaleContextHolder.getLocale())));
 
-        rideStatusValidation.validateUpdatingStatus(ride, rideStatusDto);
-        rideMapper.mapStatus(ride, rideStatusDto);
+        DriverRideStatus driverRideStatus = driverRideStatusDto.rideStatus();
+
+        rideStatusValidation.validateUpdatingDriverStatus(ride, driverRideStatus);
+        if(driverRideStatus == DriverRideStatus.ON_WAY_TO_DESTINATION) {
+            updatePassengerStatus(id, new PassengerRideStatusDto(PassengerRideStatus.IN_CAR));
+        }
+        rideMapper.mapDriverStatus(ride, driverRideStatus);
         RideReadDto rideRead = rideMapper.toReadDto(rideRepository.save(ride));
-        System.out.println("save ride");
         kafkaProducer.notifyPassenger(rideRead);
+
+        return rideRead;
+    }
+
+    @Transactional
+    public RideReadDto updatePassengerStatus(Long id, PassengerRideStatusDto passengerRideStatusDto) {
+        Ride ride = rideRepository.findById(id)
+                .orElseThrow(() -> new RideNotFoundException(messageSource.getMessage(
+                        ExceptionConstants.RIDE_NOT_FOUND_EXCEPTION_MESSAGE,
+                        new Object[]{id},
+                        LocaleContextHolder.getLocale())));
+
+        rideStatusValidation.validateUpdatingPassengerStatus(ride);
+        rideMapper.mapPassengerStatus(ride, passengerRideStatusDto.rideStatus());
+
+        RideReadDto rideRead = rideMapper.toReadDto(rideRepository.save(ride));
+        kafkaProducer.notifyDriver(rideRead);
 
         return rideRead;
     }

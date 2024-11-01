@@ -21,13 +21,18 @@ public class KafkaProducer {
         sendMessage(KafkaConstants.PASSENGER_NOTIFICATION_TOPIC, generateTransactionalKey(), rideReadDto);
     }
 
+    public void notifyDriver(RideReadDto rideReadDto) {
+        sendMessage(KafkaConstants.DRIVER_NOTIFICATION_TOPIC, generateTransactionalKey(), rideReadDto);
+    }
+
     private void sendMessage(String topic, String key, Object message) {
         CompletableFuture<SendResult<String, Object>> future =
                 kafkaTemplate.send(topic, key, message);
         future.whenComplete((result, ex) -> {
             if (ex == null) {
-                log.info("Sent message successfully {} with offset {}",
+                log.info("Sent message successfully {} to {} with offset {}",
                         message.toString(),
+                        topic,
                         result.getRecordMetadata().offset());
             } else {
                 log.error(ex.getMessage());

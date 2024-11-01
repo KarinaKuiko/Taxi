@@ -23,4 +23,6 @@ public class Passenger extends AuditingEntity {
     private String email;
 
     private String phone;
+
+    private Double rating;
 }

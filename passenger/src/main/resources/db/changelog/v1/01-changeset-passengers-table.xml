@@ -8,7 +8,7 @@
     <changeSet id="01" author="KarinaIhorevna@gmail.com">
         <sqlFile path="01-create-passengers-table.sql" relativeToChangelogFile="true"/>
         <rollback>
-            <sqlFile path="01-drop-passengers-table-sql" relativeToChangelogFile="true"/>
+            <sqlFile path="01-drop-passengers-table.sql" relativeToChangelogFile="true"/>
         </rollback>
     </changeSet>
 
