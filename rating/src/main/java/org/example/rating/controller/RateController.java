@@ -30,23 +30,23 @@ public class RateController {
 
     @GetMapping("/driver")
     public PageResponse<RateReadDto> findAllDriversRates(@RequestParam(defaultValue = "0") Integer page,
-                                             @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer limit) {
+                                                         @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer limit) {
         return PageResponse.of(driverRateService.findAll(page, limit));
     }
 
     @GetMapping("/passenger")
     public PageResponse<RateReadDto> findAllPassengersRates(@RequestParam(defaultValue = "0") Integer page,
-                                                    @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer limit) {
+                                                            @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer limit) {
         return PageResponse.of(passengerRateService.findAll(page, limit));
     }
 
     @GetMapping("/driver/{id}")
-    public RateReadDto driverRateFindById(@PathVariable("id") Long id) {
+    public RateReadDto findDriverRateById(@PathVariable("id") Long id) {
         return driverRateService.findById(id);
     }
 
     @GetMapping("/passenger/{id}")
-    public RateReadDto passengerRateFindById(@PathVariable("id") Long id) {
+    public RateReadDto findPassengerRateById(@PathVariable("id") Long id) {
         return passengerRateService.findById(id);
     }
 

@@ -5,5 +5,5 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CommonConstants {
-    public static final double DEFAULT_RATING = 5.;
+    public static final double DEFAULT_RATING = 5.0;
 }

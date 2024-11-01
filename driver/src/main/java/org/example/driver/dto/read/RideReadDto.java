@@ -1,5 +1,7 @@
 package org.example.driver.dto.read;
 
+import java.math.BigDecimal;
+
 public record RideReadDto(
         long id,
         long driverId,
@@ -8,6 +10,6 @@ public record RideReadDto(
         String addressTo,
         String driverRideStatus,
         String passengerRideStatus,
-        double cost
+        BigDecimal cost
 ) {
 }
