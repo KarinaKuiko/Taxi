@@ -8,14 +8,18 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.example.driver.entity.enumeration.Gender;
 
 @Entity
 @Table(name = "drivers")
 @Data
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class Driver extends AuditingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
