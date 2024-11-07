@@ -8,8 +8,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.example.ride.entity.enumeration.DriverRideStatus;
 import org.example.ride.entity.enumeration.PassengerRideStatus;
 
@@ -19,6 +21,8 @@ import java.math.BigDecimal;
 @Table(name = "rides")
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+@AllArgsConstructor
+@NoArgsConstructor
 public class Ride extends AuditingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
