@@ -1,6 +1,9 @@
 package org.example.rating.integration;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
+import org.example.rating.dto.create.RateCreateEditDto;
 import org.example.rating.entity.DriverRate;
 import org.example.rating.entity.PassengerRate;
 import org.example.rating.entity.enumeration.UserType;
@@ -11,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -22,12 +26,18 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class RatingControllerIT {
     private static final String URL = "/api/v1/rates";
+
+    private static WireMockServer wireMockServer;
 
     @Container
     public static PostgreSQLContainer postgreSQLContainer =
@@ -67,6 +77,9 @@ public class RatingControllerIT {
     @BeforeAll
     static void setUp() {
         kafkaContainer.start();
+        wireMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig()
+                .port(8083));
+        wireMockServer.start();
     }
 
     @BeforeEach
@@ -148,5 +161,121 @@ public class RatingControllerIT {
                 .then()
                 .statusCode(404)
                 .body("message", equalTo("Rate was not found"));
+    }
+
+    @Test
+    void create_whenRideIsFound_thenReturn200AndRateReadDto() {
+        RateCreateEditDto createRate = new RateCreateEditDto(1L, "Good", 4, 1L, UserType.DRIVER);
+
+        getRide();
+
+        RestAssuredMockMvc
+                .given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(createRate)
+                .when()
+                .post(URL)
+                .then()
+                .statusCode(201)
+                .body("id", notNullValue());
+    }
+
+    @Test
+    void create_whenRideIsNotFound_thenReturn404() {
+        RateCreateEditDto createRate = new RateCreateEditDto(1L, "Good", 4, 1L, UserType.DRIVER);
+
+        getNonexistentRide();
+
+        RestAssuredMockMvc
+                .given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(createRate)
+                .when()
+                .post(URL)
+                .then()
+                .statusCode(404)
+                .body("message", equalTo("Ride was not found"));
+    }
+
+    @Test
+    void update_whenRideAndRateIsFound_thenReturn200AndRateReadDto() {
+        RateCreateEditDto updateRate = new RateCreateEditDto(1L, "Good", 4, 1L, UserType.DRIVER);
+
+        getRide();
+
+        RestAssuredMockMvc
+                .given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(updateRate)
+                .when()
+                .put(URL + "/1")
+                .then()
+                .statusCode(200)
+                .body("id", equalTo(1))
+                .body("rideId", equalTo(1))
+                .body("comment", equalTo("Good"))
+                .body("rating", equalTo(4));
+    }
+
+    @Test
+    void update_whenRideIsNotFound_thenReturn404() {
+        RateCreateEditDto updateRate = new RateCreateEditDto(1L, "Good", 4, 1L, UserType.DRIVER);
+
+        getNonexistentRide();
+
+        RestAssuredMockMvc
+                .given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(updateRate)
+                .when()
+                .put(URL + "/1")
+                .then()
+                .statusCode(404)
+                .body("message", equalTo("Ride was not found"));
+    }
+
+    @Test
+    void update_whenRateIsNotFound_thenReturn404() {
+        RateCreateEditDto updateRate = new RateCreateEditDto(1L, "Good", 4, 1L, UserType.DRIVER);
+
+        RestAssuredMockMvc
+                .given()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(updateRate)
+                .when()
+                .put(URL + "/2")
+                .then()
+                .statusCode(404)
+                .body("message", equalTo("Rate was not found"));
+    }
+
+    private void getRide() {
+        wireMockServer.stubFor(
+                get(urlEqualTo("/api/v1/rides/1"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withStatus(200)
+                                .withBody("""
+                                        {
+                                            "id": 1,
+                                            "driverId": 1,
+                                            "passengerId": 1,
+                                            "addressFrom": "From",
+                                            "addressTo": "To",
+                                            "driverRideStatus": "ACCEPTED",
+                                            "passengerRideStatus": "WAITING",
+                                            "cost": 29.99
+                                        }
+                                        """)));
+    }
+
+    private void getNonexistentRide() {
+        wireMockServer.stubFor(
+                get(urlEqualTo("/api/v1/rides/1"))
+                        .willReturn(aResponse()
+                                .withHeader("Content-Type", "application/json")
+                                .withStatus(404)
+                                .withBody("{\"message\": \"Ride was not found\"}")));
+
     }
 }
