@@ -22,6 +22,14 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import static org.example.passenger.util.DataUtil.DEFAULT_ID;
+import static org.example.passenger.util.DataUtil.LIMIT;
+import static org.example.passenger.util.DataUtil.LIMIT_VALUE;
+import static org.example.passenger.util.DataUtil.PAGE;
+import static org.example.passenger.util.DataUtil.PAGE_VALUE;
+import static org.example.passenger.util.DataUtil.URL;
+import static org.example.passenger.util.DataUtil.URL_WITH_ID;
+import static org.example.passenger.util.DataUtil.getPassenger;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -29,7 +37,7 @@ import static org.hamcrest.Matchers.notNullValue;
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class PassengerControllerIT {
-    private static final String URL = "/api/v1/passengers";
+//    private static final String URL = "/api/v1/passengers";
 
     @Container
     public static PostgreSQLContainer postgreSQLContainer =
@@ -72,8 +80,7 @@ public class PassengerControllerIT {
         RestAssuredMockMvc.mockMvc(MockMvcBuilders.webAppContextSetup(webApplicationContext).build());
         passengerRepository.deleteAll();
         jdbcTemplate.execute("ALTER SEQUENCE passengers_id_seq RESTART WITH 1");
-        defaultPassenger = new Passenger(1L, "name",
-                "name@gmail.com", "+375441234567", 5.0);
+        defaultPassenger = getPassenger().build();
         passengerRepository.save(defaultPassenger);
     }
 
@@ -81,8 +88,8 @@ public class PassengerControllerIT {
     void findAll_whenCorrectParams_thenReturn200() {
         RestAssuredMockMvc
                 .given()
-                .param("page", 0)
-                .param("limit", 10)
+                .param(PAGE, PAGE_VALUE)
+                .param(LIMIT, LIMIT_VALUE)
                 .when()
                 .get(URL)
                 .then()
@@ -94,12 +101,12 @@ public class PassengerControllerIT {
     void findById_whenPassengerIsFound_thenReturn200AndPassengerReadDto() {
         RestAssuredMockMvc
                 .when()
-                .get(URL + "/1")
+                .get(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(200)
                 .body("id", equalTo(1))
-                .body("name", equalTo("name"))
-                .body("email", equalTo("name@gmail.com"))
+                .body("name", equalTo("passenger"))
+                .body("email", equalTo("passenger@gmail.com"))
                 .body("phone", equalTo("+375441234567"));
     }
 
@@ -107,7 +114,7 @@ public class PassengerControllerIT {
     void findById_whenPassengerIsNotFound_thenReturn404() {
         RestAssuredMockMvc
                 .when()
-                .get(URL + "/2")
+                .get(URL_WITH_ID, "2")
                 .then()
                 .statusCode(404)
                 .body("message", equalTo("Passenger was not found"));
@@ -132,7 +139,7 @@ public class PassengerControllerIT {
     @Test
     void create_whenDuplicatedEmail_thenReturn409() {
         PassengerCreateEditDto createPassenger = new PassengerCreateEditDto("test",
-                "name@gmail.com", "+375291112223");
+                "passenger@gmail.com", "+375291112223");
 
         RestAssuredMockMvc
                 .given()
@@ -147,24 +154,20 @@ public class PassengerControllerIT {
 
     @Test
     void update_whenValidInput_thenReturn200AndPassengerReadDto() {
-        Passenger createPassenger = new Passenger(2L, "test",
-                "test@gmail.com", "+375291112223", 5.0);
-        passengerRepository.save(createPassenger);
-
         PassengerCreateEditDto updatePassenger = new PassengerCreateEditDto("naming",
-                "name@gmail.com", "+375441234567");
+                "passenger@gmail.com", "+375441234567");
 
         RestAssuredMockMvc
                 .given()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updatePassenger)
                 .when()
-                .put(URL + "/1")
+                .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(200)
                 .body("id", equalTo(1))
                 .body("name", equalTo("naming"))
-                .body("email", equalTo("name@gmail.com"))
+                .body("email", equalTo("passenger@gmail.com"))
                 .body("phone", equalTo("+375441234567"));
     }
 
@@ -182,7 +185,7 @@ public class PassengerControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updatePassenger)
                 .when()
-                .put(URL + "/1")
+                .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(409)
                 .body("message", equalTo("Passenger with this email already exists"));
@@ -198,7 +201,7 @@ public class PassengerControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updatePassenger)
                 .when()
-                .put(URL + "/2")
+                .put(URL_WITH_ID, "2")
                 .then()
                 .statusCode(404)
                 .body("message", equalTo("Passenger was not found"));
@@ -208,19 +211,19 @@ public class PassengerControllerIT {
     void safeDelete_whenCarIsFound_thenReturn204() {
         RestAssuredMockMvc
                 .when()
-                .delete(URL + "/1")
+                .delete(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(204);
 
         assertThat(0, equalTo(passengerRepository.findByIsDeletedFalse(
-                PageRequest.of(0, 10)).getNumberOfElements()));
+                PageRequest.of(PAGE_VALUE, LIMIT_VALUE)).getNumberOfElements()));
     }
 
     @Test
     void safeDelete_whenCarIsNotFound_thenReturn404() {
         RestAssuredMockMvc
                 .when()
-                .delete(URL + "/2")
+                .delete(URL_WITH_ID,"2")
                 .then()
                 .statusCode(404)
                 .body("message", equalTo("Passenger was not found"));

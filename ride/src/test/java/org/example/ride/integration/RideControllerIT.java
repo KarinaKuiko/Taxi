@@ -27,18 +27,19 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import java.math.BigDecimal;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.example.ride.util.DataUtil.DEFAULT_ID;
+import static org.example.ride.util.DataUtil.URL;
+import static org.example.ride.util.DataUtil.URL_WITH_ID;
+import static org.example.ride.util.DataUtil.getRide;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class RideControllerIT {
-    private static final String URL = "/api/v1/rides";
     private static WireMockServer driverWireMockServer;
     private static WireMockServer passengererWireMockServer;
 
@@ -89,7 +90,7 @@ public class RideControllerIT {
         RestAssuredMockMvc.mockMvc(MockMvcBuilders.webAppContextSetup(webApplicationContext).build());
         rideRepository.deleteAll();
         jdbcTemplate.execute("ALTER SEQUENCE rides_id_seq RESTART WITH 1");
-        defaultRide = new Ride(1L, 1L, 1L, "From", "To", DriverRideStatus.ACCEPTED, PassengerRideStatus.WAITING, new BigDecimal("123.45"));
+        defaultRide = getRide();
         rideRepository.save(defaultRide);
     }
 
@@ -107,21 +108,21 @@ public class RideControllerIT {
     void findById_whenRideIsFound_thenReturn200AndRideReadDto() {
         RestAssuredMockMvc
                 .when()
-                .get(URL + "/1")
+                .get(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(200)
                 .body("id", equalTo(1))
                 .body("driverId", equalTo(1))
                 .body("passengerId", equalTo(1))
-                .body("addressFrom", equalTo("From"))
-                .body("addressTo", equalTo("To"));
+                .body("addressFrom", equalTo("from"))
+                .body("addressTo", equalTo("to"));
     }
 
     @Test
     void findById_whenRideIsNotFound_thenReturn404() {
         RestAssuredMockMvc
                 .when()
-                .get(URL + "/2")
+                .get(URL_WITH_ID, "2")
                 .then()
                 .statusCode(404)
                 .body("message", equalTo("Ride was not found"));
@@ -136,7 +137,7 @@ public class RideControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
-                .put(URL + "/1/driver-status")
+                .put(URL_WITH_ID + "/driver-status", DEFAULT_ID.toString())
                 .then()
                 .statusCode(200)
                 .body("driverRideStatus", equalTo("ON_WAY_FOR_PASSENGER"));
@@ -151,7 +152,7 @@ public class RideControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
-                .put(URL + "/1/driver-status")
+                .put(URL_WITH_ID + "/driver-status", DEFAULT_ID.toString())
                 .then()
                 .statusCode(409)
                 .body("message", equalTo("Cannot be updated to the proposed status"));
@@ -166,7 +167,7 @@ public class RideControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
-                .put(URL + "/2/driver-status")
+                .put(URL_WITH_ID + "/driver-status", "2")
                 .then()
                 .statusCode(404)
                 .body("message", equalTo("Ride was not found"));
@@ -184,7 +185,7 @@ public class RideControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
-                .put(URL + "/1/passenger-status")
+                .put(URL_WITH_ID + "/passenger-status", DEFAULT_ID.toString())
                 .then()
                 .statusCode(200)
                 .body("passengerRideStatus", equalTo("GETTING_OUT"));
@@ -199,7 +200,7 @@ public class RideControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
-                .put(URL + "/1/passenger-status")
+                .put(URL_WITH_ID + "/passenger-status", DEFAULT_ID.toString())
                 .then()
                 .statusCode(409)
                 .body("message", equalTo("Status cannot be changed now"));
@@ -214,7 +215,7 @@ public class RideControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
-                .put(URL + "/2/passenger-status")
+                .put(URL_WITH_ID + "/passenger-status", "2")
                 .then()
                 .statusCode(404)
                 .body("message", equalTo("Ride was not found"));
@@ -287,7 +288,7 @@ public class RideControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateRide)
                 .when()
-                .put(URL + "/1")
+                .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(200)
                 .body("driverId", equalTo(1))
@@ -308,7 +309,7 @@ public class RideControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateRide)
                 .when()
-                .put(URL + "/1")
+                .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(404)
                 .body("message", equalTo("Driver was not found"));
@@ -326,7 +327,7 @@ public class RideControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateRide)
                 .when()
-                .put(URL + "/1")
+                .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(404)
                 .body("message", equalTo("Passenger was not found"));
@@ -341,7 +342,7 @@ public class RideControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateRide)
                 .when()
-                .put(URL + "/2")
+                .put(URL_WITH_ID, "2")
                 .then()
                 .statusCode(404)
                 .body("message", equalTo("Ride was not found"));

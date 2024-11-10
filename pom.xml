@@ -7,6 +7,7 @@
     <groupId>org.example</groupId>
     <artifactId>Taxi</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -14,4 +15,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <modules>
+        <module>driver</module>
+        <module>passenger</module>
+        <module>ride</module>
+        <module>rating</module>
+    </modules>
 </project>

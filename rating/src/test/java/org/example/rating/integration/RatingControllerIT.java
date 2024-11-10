@@ -29,13 +29,26 @@ import org.testcontainers.utility.DockerImageName;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.example.rating.util.DataUtil.DEFAULT_ID;
+import static org.example.rating.util.DataUtil.DRIVER_URL;
+import static org.example.rating.util.DataUtil.DRIVER_URL_WITH_ID;
+import static org.example.rating.util.DataUtil.LIMIT;
+import static org.example.rating.util.DataUtil.LIMIT_VALUE;
+import static org.example.rating.util.DataUtil.PAGE;
+import static org.example.rating.util.DataUtil.PAGE_VALUE;
+import static org.example.rating.util.DataUtil.PASSENGER_URL;
+import static org.example.rating.util.DataUtil.PASSENGER_URL_WITH_ID;
+import static org.example.rating.util.DataUtil.URL;
+import static org.example.rating.util.DataUtil.URL_WITH_ID;
+import static org.example.rating.util.DataUtil.getDriverRate;
+import static org.example.rating.util.DataUtil.getPassengerRate;
+import static org.example.rating.util.DataUtil.getPassengerRateCreateEditDto;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class RatingControllerIT {
-    private static final String URL = "/api/v1/rates";
 
     private static WireMockServer wireMockServer;
 
@@ -88,8 +101,8 @@ public class RatingControllerIT {
         passengerRateRepository.deleteAll();
         jdbcTemplate.execute("ALTER SEQUENCE passenger_rates_id_seq RESTART WITH 1");
         jdbcTemplate.execute("ALTER SEQUENCE rating_id_seq RESTART WITH 1");
-        defaultDriverRate = new DriverRate(1L, 1L, "Great!", 5, 1L, UserType.PASSENGER);
-        defaultPassengerRate = new PassengerRate(1L, 1L, "Good", 4, 1L, UserType.DRIVER);
+        defaultDriverRate = getDriverRate();
+        defaultPassengerRate = getPassengerRate();
         passengerRateRepository.save(defaultPassengerRate);
         driverRateRepository.save(defaultDriverRate);
     }
@@ -98,10 +111,10 @@ public class RatingControllerIT {
     void findAllDriversRates_whenValidParams_thenReturn200() {
         RestAssuredMockMvc
                 .given()
-                .param("page", 0)
-                .param("limit", 10)
+                .param(PAGE, PAGE_VALUE)
+                .param(LIMIT, LIMIT_VALUE)
                 .when()
-                .get(URL + "/driver")
+                .get(DRIVER_URL)
                 .then()
                 .statusCode(200)
                 .body("content.size()", equalTo(1));
@@ -111,7 +124,7 @@ public class RatingControllerIT {
     void findAllPassengersRates_whenValidParams_thenReturn200() {
         RestAssuredMockMvc
                 .when()
-                .get(URL + "/passenger")
+                .get(PASSENGER_URL)
                 .then()
                 .statusCode(200)
                 .body("content.size()", equalTo(1));
@@ -121,20 +134,20 @@ public class RatingControllerIT {
     void findDriverRateById_whenRateIsFound_thenReturn200AndRateReadDto() {
         RestAssuredMockMvc
                 .when()
-                .get(URL + "/driver/1")
+                .get(DRIVER_URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(200)
                 .body("id", equalTo(1))
                 .body("rideId", equalTo(1))
-                .body("comment", equalTo("Great!"))
-                .body("rating", equalTo(5));
+                .body("comment", equalTo("Good"))
+                .body("rating", equalTo(4));
     }
 
     @Test
     void findDriverRateById_whenRateIsNotFound_thenReturn404() {
         RestAssuredMockMvc
                 .when()
-                .get(URL + "/driver/2")
+                .get(DRIVER_URL_WITH_ID, "2")
                 .then()
                 .statusCode(404)
                 .body("message", equalTo("Rate was not found"));
@@ -144,7 +157,7 @@ public class RatingControllerIT {
     void findPassengerRateById_whenRateIsFound_thenReturn200AndRateReadDto() {
         RestAssuredMockMvc
                 .when()
-                .get(URL + "/passenger/1")
+                .get(PASSENGER_URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(200)
                 .body("id", equalTo(1))
@@ -157,7 +170,7 @@ public class RatingControllerIT {
     void findPassengerRateById_whenRateIsNotFound_thenReturn404() {
         RestAssuredMockMvc
                 .when()
-                .get(URL + "/passenger/2")
+                .get(PASSENGER_URL_WITH_ID, "2")
                 .then()
                 .statusCode(404)
                 .body("message", equalTo("Rate was not found"));
@@ -165,7 +178,7 @@ public class RatingControllerIT {
 
     @Test
     void create_whenRideIsFound_thenReturn200AndRateReadDto() {
-        RateCreateEditDto createRate = new RateCreateEditDto(1L, "Good", 4, 1L, UserType.DRIVER);
+        RateCreateEditDto createRate = getPassengerRateCreateEditDto();
 
         getRide();
 
@@ -182,7 +195,7 @@ public class RatingControllerIT {
 
     @Test
     void create_whenRideIsNotFound_thenReturn404() {
-        RateCreateEditDto createRate = new RateCreateEditDto(1L, "Good", 4, 1L, UserType.DRIVER);
+        RateCreateEditDto createRate = getPassengerRateCreateEditDto();
 
         getNonexistentRide();
 
@@ -199,7 +212,7 @@ public class RatingControllerIT {
 
     @Test
     void update_whenRideAndRateIsFound_thenReturn200AndRateReadDto() {
-        RateCreateEditDto updateRate = new RateCreateEditDto(1L, "Good", 4, 1L, UserType.DRIVER);
+        RateCreateEditDto updateRate = new RateCreateEditDto(1L, "Good", 5, 1L, UserType.DRIVER);
 
         getRide();
 
@@ -208,18 +221,18 @@ public class RatingControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateRate)
                 .when()
-                .put(URL + "/1")
+                .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(200)
                 .body("id", equalTo(1))
                 .body("rideId", equalTo(1))
                 .body("comment", equalTo("Good"))
-                .body("rating", equalTo(4));
+                .body("rating", equalTo(5));
     }
 
     @Test
     void update_whenRideIsNotFound_thenReturn404() {
-        RateCreateEditDto updateRate = new RateCreateEditDto(1L, "Good", 4, 1L, UserType.DRIVER);
+        RateCreateEditDto updateRate = getPassengerRateCreateEditDto();
 
         getNonexistentRide();
 
@@ -228,7 +241,7 @@ public class RatingControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateRate)
                 .when()
-                .put(URL + "/1")
+                .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(404)
                 .body("message", equalTo("Ride was not found"));
@@ -236,14 +249,14 @@ public class RatingControllerIT {
 
     @Test
     void update_whenRateIsNotFound_thenReturn404() {
-        RateCreateEditDto updateRate = new RateCreateEditDto(1L, "Good", 4, 1L, UserType.DRIVER);
+        RateCreateEditDto updateRate = getPassengerRateCreateEditDto();
 
         RestAssuredMockMvc
                 .given()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateRate)
                 .when()
-                .put(URL + "/2")
+                .put(URL_WITH_ID, "2")
                 .then()
                 .statusCode(404)
                 .body("message", equalTo("Rate was not found"));

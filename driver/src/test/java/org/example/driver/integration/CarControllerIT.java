@@ -24,6 +24,15 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.util.List;
 
+import static org.example.driver.util.DataUtil.CAR_ENTITY;
+import static org.example.driver.util.DataUtil.DEFAULT_ID;
+import static org.example.driver.util.DataUtil.LIMIT;
+import static org.example.driver.util.DataUtil.LIMIT_VALUE;
+import static org.example.driver.util.DataUtil.PAGE;
+import static org.example.driver.util.DataUtil.PAGE_VALUE;
+import static org.example.driver.util.DataUtil.URL;
+import static org.example.driver.util.DataUtil.URL_WITH_ID;
+import static org.example.driver.util.DataUtil.getCar;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -31,7 +40,6 @@ import static org.hamcrest.Matchers.notNullValue;
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CarControllerIT {
-    private static final String URL = "/api/v1/cars";
 
     @Container
     public static PostgreSQLContainer postgreSQLContainer =
@@ -74,7 +82,7 @@ public class CarControllerIT {
         RestAssuredMockMvc.mockMvc(MockMvcBuilders.webAppContextSetup(webApplicationContext).build());
         carRepository.deleteAll();
         jdbcTemplate.execute("ALTER SEQUENCE cars_id_seq RESTART WITH 1");
-        defaultCar = new Car(1L, "red", "BMW", "AB123CD", 2023, List.of());
+        defaultCar = getCar().build();
         carRepository.save(defaultCar);
     }
 
@@ -82,10 +90,10 @@ public class CarControllerIT {
     void findAll_whenCorrectParams_thenReturn200() {
         RestAssuredMockMvc
                 .given()
-                .param("page", 0)
-                .param("limit", 10)
+                .param(PAGE, PAGE_VALUE)
+                .param(LIMIT, LIMIT_VALUE)
                 .when()
-                .get(URL)
+                .get(URL, CAR_ENTITY)
                 .then()
                 .statusCode(200)
                 .body("content.size()", equalTo(1));
@@ -95,7 +103,7 @@ public class CarControllerIT {
     void findById_whenCarIsFound_thenReturn200AndCarReadDto() {
         RestAssuredMockMvc
                 .when()
-                .get(URL + "/1")
+                .get(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID.toString())
                 .then()
                 .statusCode(200)
                 .body("id", equalTo(1))
@@ -109,7 +117,7 @@ public class CarControllerIT {
     void findById_whenCarIsNotFound_thenReturn404() {
         RestAssuredMockMvc
                 .when()
-                .get(URL + "/10")
+                .get(URL_WITH_ID, CAR_ENTITY, "10")
                 .then()
                 .statusCode(404)
                 .body("message", equalTo("Car was not found"));
@@ -124,7 +132,7 @@ public class CarControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(createCar)
                 .when()
-                .post(URL)
+                .post(URL, CAR_ENTITY)
                 .then()
                 .statusCode(201)
                 .body("id", notNullValue());
@@ -139,7 +147,7 @@ public class CarControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(createCar)
                 .when()
-                .post(URL)
+                .post(URL, CAR_ENTITY)
                 .then()
                 .statusCode(409)
                 .body("message", equalTo("Car with this number already exists"));
@@ -154,7 +162,7 @@ public class CarControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateCar)
                 .when()
-                .put(URL + "/1")
+                .put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID.toString())
                 .then()
                 .statusCode(200)
                 .body("id", equalTo(1))
@@ -176,7 +184,7 @@ public class CarControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateCar)
                 .when()
-                .put(URL + "/1")
+                .put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID.toString())
                 .then()
                 .statusCode(409)
                 .body("message", equalTo("Car with this number already exists"));
@@ -191,7 +199,7 @@ public class CarControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateCar)
                 .when()
-                .put(URL + "/2")
+                .put(URL_WITH_ID, CAR_ENTITY, "2")
                 .then()
                 .statusCode(404)
                 .body("message", equalTo("Car was not found"));
@@ -201,19 +209,19 @@ public class CarControllerIT {
     void safeDelete_whenCarIsFound_thenReturn204() {
         RestAssuredMockMvc
                 .when()
-                .delete(URL + "/1")
+                .delete(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID.toString())
                 .then()
                 .statusCode(204);
 
         assertThat(0, equalTo(carRepository.findByIsDeletedFalse(
-                PageRequest.of(0, 10)).getNumberOfElements()));
+                PageRequest.of(PAGE_VALUE, LIMIT_VALUE)).getNumberOfElements()));
     }
 
     @Test
     void safeDelete_whenCarIsNotFound_thenReturn404() {
         RestAssuredMockMvc
                 .when()
-                .delete(URL + "/2")
+                .delete(URL_WITH_ID, CAR_ENTITY, "2")
                 .then()
                 .statusCode(404)
                 .body("message", equalTo("Car was not found"));
