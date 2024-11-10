@@ -10,13 +10,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.example.ride.util.DataUtil.DEFAULT_ID;
+import static org.example.ride.util.DataUtil.getPassengerReadDto;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class PassengerClientServiceTest {
-
-    private static final Long DEFAULT_ID = 1L;
+class PassengerClientServiceTest {
 
     @InjectMocks
     private PassengerClientService passengerClientService;
@@ -26,11 +26,11 @@ public class PassengerClientServiceTest {
 
     @Test
     void checkExistingPassenger_thenReturnPassengerReadDto() {
-        PassengerReadDto readPassenger = new PassengerReadDto(DEFAULT_ID, "name", "name@email.com", "+375441234567", 5.0);
+        PassengerReadDto readPassenger = getPassengerReadDto();
 
         when(passengerClient.findById(DEFAULT_ID)).thenReturn(readPassenger);
 
-        assertThat(passengerClientService.checkExistingPassenger(DEFAULT_ID)).isNotNull();
+        assertThat(passengerClientService.getPassenger(DEFAULT_ID)).isNotNull();
         verify(passengerClient).findById(DEFAULT_ID);
     }
 }

@@ -6,9 +6,9 @@ import org.example.ride.entity.enumeration.PassengerRideStatus;
 import java.math.BigDecimal;
 
 public record RideReadDto(
-        Long id,
+        long id,
         Long driverId,
-        Long passengerId,
+        long passengerId,
         String addressFrom,
         String addressTo,
         DriverRideStatus driverRideStatus,

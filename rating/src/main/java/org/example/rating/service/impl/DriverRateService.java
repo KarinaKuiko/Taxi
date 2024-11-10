@@ -56,7 +56,7 @@ public class DriverRateService implements RateService {
     @Transactional
     public RateReadDto create(RateCreateEditDto rateDto) {
         DriverRate rate = rateMapper.toDriverRate(rateDto);
-        RideReadDto rideReadDto = rideClient.checkExistingRide(rate.getRideId());
+        RideReadDto rideReadDto = rideClient.getRide(rate.getRideId());
         rate = driverRateRepository.save(rate);
         updateAverageRating(rideReadDto.driverId());
         return rateMapper.toReadDto(rate);
@@ -67,7 +67,7 @@ public class DriverRateService implements RateService {
     public RateReadDto update(Long id, RateCreateEditDto rateDto) {
         return driverRateRepository.findById(id)
                 .map(rate -> {
-                    RideReadDto rideReadDto = rideClient.checkExistingRide(rateDto.rideId());
+                    RideReadDto rideReadDto = rideClient.getRide(rateDto.rideId());
                     rateMapper.map(rate, rateDto);
                     driverRateRepository.save(rate);
                     updateAverageRating(rideReadDto.driverId());

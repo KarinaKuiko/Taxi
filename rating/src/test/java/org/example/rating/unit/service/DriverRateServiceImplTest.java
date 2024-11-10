@@ -5,7 +5,6 @@ import org.example.rating.dto.create.RateCreateEditDto;
 import org.example.rating.dto.read.RateReadDto;
 import org.example.rating.dto.read.RideReadDto;
 import org.example.rating.entity.DriverRate;
-import org.example.rating.entity.enumeration.UserType;
 import org.example.rating.exception.rate.RateNotFoundException;
 import org.example.rating.kafka.KafkaProducer;
 import org.example.rating.mapper.RateMapper;
@@ -13,7 +12,6 @@ import org.example.rating.repository.DriverRateRepository;
 import org.example.rating.service.RateCounterService;
 import org.example.rating.service.RideClientService;
 import org.example.rating.service.impl.DriverRateService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,11 +24,17 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.example.rating.util.DataUtil.DEFAULT_ID;
+import static org.example.rating.util.DataUtil.LIMIT_VALUE;
+import static org.example.rating.util.DataUtil.PAGE_VALUE;
+import static org.example.rating.util.DataUtil.getDriverRate;
+import static org.example.rating.util.DataUtil.getDriverRateCreateEditDto;
+import static org.example.rating.util.DataUtil.getDriverRateReadDto;
+import static org.example.rating.util.DataUtil.getRideReadDto;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -38,9 +42,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class DriverRateServiceImplTest {
-
-    private static final Long DEFAULT_ID = 1L;
+class DriverRateServiceImplTest {
 
     @InjectMocks
     private DriverRateService driverRateService;
@@ -63,28 +65,19 @@ public class DriverRateServiceImplTest {
     @Mock
     private KafkaProducer kafkaProducer;
 
-    private DriverRate defaultRate;
-    private RateCreateEditDto createRate;
-    private RateReadDto readRate;
-    private RideReadDto readRide;
-
-    @BeforeEach
-    void init() {
-        readRide = new RideReadDto(DEFAULT_ID, DEFAULT_ID, DEFAULT_ID, "from", "to", "ACCEPTED", "WAITING", new BigDecimal("123.45"));
-        defaultRate = new DriverRate(DEFAULT_ID, DEFAULT_ID, "Great ride!", 5, DEFAULT_ID, UserType.PASSENGER);
-        createRate = new RateCreateEditDto(DEFAULT_ID, "Great ride!", 5, DEFAULT_ID, UserType.PASSENGER);
-        readRate = new RateReadDto(DEFAULT_ID, DEFAULT_ID, "Great ride!", 5, DEFAULT_ID, UserType.PASSENGER);
-    }
+    private DriverRate defaultRate = getDriverRate();
+    private RateCreateEditDto createRate = getDriverRateCreateEditDto();
+    private RateReadDto readRate = getDriverRateReadDto();
+    private RideReadDto readRide = getRideReadDto();
 
     @Test
     void findAll_thenReturnPageRateReadDto() {
-        int page = 0, limit = 10;
-        Pageable request = PageRequest.of(page, limit);
+        Pageable request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
         when(driverRateRepository.findAll(request)).thenReturn(new PageImpl<>(List.of(defaultRate), request, 1));
         when(rateMapper.toReadDto(defaultRate)).thenReturn(readRate);
 
-        Page<RateReadDto> result = driverRateService.findAll(page, limit);
+        Page<RateReadDto> result = driverRateService.findAll(PAGE_VALUE, LIMIT_VALUE);
 
         assertThat(result).isNotNull();
         assertThat(result.getTotalElements()).isEqualTo(1);
@@ -111,7 +104,8 @@ public class DriverRateServiceImplTest {
                 LocaleContextHolder.getLocale()))
                 .thenReturn(ExceptionConstants.RATE_NOT_FOUND);
 
-        RateNotFoundException exception = assertThrows(RateNotFoundException.class, () -> driverRateService.findById(DEFAULT_ID));
+        RateNotFoundException exception = assertThrows(RateNotFoundException.class,
+                () -> driverRateService.findById(DEFAULT_ID));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.RATE_NOT_FOUND);
         verify(driverRateRepository).findById(DEFAULT_ID);
@@ -125,13 +119,13 @@ public class DriverRateServiceImplTest {
     @Test
     void create_whenRideIsExists_thenReturnRateReadDto() {
         when(rateMapper.toDriverRate(createRate)).thenReturn(defaultRate);
-        when(rideClient.checkExistingRide(DEFAULT_ID)).thenReturn(readRide);
+        when(rideClient.getRide(DEFAULT_ID)).thenReturn(readRide);
         when(driverRateRepository.save(defaultRate)).thenReturn(defaultRate);
         when(rateMapper.toReadDto(defaultRate)).thenReturn(readRate);
 
         assertThat(driverRateService.create(createRate)).isNotNull();
         verify(rateMapper).toDriverRate(createRate);
-        verify(rideClient).checkExistingRide(DEFAULT_ID);
+        verify(rideClient).getRide(DEFAULT_ID);
         verify(driverRateRepository).save(defaultRate);
         verify(rateMapper).toReadDto(defaultRate);
     }
@@ -139,13 +133,13 @@ public class DriverRateServiceImplTest {
     @Test
     void update_whenRateIsFound_thenReturnRateReadDto() {
         when(driverRateRepository.findById(DEFAULT_ID)).thenReturn(Optional.of(defaultRate));
-        when(rideClient.checkExistingRide(DEFAULT_ID)).thenReturn(readRide);
+        when(rideClient.getRide(DEFAULT_ID)).thenReturn(readRide);
         when(driverRateRepository.save(defaultRate)).thenReturn(defaultRate);
         when(rateMapper.toReadDto(defaultRate)).thenReturn(readRate);
 
         assertThat(driverRateService.update(DEFAULT_ID, createRate)).isNotNull();
         verify(driverRateRepository).findById(DEFAULT_ID);
-        verify(rideClient).checkExistingRide(DEFAULT_ID);
+        verify(rideClient).getRide(DEFAULT_ID);
         verify(rateMapper).map(defaultRate, createRate);
         verify(driverRateRepository).save(defaultRate);
         verify(rateMapper).toReadDto(defaultRate);
@@ -160,11 +154,12 @@ public class DriverRateServiceImplTest {
                 LocaleContextHolder.getLocale()))
                 .thenReturn(ExceptionConstants.RATE_NOT_FOUND);
 
-        RateNotFoundException exception = assertThrows(RateNotFoundException.class, () -> driverRateService.update(DEFAULT_ID, createRate));
+        RateNotFoundException exception = assertThrows(RateNotFoundException.class,
+                () -> driverRateService.update(DEFAULT_ID, createRate));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.RATE_NOT_FOUND);
         verify(driverRateRepository).findById(DEFAULT_ID);
-        verify(rideClient, never()).checkExistingRide(any());
+        verify(rideClient, never()).getRide(any());
         verify(rateMapper, never()).map(any(), any());
         verify(driverRateRepository, never()).save(any());
         verify(rateMapper, never()).toReadDto(any(DriverRate.class));

@@ -3,11 +3,11 @@ package org.example.driver.dto.read;
 import java.util.List;
 
 public record CarReadDto(
-        Long id,
+        long id,
         String color,
         String brand,
         String number,
-        Integer year,
+        int year,
         List<DriverReadDto> drivers
 ) {
 }

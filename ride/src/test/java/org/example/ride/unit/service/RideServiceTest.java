@@ -20,7 +20,6 @@ import org.example.ride.service.PassengerClientService;
 import org.example.ride.service.RideService;
 import org.example.ride.utils.PriceGenerator;
 import org.example.ride.validation.RideStatusValidation;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,11 +32,18 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.example.ride.util.DataUtil.DEFAULT_ID;
+import static org.example.ride.util.DataUtil.LIMIT_VALUE;
+import static org.example.ride.util.DataUtil.PAGE_VALUE;
+import static org.example.ride.util.DataUtil.getDriverReadDto;
+import static org.example.ride.util.DataUtil.getPassengerReadDto;
+import static org.example.ride.util.DataUtil.getRide;
+import static org.example.ride.util.DataUtil.getRideCreateEditDto;
+import static org.example.ride.util.DataUtil.getRideReadDto;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -46,9 +52,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class RideServiceTest {
-
-    private static final Long DEFAULT_ID = 1L;
+class RideServiceTest {
 
     @InjectMocks
     private RideService rideService;
@@ -77,18 +81,9 @@ public class RideServiceTest {
     @Mock
     private KafkaProducer kafkaProducer;
 
-    private Ride defaultRide;
-    private RideCreateEditDto createRide;
-    private RideReadDto readRide;
-
-    @BeforeEach
-    void init() {
-        defaultRide = new Ride(DEFAULT_ID, DEFAULT_ID, DEFAULT_ID, "from",
-                "to", DriverRideStatus.ACCEPTED, PassengerRideStatus.WAITING, new BigDecimal("123.45"));
-        createRide = new RideCreateEditDto(DEFAULT_ID, DEFAULT_ID, "from", "to");
-        readRide = new RideReadDto(DEFAULT_ID, DEFAULT_ID, DEFAULT_ID, "from",
-                "to", DriverRideStatus.ACCEPTED, PassengerRideStatus.WAITING, new BigDecimal("123.45"));
-    }
+    private Ride defaultRide = getRide();
+    private RideCreateEditDto createRide = getRideCreateEditDto();
+    private RideReadDto readRide = getRideReadDto();
 
     @Test
     void findRides_whenDriverAndPassengerIdsEnter_thenThrowInvalidCountParametersException() {
@@ -99,7 +94,7 @@ public class RideServiceTest {
                 .thenReturn(ExceptionConstants.INVALID_COUNT_PARAMETERS_MESSAGE);
 
         InvalidCountParametersException exception = assertThrows(InvalidCountParametersException.class,
-                () -> rideService.findRides(DEFAULT_ID, DEFAULT_ID, 1, 10));
+                () -> rideService.findRides(DEFAULT_ID, DEFAULT_ID, PAGE_VALUE, LIMIT_VALUE));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.INVALID_COUNT_PARAMETERS_MESSAGE);
         verify(messageSource).getMessage(
@@ -110,14 +105,13 @@ public class RideServiceTest {
 
     @Test
     void findRides_whenDriverIdEnter_thenReturnPageRideReadDto() {
-        int page = 0, limit = 10;
-        Pageable request = PageRequest.of(page, limit);
+        Pageable request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
         when(rideRepository.findByDriverId(DEFAULT_ID, request))
                 .thenReturn(new PageImpl<>(List.of(defaultRide), request, 1));
         when(rideMapper.toReadDto(defaultRide)).thenReturn(readRide);
 
-        Page<RideReadDto> result = rideService.findRides(DEFAULT_ID, null, page, limit);
+        Page<RideReadDto> result = rideService.findRides(DEFAULT_ID, null, PAGE_VALUE, LIMIT_VALUE);
 
         assertThat(result).isNotNull();
         assertThat(result.getTotalElements()).isEqualTo(1);
@@ -127,14 +121,13 @@ public class RideServiceTest {
 
     @Test
     void findRides_whenPassengerIdEnter_thenReturnPageRideReadDto() {
-        int page = 0, limit = 10;
-        Pageable request = PageRequest.of(page, limit);
+        Pageable request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
         when(rideRepository.findByPassengerId(DEFAULT_ID, request))
                 .thenReturn(new PageImpl<>(List.of(defaultRide), request, 1));
         when(rideMapper.toReadDto(defaultRide)).thenReturn(readRide);
 
-        Page<RideReadDto> result = rideService.findRides(null, DEFAULT_ID, page, limit);
+        Page<RideReadDto> result = rideService.findRides(null, DEFAULT_ID, PAGE_VALUE, LIMIT_VALUE);
 
         assertThat(result).isNotNull();
         assertThat(result.getTotalElements()).isEqualTo(1);
@@ -144,14 +137,13 @@ public class RideServiceTest {
 
     @Test
     void findAll_thenReturnPageRideReadDto() {
-        int page = 0, limit = 10;
-        Pageable request = PageRequest.of(page, limit);
+        Pageable request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
         when(rideRepository.findAll(request))
                 .thenReturn(new PageImpl<>(List.of(defaultRide), request, 1));
         when(rideMapper.toReadDto(defaultRide)).thenReturn(readRide);
 
-        Page<RideReadDto> result = rideService.findAll(page, limit);
+        Page<RideReadDto> result = rideService.findAll(PAGE_VALUE, LIMIT_VALUE);
 
         assertThat(result).isNotNull();
         assertThat(result.getTotalElements()).isEqualTo(1);
@@ -192,14 +184,13 @@ public class RideServiceTest {
 
     @Test
     void findByPassengerId_whenIdEnter_thenReturnPageRideReadDto() {
-        int page = 0, limit = 10;
-        Pageable request = PageRequest.of(page, limit);
+        Pageable request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
         when(rideRepository.findByPassengerId(DEFAULT_ID, request))
                 .thenReturn(new PageImpl<>(List.of(defaultRide), request, 1));
         when(rideMapper.toReadDto(defaultRide)).thenReturn(readRide);
 
-        Page<RideReadDto> result = rideService.findByPassengerId(DEFAULT_ID, page, limit);
+        Page<RideReadDto> result = rideService.findByPassengerId(DEFAULT_ID, PAGE_VALUE, LIMIT_VALUE);
 
         assertThat(result).isNotNull();
         assertThat(result.getTotalElements()).isEqualTo(1);
@@ -209,14 +200,13 @@ public class RideServiceTest {
 
     @Test
     void findByDriverId_whenIdEnter_thenReturnPageRideReadDto() {
-        int page = 0, limit = 10;
-        Pageable request = PageRequest.of(page, limit);
+        Pageable request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
         when(rideRepository.findByDriverId(DEFAULT_ID, request))
                 .thenReturn(new PageImpl<>(List.of(defaultRide), request, 1));
         when(rideMapper.toReadDto(defaultRide)).thenReturn(readRide);
 
-        Page<RideReadDto> result = rideService.findByDriverId(DEFAULT_ID, page, limit);
+        Page<RideReadDto> result = rideService.findByDriverId(DEFAULT_ID, PAGE_VALUE, LIMIT_VALUE);
 
         assertThat(result).isNotNull();
         assertThat(result.getTotalElements()).isEqualTo(1);
@@ -226,13 +216,11 @@ public class RideServiceTest {
 
     @Test
     void create_whenRideCreateEditDtoEnter_thenReturnRideReadDto() {
-        DriverReadDto readDriver = new DriverReadDto(DEFAULT_ID, "name",
-                "name@gmail.com", "+375331234567", "MALE", DEFAULT_ID, 5.0);
-        PassengerReadDto readPassenger = new PassengerReadDto(DEFAULT_ID, "name",
-                "name@gmail.com", "+375331234567", 5.0);
+        DriverReadDto readDriver = getDriverReadDto();
+        PassengerReadDto readPassenger = getPassengerReadDto();
 
-        when(driverClient.checkExistingDriver(DEFAULT_ID)).thenReturn(readDriver);
-        when(passengerClient.checkExistingPassenger(DEFAULT_ID)).thenReturn(readPassenger);
+        when(driverClient.getDriver(DEFAULT_ID)).thenReturn(readDriver);
+        when(passengerClient.getPassenger(DEFAULT_ID)).thenReturn(readPassenger);
         when(rideMapper.toRide(createRide)).thenReturn(defaultRide);
         when(rideRepository.save(defaultRide)).thenReturn(defaultRide);
         when(rideMapper.toReadDto(defaultRide)).thenReturn(readRide);
@@ -240,8 +228,8 @@ public class RideServiceTest {
         assertThat(rideService.create(createRide)).isNotNull();
         assertThat(defaultRide.getDriverRideStatus()).isEqualTo(DriverRideStatus.CREATED);
         assertThat(defaultRide.getPassengerRideStatus()).isEqualTo(PassengerRideStatus.WAITING);
-        verify(driverClient).checkExistingDriver(DEFAULT_ID);
-        verify(passengerClient).checkExistingPassenger(DEFAULT_ID);
+        verify(driverClient).getDriver(DEFAULT_ID);
+        verify(passengerClient).getPassenger(DEFAULT_ID);
         verify(rideMapper).toRide(createRide);
         verify(rideRepository).save(defaultRide);
         verify(rideMapper).toReadDto(defaultRide);
@@ -249,20 +237,18 @@ public class RideServiceTest {
 
     @Test
     void update_whenRideIsFound_thenReturnRideReadDto() {
-        DriverReadDto readDriver = new DriverReadDto(DEFAULT_ID, "name",
-                "name@gmail.com", "+375331234567", "MALE", DEFAULT_ID, 5.0);
-        PassengerReadDto readPassenger = new PassengerReadDto(DEFAULT_ID, "name",
-                "name@gmail.com", "+375331234567", 5.0);
+        DriverReadDto readDriver = getDriverReadDto();
+        PassengerReadDto readPassenger = getPassengerReadDto();
 
         when(rideRepository.findById(DEFAULT_ID)).thenReturn(Optional.of(defaultRide));
-        when(driverClient.checkExistingDriver(DEFAULT_ID)).thenReturn(readDriver);
-        when(passengerClient.checkExistingPassenger(DEFAULT_ID)).thenReturn(readPassenger);
+        when(driverClient.getDriver(DEFAULT_ID)).thenReturn(readDriver);
+        when(passengerClient.getPassenger(DEFAULT_ID)).thenReturn(readPassenger);
         when(rideRepository.save(defaultRide)).thenReturn(defaultRide);
         when(rideMapper.toReadDto(defaultRide)).thenReturn(readRide);
 
         assertThat(rideService.update(DEFAULT_ID, createRide)).isNotNull();
-        verify(driverClient).checkExistingDriver(DEFAULT_ID);
-        verify(passengerClient).checkExistingPassenger(DEFAULT_ID);
+        verify(driverClient).getDriver(DEFAULT_ID);
+        verify(passengerClient).getPassenger(DEFAULT_ID);
         verify(rideMapper).map(defaultRide, createRide);
         verify(rideRepository).save(defaultRide);
         verify(rideMapper).toReadDto(defaultRide);
@@ -286,8 +272,8 @@ public class RideServiceTest {
                 new Object[]{DEFAULT_ID},
                 LocaleContextHolder.getLocale());
         verify(rideRepository).findById(DEFAULT_ID);
-        verify(driverClient, never()).checkExistingDriver(any());
-        verify(passengerClient, never()).checkExistingPassenger(any());
+        verify(driverClient, never()).getDriver(any());
+        verify(passengerClient, never()).getPassenger(any());
         verify(rideMapper, never()).map(any(), any());
         verify(rideRepository, never()).save(any());
         verify(rideMapper, never()).toReadDto(any());

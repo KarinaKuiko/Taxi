@@ -5,14 +5,12 @@ import org.example.driver.dto.create.CarCreateEditDto;
 import org.example.driver.dto.read.CarReadDto;
 import org.example.driver.entity.Car;
 import org.example.driver.entity.Driver;
-import org.example.driver.entity.enumeration.Gender;
 import org.example.driver.exception.car.CarNotFoundException;
 import org.example.driver.exception.car.DuplicatedCarNumberException;
 import org.example.driver.mapper.CarMapper;
 import org.example.driver.repository.CarRepository;
 import org.example.driver.repository.DriverRepository;
 import org.example.driver.service.CarService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,6 +26,13 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.example.driver.util.DataUtil.DEFAULT_ID;
+import static org.example.driver.util.DataUtil.LIMIT_VALUE;
+import static org.example.driver.util.DataUtil.PAGE_VALUE;
+import static org.example.driver.util.DataUtil.getCar;
+import static org.example.driver.util.DataUtil.getCarCreateEditDto;
+import static org.example.driver.util.DataUtil.getCarReadDto;
+import static org.example.driver.util.DataUtil.getDriver;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -35,9 +40,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class CarServiceTest {
-
-    private static final Long DEFAULT_ID = 1L;
+class CarServiceTest {
 
     @Mock
     private CarRepository carRepository;
@@ -54,18 +57,10 @@ public class CarServiceTest {
     @InjectMocks
     private CarService carService;
 
-    private Car defaultCar;
-    private CarCreateEditDto createCar;
-    private CarReadDto readCar;
-    private Driver driver;
-
-    @BeforeEach
-    void init() {
-        driver = new Driver(DEFAULT_ID, "name", "name@gmail.com", "+375331234567", Gender.MALE, defaultCar, 5.);
-        defaultCar = new Car(DEFAULT_ID, "red", "BMW", "AB123CD", 2023, List.of(driver));
-        createCar = new CarCreateEditDto("red", "BMW", "AB123CD", 2023);
-        readCar = new CarReadDto(DEFAULT_ID, "red", "BMW", "AB123CD", 2023, List.of());
-    }
+    private Car defaultCar = getCar().build();
+    private CarCreateEditDto createCar = getCarCreateEditDto();
+    private CarReadDto readCar = getCarReadDto();
+    private Driver driver = getDriver().build();
 
     @Test
     void create_whenCarNumberIsNotDuplicated_thenReturnCarReadDto() {
@@ -92,7 +87,8 @@ public class CarServiceTest {
                 LocaleContextHolder.getLocale()))
                 .thenReturn(ExceptionConstants.CAR_DUPLICATED_NUMBER);
 
-        DuplicatedCarNumberException exception = assertThrows(DuplicatedCarNumberException.class, () -> carService.create(createCar));
+        DuplicatedCarNumberException exception = assertThrows(DuplicatedCarNumberException.class,
+                () -> carService.create(createCar));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.CAR_DUPLICATED_NUMBER);
         verify(carRepository).findByNumberAndIsDeletedFalse(createCar.number());
@@ -133,7 +129,8 @@ public class CarServiceTest {
                 LocaleContextHolder.getLocale()))
                 .thenReturn(ExceptionConstants.CAR_DUPLICATED_NUMBER);
 
-        DuplicatedCarNumberException exception = assertThrows(DuplicatedCarNumberException.class, () -> carService.update(2L, createCar));
+        DuplicatedCarNumberException exception = assertThrows(DuplicatedCarNumberException.class,
+                () -> carService.update(2L, createCar));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.CAR_DUPLICATED_NUMBER);
         verify(carRepository).findByIdAndIsDeletedFalse(2L);
@@ -172,7 +169,8 @@ public class CarServiceTest {
                 LocaleContextHolder.getLocale()))
                 .thenReturn(ExceptionConstants.CAR_NOT_FOUND);
 
-        CarNotFoundException exception = assertThrows(CarNotFoundException.class, () -> carService.update(2L, createCar));
+        CarNotFoundException exception = assertThrows(CarNotFoundException.class,
+                () -> carService.update(2L, createCar));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.CAR_NOT_FOUND);
         verify(carRepository).findByIdAndIsDeletedFalse(2L);
@@ -227,7 +225,8 @@ public class CarServiceTest {
                 LocaleContextHolder.getLocale()))
                 .thenReturn(ExceptionConstants.CAR_NOT_FOUND);
 
-        CarNotFoundException exception = assertThrows(CarNotFoundException.class, () -> carService.safeDelete(DEFAULT_ID));
+        CarNotFoundException exception = assertThrows(CarNotFoundException.class,
+                () -> carService.safeDelete(DEFAULT_ID));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.CAR_NOT_FOUND);
         assertThat(defaultCar.isDeleted()).isFalse();
@@ -243,13 +242,13 @@ public class CarServiceTest {
 
     @Test
     void findAll_thenReturnPageCarReadDto() {
-        int page = 0, limit = 10;
-        PageRequest request = PageRequest.of(page, limit);
+        PageRequest request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
-        when(carRepository.findByIsDeletedFalse(request)).thenReturn(new PageImpl<>(List.of(defaultCar), request, 1));
+        when(carRepository.findByIsDeletedFalse(request)).thenReturn(
+                new PageImpl<>(List.of(defaultCar), request, 1));
         when(carMapper.toReadDto(defaultCar)).thenReturn(readCar);
 
-        Page<CarReadDto> result = carService.findAll(page, limit);
+        Page<CarReadDto> result = carService.findAll(PAGE_VALUE, LIMIT_VALUE);
 
         assertThat(result).isNotNull();
         assertThat(result.getTotalElements()).isEqualTo(1);
@@ -259,13 +258,12 @@ public class CarServiceTest {
 
     @Test
     void findAllWithDeleted_thenReturnPageCarReadDto() {
-        int page = 0, limit = 10;
-        PageRequest request = PageRequest.of(page, limit);
+        PageRequest request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
         when(carRepository.findAll(request)).thenReturn(new PageImpl<>(List.of(defaultCar), request, 1));
         when(carMapper.toReadDto(defaultCar)).thenReturn(readCar);
 
-        Page<CarReadDto> result = carService.findAllWithDeleted(page, limit);
+        Page<CarReadDto> result = carService.findAllWithDeleted(PAGE_VALUE, LIMIT_VALUE);
 
         assertThat(result).isNotNull();
         assertThat(result.getTotalElements()).isEqualTo(1);
@@ -292,7 +290,8 @@ public class CarServiceTest {
                 LocaleContextHolder.getLocale()))
                 .thenReturn(ExceptionConstants.CAR_NOT_FOUND);
 
-        CarNotFoundException exception = assertThrows(CarNotFoundException.class, () -> carService.findById(DEFAULT_ID));
+        CarNotFoundException exception = assertThrows(CarNotFoundException.class,
+                () -> carService.findById(DEFAULT_ID));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.CAR_NOT_FOUND);
         verify(messageSource).getMessage(

@@ -14,7 +14,7 @@ public class PassengerClientService {
     private final PassengerClient passengerClient;
 
     @CircuitBreaker(name = "passenger-client")
-    public PassengerReadDto checkExistingPassenger(Long id) {
+    public PassengerReadDto getPassenger(Long id) {
         return passengerClient.findById(id);
     }
 }

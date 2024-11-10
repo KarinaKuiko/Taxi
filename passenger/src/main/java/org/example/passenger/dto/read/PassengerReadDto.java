@@ -1,12 +1,12 @@
 package org.example.passenger.dto.read;
 
 public record PassengerReadDto(
-        Long id,
+        long id,
         String name,
 
         String email,
 
         String phone,
-        Double rating
+        double rating
 ) {
 }

@@ -14,7 +14,7 @@ public class RideClientService {
     private final RideClient rideClient;
 
     @CircuitBreaker(name = "ride-client")
-    public RideReadDto checkExistingRide(Long rideId) {
+    public RideReadDto getRide(Long rideId) {
         return rideClient.findById(rideId);
     }
 }

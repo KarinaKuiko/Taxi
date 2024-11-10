@@ -14,7 +14,7 @@ public class DriverClientService {
     private final DriverClient driverClient;
 
     @CircuitBreaker(name = "driver-client")
-    public DriverReadDto checkExistingDriver(Long id) {
+    public DriverReadDto getDriver(Long id) {
         return driverClient.findById(id);
     }
 }

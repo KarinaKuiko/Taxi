@@ -3,11 +3,11 @@ package org.example.rating.dto.read;
 import org.example.rating.entity.enumeration.UserType;
 
 public record RateReadDto(
-        Long id,
-        Long rideId,
+        long id,
+        long rideId,
         String comment,
         Integer rating,
-        Long userId,
+        long userId,
         UserType userType
 ) {
 }

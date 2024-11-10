@@ -1,6 +1,7 @@
 package org.example.ride.unit.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.ride.config.MessageSourceConfig;
 import org.example.ride.controller.RideController;
 import org.example.ride.dto.create.DriverRideStatusDto;
 import org.example.ride.dto.create.PassengerRideStatusDto;
@@ -11,7 +12,6 @@ import org.example.ride.entity.enumeration.DriverRideStatus;
 import org.example.ride.entity.enumeration.PassengerRideStatus;
 import org.example.ride.exception.violation.Violation;
 import org.example.ride.service.RideService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -19,6 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +31,15 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.example.ride.util.DataUtil.DEFAULT_ID;
+import static org.example.ride.util.DataUtil.LIMIT;
+import static org.example.ride.util.DataUtil.LIMIT_VALUE;
+import static org.example.ride.util.DataUtil.PAGE;
+import static org.example.ride.util.DataUtil.PAGE_VALUE;
+import static org.example.ride.util.DataUtil.URL;
+import static org.example.ride.util.DataUtil.URL_WITH_ID;
+import static org.example.ride.util.DataUtil.getRideCreateEditDto;
+import static org.example.ride.util.DataUtil.getRideReadDto;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -39,9 +49,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = RideController.class)
-public class RideControllerTest {
-    private static final String URL = "/api/v1/rides";
-    private static final Long DEFAULT_ID = 1L;
+@Import(MessageSourceConfig.class)
+class RideControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -52,22 +61,19 @@ public class RideControllerTest {
     @MockBean
     private RideService rideService;
 
-    private RideReadDto defaultRide;
+    private RideReadDto readRide = getRideReadDto();
+    private RideCreateEditDto createRide = getRideCreateEditDto();
 
-    @BeforeEach
-    void init() {
-        defaultRide = new RideReadDto(DEFAULT_ID, DEFAULT_ID, DEFAULT_ID, "From", "To",
-                DriverRideStatus.ACCEPTED, PassengerRideStatus.WAITING, new BigDecimal("123.43"));
-    }
 
     @Nested
     @DisplayName("Find all tests")
     public class findAllTests {
         @Test
         void findAll_whenVerifyingRequestMatchingWithoutParams_thenReturn200() throws Exception {
-            Page<RideReadDto> ridePage = new PageImpl<>(List.of(defaultRide), PageRequest.of(0, 10), 1);
+            Page<RideReadDto> ridePage = new PageImpl<>(List.of(readRide),
+                    PageRequest.of(PAGE_VALUE, LIMIT_VALUE), 1);
 
-            when(rideService.findRides(null, null, 0, 10)).thenReturn(ridePage);
+            when(rideService.findRides(null, null, PAGE_VALUE, LIMIT_VALUE)).thenReturn(ridePage);
 
             mockMvc.perform(get(URL))
                     .andExpect(status().isOk());
@@ -75,52 +81,55 @@ public class RideControllerTest {
 
         @Test
         void findAll_whenCorrectParams_thenReturn200() throws Exception {
-            Page<RideReadDto> ridePage = new PageImpl<>(List.of(defaultRide), PageRequest.of(0, 10), 1);
+            Page<RideReadDto> ridePage = new PageImpl<>(List.of(readRide),
+                    PageRequest.of(PAGE_VALUE, LIMIT_VALUE), 1);
 
-            when(rideService.findRides(null, null, 0, 10)).thenReturn(ridePage);
+            when(rideService.findRides(null, null, PAGE_VALUE, LIMIT_VALUE)).thenReturn(ridePage);
 
             mockMvc.perform(get(URL)
-                            .param("page", "0")
-                            .param("limit", "10"))
+                            .param(PAGE, PAGE_VALUE.toString())
+                            .param(LIMIT, LIMIT_VALUE.toString()))
                     .andExpect(status().isOk());
         }
 
         @Test
         void findAll_whenCorrectParamsWithDriverId_thenReturn200() throws Exception {
-            Page<RideReadDto> ridePage = new PageImpl<>(List.of(defaultRide), PageRequest.of(0, 10), 1);
+            Page<RideReadDto> ridePage = new PageImpl<>(List.of(readRide),
+                    PageRequest.of(PAGE_VALUE, LIMIT_VALUE), 1);
 
-            when(rideService.findRides(1L, null, 0, 10)).thenReturn(ridePage);
+            when(rideService.findRides(1L, null, PAGE_VALUE, LIMIT_VALUE)).thenReturn(ridePage);
 
             mockMvc.perform(get(URL)
                             .param("driverId", "1")
-                            .param("page", "0")
-                            .param("limit", "10"))
+                            .param(PAGE, PAGE_VALUE.toString())
+                            .param(LIMIT, LIMIT_VALUE.toString()))
                     .andExpect(status().isOk());
         }
 
         @Test
         void findAll_whenCorrectParamsWithPassengerId_thenReturn200() throws Exception {
-            Page<RideReadDto> ridePage = new PageImpl<>(List.of(defaultRide), PageRequest.of(0, 10), 1);
+            Page<RideReadDto> ridePage = new PageImpl<>(List.of(readRide),
+                    PageRequest.of(PAGE_VALUE, LIMIT_VALUE), 1);
 
-            when(rideService.findRides(null, 1L, 0, 10)).thenReturn(ridePage);
+            when(rideService.findRides(null, 1L, PAGE_VALUE, LIMIT_VALUE)).thenReturn(ridePage);
 
             mockMvc.perform(get(URL)
                             .param("passengerId", "1")
-                            .param("page", "0")
-                            .param("limit", "10"))
+                            .param(PAGE, PAGE_VALUE.toString())
+                            .param(LIMIT, LIMIT_VALUE.toString()))
                     .andExpect(status().isOk());
         }
 
         @Test
         void findAll_whenLimitIsGreaterThanMax_thenReturn400AndValidationResponse() throws Exception {
             MvcResult mvcResult = mockMvc.perform(get(URL)
-                            .param("page", "1")
-                            .param("limit", "101"))
+                            .param(PAGE, PAGE_VALUE.toString())
+                            .param(LIMIT, "101"))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
             ValidationResponse expextedValidationResponse = new ValidationResponse(
-                    List.of(new Violation("limit", "must be less than or equal to 100")));
+                    List.of(new Violation(LIMIT, "must be less than or equal to 100")));
             String actualResponse = mvcResult.getResponse().getContentAsString();
 
             assertThat(actualResponse).isEqualToIgnoringWhitespace(
@@ -130,13 +139,13 @@ public class RideControllerTest {
         @Test
         void findAll_whenLimitIsLessThanMin_thenReturn400AndValidationResponse() throws Exception {
             MvcResult mvcResult = mockMvc.perform(get(URL)
-                            .param("page", "1")
-                            .param("limit", "0"))
+                            .param(PAGE, PAGE_VALUE.toString())
+                            .param(LIMIT, "0"))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
             ValidationResponse expextedValidationResponse = new ValidationResponse(
-                    List.of(new Violation("limit", "must be greater than or equal to 1")));
+                    List.of(new Violation(LIMIT, "must be greater than or equal to 1")));
             String actualResponse = mvcResult.getResponse().getContentAsString();
 
             assertThat(actualResponse).isEqualToIgnoringWhitespace(
@@ -148,31 +157,18 @@ public class RideControllerTest {
     @DisplayName("Find by id tests")
     public class FindByIdTests {
         @Test
-        void findById_whenValidInput_thenReturn200() throws Exception {
-            when(rideService.findById(DEFAULT_ID)).thenReturn(defaultRide);
-
-            MvcResult mvcResult = mockMvc.perform(get(URL + "/{id}", DEFAULT_ID))
-                    .andExpect(status().isOk())
-                    .andReturn();
-
-            String actual = mvcResult.getResponse().getContentAsString();
-
-            assertThat(actual).isEqualToIgnoringWhitespace(
-                    objectMapper.writeValueAsString(defaultRide));
-        }
-
-        @Test
         void findById_whenVerifyingRequestMatching_thenReturn200() throws Exception {
-            when(rideService.findById(DEFAULT_ID)).thenReturn(defaultRide);
+            when(rideService.findById(DEFAULT_ID)).thenReturn(readRide);
 
-            MvcResult mvcResult = mockMvc.perform(get(URL + "/1"))
+            MvcResult mvcResult = mockMvc.perform(get(URL_WITH_ID, DEFAULT_ID))
                     .andExpect(status().isOk())
                     .andReturn();
 
             String actual = mvcResult.getResponse().getContentAsString();
 
             assertThat(actual).isEqualToIgnoringWhitespace(
-                    objectMapper.writeValueAsString(defaultRide));
+                    objectMapper.writeValueAsString(readRide));
+            verify(rideService, times(1)).findById(DEFAULT_ID);
         }
     }
 
@@ -181,19 +177,17 @@ public class RideControllerTest {
     public class CreateTests {
         @Test
         void create_whenVerifyingRequestMatching_thenReturn200() throws Exception {
-            RideCreateEditDto createRide = new RideCreateEditDto(1L, 1L, "Test", "Test");
-
             mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(createRide)))
                     .andExpect(status().isCreated())
                     .andReturn();
+
+            verify(rideService, times(1)).create(createRide);
         }
 
         @Test
         void create_whenValidInput_thenMapsToBusinessModel() throws Exception {
-            RideCreateEditDto createRide = new RideCreateEditDto(1L, 1L, "Test", "Test");
-
             mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(createRide)))
@@ -203,18 +197,14 @@ public class RideControllerTest {
             ArgumentCaptor<RideCreateEditDto> rideCaptor = ArgumentCaptor.forClass(RideCreateEditDto.class);
 
             verify(rideService, times(1)).create(rideCaptor.capture());
-            assertThat(rideCaptor.getValue().driverId()).isEqualTo(1L);
-            assertThat(rideCaptor.getValue().passengerId()).isEqualTo(1L);
-            assertThat(rideCaptor.getValue().addressFrom()).isEqualTo("Test");
-            assertThat(rideCaptor.getValue().addressTo()).isEqualTo("Test");
+            assertThat(rideCaptor.getValue().driverId()).isEqualTo(DEFAULT_ID);
+            assertThat(rideCaptor.getValue().passengerId()).isEqualTo(DEFAULT_ID);
+            assertThat(rideCaptor.getValue().addressFrom()).isEqualTo("from");
+            assertThat(rideCaptor.getValue().addressTo()).isEqualTo("to");
         }
 
         @Test
         void create_whenValidInput_thenReturn201AndCarReadDto() throws Exception {
-            RideCreateEditDto createRide = new RideCreateEditDto(1L, 1L, "Test", "Test");
-            RideReadDto readRide = new RideReadDto(3L, 1L, 1L, "Test", "Test",
-                    DriverRideStatus.CREATED, PassengerRideStatus.WAITING, new BigDecimal("555.10"));
-
             when(rideService.create(createRide)).thenReturn(readRide);
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -239,10 +229,10 @@ public class RideControllerTest {
                     .andReturn();
 
             ValidationResponse expectedValidationResponse = new ValidationResponse(
-                    List.of(new Violation("driverId", "{id.min}"),
-                            new Violation("passengerId", "{id.min}"),
-                            new Violation("addressFrom", "{address.from.blank}"),
-                            new Violation("addressTo", "{address.from.blank}")));
+                    List.of(new Violation("driverId", "Id should be 1 and more"),
+                            new Violation("passengerId", "Id should be 1 and more"),
+                            new Violation("addressFrom", "Address from cannot be blank"),
+                            new Violation("addressTo", "Address to cannot be blank")));
             ValidationResponse actualResponse = objectMapper.readValue(
                     mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
@@ -252,7 +242,7 @@ public class RideControllerTest {
 
         @Test
         void create_whenInvalidInputNull_thenReturn400AndValidationResponse() throws Exception {
-            RideCreateEditDto createRide = new RideCreateEditDto(null, null, null, null);
+            RideCreateEditDto createRide = new RideCreateEditDto(null, null, "from", "to");
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -261,9 +251,7 @@ public class RideControllerTest {
                     .andReturn();
 
             ValidationResponse expectedValidationResponse = new ValidationResponse(
-                    List.of(new Violation("passengerId", "{passenger.null}"),
-                            new Violation("addressFrom", "{address.from.blank}"),
-                            new Violation("addressTo", "{address.from.blank}")));
+                    List.of(new Violation("passengerId", "Passenger cannot be null")));
             ValidationResponse actualResponse = objectMapper.readValue(
                     mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
@@ -277,31 +265,19 @@ public class RideControllerTest {
     public class UpdateTests {
         @Test
         void update_whenVerifyingRequestMatching_thenReturn200() throws Exception {
-            RideCreateEditDto updateRide = new RideCreateEditDto(1L, 1L, "Test", "Test");
-
-            mockMvc.perform(put(URL + "/{id}", DEFAULT_ID)
+            mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(updateRide)))
+                            .content(objectMapper.writeValueAsString(createRide)))
                     .andExpect(status().isOk());
-        }
 
-        @Test
-        void update_whenValidInput_thenReturn200() throws Exception {
-            RideCreateEditDto updateRide = new RideCreateEditDto(1L, 1L, "Test", "Test");
-
-            mockMvc.perform(put(URL + "/1")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(updateRide)))
-                    .andExpect(status().isOk());
+            verify(rideService, times(1)).update(DEFAULT_ID, createRide);
         }
 
         @Test
         void update_whenValidInput_thenMapsToBusinessModel() throws Exception {
-            RideCreateEditDto updateRide = new RideCreateEditDto(1L, 1L, "Test", "Test");
-
-            mockMvc.perform(put(URL + "/{id}", DEFAULT_ID)
+            mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(updateRide)))
+                            .content(objectMapper.writeValueAsString(createRide)))
                     .andExpect(status().isOk());
 
             ArgumentCaptor<RideCreateEditDto> rideCaptor = ArgumentCaptor.forClass(RideCreateEditDto.class);
@@ -309,23 +285,19 @@ public class RideControllerTest {
 
             verify(rideService, times(1)).update(idCaptor.capture(), rideCaptor.capture());
             assertThat(idCaptor.getValue()).isEqualTo(DEFAULT_ID);
-            assertThat(rideCaptor.getValue().driverId()).isEqualTo(1L);
-            assertThat(rideCaptor.getValue().passengerId()).isEqualTo(1L);
-            assertThat(rideCaptor.getValue().addressFrom()).isEqualTo("Test");
-            assertThat(rideCaptor.getValue().addressTo()).isEqualTo("Test");
+            assertThat(rideCaptor.getValue().driverId()).isEqualTo(DEFAULT_ID);
+            assertThat(rideCaptor.getValue().passengerId()).isEqualTo(DEFAULT_ID);
+            assertThat(rideCaptor.getValue().addressFrom()).isEqualTo("from");
+            assertThat(rideCaptor.getValue().addressTo()).isEqualTo("to");
         }
 
         @Test
         void update_whenValidInput_thenReturn200AndCarReadDto() throws Exception {
-            RideCreateEditDto updateRide = new RideCreateEditDto(1L, 1L, "Test", "Test");
-            RideReadDto readRide = new RideReadDto(DEFAULT_ID, 1L, 1L, "Test", "Test",
-                    DriverRideStatus.ACCEPTED, PassengerRideStatus.WAITING, new BigDecimal("123.43"));
+            when(rideService.update(DEFAULT_ID, createRide)).thenReturn(readRide);
 
-            when(rideService.update(DEFAULT_ID, updateRide)).thenReturn(readRide);
-
-            MvcResult mvcResult = mockMvc.perform(put(URL + "/{id}", DEFAULT_ID)
+            MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(updateRide)))
+                            .content(objectMapper.writeValueAsString(createRide)))
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -338,17 +310,17 @@ public class RideControllerTest {
         void update_whenInvalidInputMinAndNull_thenReturn400AndValidationResponse() throws Exception {
             RideCreateEditDto updateRide = new RideCreateEditDto(0L, 0L, null, null);
 
-            MvcResult mvcResult = mockMvc.perform(put(URL + "/{id}", DEFAULT_ID)
+            MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(updateRide)))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
             ValidationResponse expectedValidationResponse = new ValidationResponse(
-                    List.of(new Violation("driverId", "{id.min}"),
-                            new Violation("passengerId", "{id.min}"),
-                            new Violation("addressFrom", "{address.from.blank}"),
-                            new Violation("addressTo", "{address.from.blank}")));
+                    List.of(new Violation("driverId", "Id should be 1 and more"),
+                            new Violation("passengerId", "Id should be 1 and more"),
+                            new Violation("addressFrom", "Address from cannot be blank"),
+                            new Violation("addressTo", "Address to cannot be blank")));
             ValidationResponse actualResponse = objectMapper.readValue(
                     mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
@@ -358,7 +330,7 @@ public class RideControllerTest {
 
         @Test
         void update_whenInvalidInputNull_thenReturn400AndValidationResponse() throws Exception {
-            RideCreateEditDto updateRide = new RideCreateEditDto(null, null, null, null);
+            RideCreateEditDto updateRide = new RideCreateEditDto(null, null, "from", "to");
 
             MvcResult mvcResult = mockMvc.perform(put(URL + "/{id}", DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -367,9 +339,7 @@ public class RideControllerTest {
                     .andReturn();
 
             ValidationResponse expectedValidationResponse = new ValidationResponse(
-                    List.of(new Violation("passengerId", "{passenger.null}"),
-                            new Violation("addressFrom", "{address.from.blank}"),
-                            new Violation("addressTo", "{address.from.blank}")));
+                    List.of(new Violation("passengerId", "Passenger cannot be null")));
             ValidationResponse actualResponse = objectMapper.readValue(
                     mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
@@ -381,27 +351,19 @@ public class RideControllerTest {
         void updateDriverStatus_whenVerifyingRequestMatching_thenReturn200() throws Exception {
             DriverRideStatusDto driverRideStatusDto = new DriverRideStatusDto(DriverRideStatus.ON_WAY_FOR_PASSENGER);
 
-            mockMvc.perform(put(URL + "/{id}/driver-status", DEFAULT_ID)
+            mockMvc.perform(put(URL_WITH_ID + "/driver-status", DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(driverRideStatusDto)))
                     .andExpect(status().isOk());
-        }
 
-        @Test
-        void updateDriverStatus_whenValidInput_thenReturn200() throws Exception {
-            DriverRideStatusDto driverRideStatusDto = new DriverRideStatusDto(DriverRideStatus.ON_WAY_FOR_PASSENGER);
-
-            mockMvc.perform(put(URL + "/1/driver-status")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(driverRideStatusDto)))
-                    .andExpect(status().isOk());
+            verify(rideService, times(1)).updateDriverStatus(DEFAULT_ID, driverRideStatusDto);
         }
 
         @Test
         void updateDriverStatus_whenValidInput_thenMapsToBusinessModel() throws Exception {
             DriverRideStatusDto driverRideStatusDto = new DriverRideStatusDto(DriverRideStatus.ON_WAY_FOR_PASSENGER);
 
-            mockMvc.perform(put(URL + "/{id}/driver-status", DEFAULT_ID)
+            mockMvc.perform(put(URL_WITH_ID + "/driver-status", DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(driverRideStatusDto)))
                     .andExpect(status().isOk());
@@ -419,12 +381,12 @@ public class RideControllerTest {
         @Test
         void updateDriverStatus_whenValidInput_thenReturn200AndCarReadDto() throws Exception {
             DriverRideStatusDto driverRideStatusDto = new DriverRideStatusDto(DriverRideStatus.ON_WAY_FOR_PASSENGER);
-            RideReadDto readRide = new RideReadDto(DEFAULT_ID, 1L, 1L, "From", "To",
+            RideReadDto readRide = new RideReadDto(DEFAULT_ID, DEFAULT_ID, DEFAULT_ID, "From", "To",
                     DriverRideStatus.ON_WAY_FOR_PASSENGER, PassengerRideStatus.WAITING, new BigDecimal("123.43"));
 
             when(rideService.updateDriverStatus(DEFAULT_ID, driverRideStatusDto)).thenReturn(readRide);
 
-            MvcResult mvcResult = mockMvc.perform(put(URL + "/{id}/driver-status", DEFAULT_ID)
+            MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID + "/driver-status", DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(driverRideStatusDto)))
                     .andExpect(status().isOk())
@@ -439,27 +401,19 @@ public class RideControllerTest {
         void updatePassengerStatus_whenVerifyingRequestMatching_thenReturn200() throws Exception {
             PassengerRideStatusDto passengerRideStatusDto = new PassengerRideStatusDto(PassengerRideStatus.GETTING_OUT);
 
-            mockMvc.perform(put(URL + "/{id}/passenger-status", DEFAULT_ID)
+            mockMvc.perform(put(URL_WITH_ID + "/passenger-status", DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(passengerRideStatusDto)))
                     .andExpect(status().isOk());
-        }
 
-        @Test
-        void updatePassengerStatus_whenValidInput_thenReturn200() throws Exception {
-            PassengerRideStatusDto passengerRideStatusDto = new PassengerRideStatusDto(PassengerRideStatus.GETTING_OUT);
-
-            mockMvc.perform(put(URL + "/1/passenger-status")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(passengerRideStatusDto)))
-                    .andExpect(status().isOk());
+            verify(rideService, times(1)).updatePassengerStatus(DEFAULT_ID, passengerRideStatusDto);
         }
 
         @Test
         void updatePassengerStatus_whenValidInput_thenMapsToBusinessModel() throws Exception {
             PassengerRideStatusDto passengerRideStatusDto = new PassengerRideStatusDto(PassengerRideStatus.GETTING_OUT);
 
-            mockMvc.perform(put(URL + "/{id}/passenger-status", DEFAULT_ID)
+            mockMvc.perform(put(URL_WITH_ID + "/passenger-status", DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(passengerRideStatusDto)))
                     .andExpect(status().isOk());
@@ -482,7 +436,7 @@ public class RideControllerTest {
 
             when(rideService.updatePassengerStatus(DEFAULT_ID, passengerRideStatusDto)).thenReturn(readRide);
 
-            MvcResult mvcResult = mockMvc.perform(put(URL + "/{id}/passenger-status", DEFAULT_ID)
+            MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID + "/passenger-status", DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(passengerRideStatusDto)))
                     .andExpect(status().isOk())

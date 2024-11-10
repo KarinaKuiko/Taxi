@@ -6,7 +6,6 @@ import org.example.driver.dto.read.DriverReadDto;
 import org.example.driver.dto.read.UserRateDto;
 import org.example.driver.entity.Car;
 import org.example.driver.entity.Driver;
-import org.example.driver.entity.enumeration.Gender;
 import org.example.driver.exception.car.CarNotFoundException;
 import org.example.driver.exception.driver.DriverNotFoundException;
 import org.example.driver.exception.driver.DuplicatedDriverEmailException;
@@ -14,7 +13,6 @@ import org.example.driver.mapper.DriverMapper;
 import org.example.driver.repository.CarRepository;
 import org.example.driver.repository.DriverRepository;
 import org.example.driver.service.DriverService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,6 +29,13 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.example.driver.util.DataUtil.DEFAULT_ID;
+import static org.example.driver.util.DataUtil.LIMIT_VALUE;
+import static org.example.driver.util.DataUtil.PAGE_VALUE;
+import static org.example.driver.util.DataUtil.getCar;
+import static org.example.driver.util.DataUtil.getDriver;
+import static org.example.driver.util.DataUtil.getDriverCreateEditDto;
+import static org.example.driver.util.DataUtil.getDriverReadDto;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -38,9 +43,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class DriverServiceTest {
-
-    private static final Long DEFAULT_ID = 1L;
+class DriverServiceTest {
 
     @InjectMocks
     private DriverService driverService;
@@ -57,18 +60,10 @@ public class DriverServiceTest {
     @Mock
     private MessageSource messageSource;
 
-    private Driver defaultDriver;
-    private DriverCreateEditDto createDriver;
-    private DriverReadDto readDriver;
-    private Car car;
-
-    @BeforeEach
-    void init() {
-        defaultDriver = new Driver(DEFAULT_ID, "name", "name@gmail.com", "+375331234567", Gender.MALE, car, 5.);
-        car = new Car(DEFAULT_ID, "red", "BMW", "AB123CD", 2023, List.of(defaultDriver));
-        createDriver = new DriverCreateEditDto("name", "name@gmail.com", "+375331234567", Gender.MALE, DEFAULT_ID);
-        readDriver = new DriverReadDto(DEFAULT_ID, "name", "name@gmail.com", "+375331234567", Gender.MALE, DEFAULT_ID, 5.);
-    }
+    private Driver defaultDriver = getDriver().build();
+    private DriverCreateEditDto createDriver = getDriverCreateEditDto();
+    private DriverReadDto readDriver = getDriverReadDto();
+    private Car car = getCar().build();
 
     @Test
     void create_whenEmailIsNotDuplicatedAndCarIsFound_thenReturnDriverReadDto() {
@@ -99,7 +94,8 @@ public class DriverServiceTest {
                 LocaleContextHolder.getLocale()))
                 .thenReturn(ExceptionConstants.CAR_NOT_FOUND);
 
-        CarNotFoundException exception = assertThrows(CarNotFoundException.class, () -> driverService.create(createDriver));
+        CarNotFoundException exception = assertThrows(CarNotFoundException.class,
+                () -> driverService.create(createDriver));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.CAR_NOT_FOUND);
         verify(driverRepository).findByEmailAndIsDeletedFalse(createDriver.email());
@@ -123,7 +119,8 @@ public class DriverServiceTest {
                 LocaleContextHolder.getLocale()))
                 .thenReturn(ExceptionConstants.DRIVER_DUPLICATED_EMAIL);
 
-        DuplicatedDriverEmailException exception = assertThrows(DuplicatedDriverEmailException.class, () -> driverService.create(createDriver));
+        DuplicatedDriverEmailException exception = assertThrows(DuplicatedDriverEmailException.class,
+                () -> driverService.create(createDriver));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.DRIVER_DUPLICATED_EMAIL);
         verify(driverRepository).findByEmailAndIsDeletedFalse(createDriver.email());
@@ -166,7 +163,8 @@ public class DriverServiceTest {
                 LocaleContextHolder.getLocale()))
                 .thenReturn(ExceptionConstants.DRIVER_DUPLICATED_EMAIL);
 
-        DuplicatedDriverEmailException exception = assertThrows(DuplicatedDriverEmailException.class, () -> driverService.update(2L, createDriver));
+        DuplicatedDriverEmailException exception = assertThrows(DuplicatedDriverEmailException.class,
+                () -> driverService.update(2L, createDriver));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.DRIVER_DUPLICATED_EMAIL);
         verify(driverRepository).findByEmailAndIsDeletedFalse(createDriver.email());
@@ -192,7 +190,8 @@ public class DriverServiceTest {
                 LocaleContextHolder.getLocale()))
                 .thenReturn(ExceptionConstants.CAR_NOT_FOUND);
 
-        CarNotFoundException exception = assertThrows(CarNotFoundException.class, () -> driverService.update(DEFAULT_ID, createDriver));
+        CarNotFoundException exception = assertThrows(CarNotFoundException.class,
+                () -> driverService.update(DEFAULT_ID, createDriver));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.CAR_NOT_FOUND);
         verify(driverRepository).findByIdAndIsDeletedFalse(DEFAULT_ID);
@@ -216,7 +215,8 @@ public class DriverServiceTest {
                 LocaleContextHolder.getLocale()))
                 .thenReturn(ExceptionConstants.DRIVER_NOT_FOUND);
 
-        DriverNotFoundException exception = assertThrows(DriverNotFoundException.class, () -> driverService.update(DEFAULT_ID, createDriver));
+        DriverNotFoundException exception = assertThrows(DriverNotFoundException.class,
+                () -> driverService.update(DEFAULT_ID, createDriver));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.DRIVER_NOT_FOUND);
         verify(driverRepository).findByIdAndIsDeletedFalse(DEFAULT_ID);
@@ -253,7 +253,8 @@ public class DriverServiceTest {
                 LocaleContextHolder.getLocale()))
                 .thenReturn(ExceptionConstants.DRIVER_NOT_FOUND);
 
-        DriverNotFoundException exception = assertThrows(DriverNotFoundException.class, () -> driverService.update(DEFAULT_ID, createDriver));
+        DriverNotFoundException exception = assertThrows(DriverNotFoundException.class,
+                () -> driverService.update(DEFAULT_ID, createDriver));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.DRIVER_NOT_FOUND);
         verify(driverRepository).findByIdAndIsDeletedFalse(DEFAULT_ID);
@@ -266,13 +267,13 @@ public class DriverServiceTest {
 
     @Test
     void findAll_thenReturnPageDriverReadDto() {
-        int page = 0, limit = 10;
-        Pageable request = PageRequest.of(page, limit);
+        Pageable request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
-        when(driverRepository.findByIsDeletedFalse(request)).thenReturn(new PageImpl<>(List.of(defaultDriver), request, 1));
+        when(driverRepository.findByIsDeletedFalse(request)).thenReturn(
+                new PageImpl<>(List.of(defaultDriver), request, 1));
         when(driverMapper.toReadDto(defaultDriver)).thenReturn(readDriver);
 
-        Page<DriverReadDto> result = driverService.findAll(page, limit);
+        Page<DriverReadDto> result = driverService.findAll(PAGE_VALUE, LIMIT_VALUE);
 
         assertThat(result).isNotNull();
         assertThat(result.getTotalElements()).isEqualTo(1);
@@ -282,13 +283,12 @@ public class DriverServiceTest {
 
     @Test
     void findAllWithDeleted_thenReturnPageDriverReadDto() {
-        int page = 0, limit = 10;
-        Pageable request = PageRequest.of(page, limit);
+        Pageable request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
         when(driverRepository.findAll(request)).thenReturn(new PageImpl<>(List.of(defaultDriver), request, 1));
         when(driverMapper.toReadDto(defaultDriver)).thenReturn(readDriver);
 
-        Page<DriverReadDto> result = driverService.findAllWithDeleted(page, limit);
+        Page<DriverReadDto> result = driverService.findAllWithDeleted(PAGE_VALUE, LIMIT_VALUE);
 
         assertThat(result).isNotNull();
         assertThat(result.getTotalElements()).isEqualTo(1);
@@ -315,7 +315,8 @@ public class DriverServiceTest {
                 LocaleContextHolder.getLocale()))
                 .thenReturn(ExceptionConstants.DRIVER_NOT_FOUND);
 
-        DriverNotFoundException exception = assertThrows(DriverNotFoundException.class, () -> driverService.findById(DEFAULT_ID));
+        DriverNotFoundException exception = assertThrows(DriverNotFoundException.class,
+                () -> driverService.findById(DEFAULT_ID));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.DRIVER_NOT_FOUND);
         verify(driverRepository).findByIdAndIsDeletedFalse(DEFAULT_ID);

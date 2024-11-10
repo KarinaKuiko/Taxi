@@ -16,7 +16,7 @@ public record RideCreateEditDto(
         @NotBlank(message = "{address.from.blank}")
         String addressFrom,
 
-        @NotBlank(message = "{address.from.blank}")
+        @NotBlank(message = "{address.to.blank}")
         String addressTo
 ) {
 }

@@ -27,6 +27,12 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.example.passenger.util.DataUtil.DEFAULT_ID;
+import static org.example.passenger.util.DataUtil.LIMIT_VALUE;
+import static org.example.passenger.util.DataUtil.PAGE_VALUE;
+import static org.example.passenger.util.DataUtil.getPassenger;
+import static org.example.passenger.util.DataUtil.getPassengerCreateEditDto;
+import static org.example.passenger.util.DataUtil.getPassengerReadDto;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -34,9 +40,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class PassengerServiceTest {
-
-    private static final Long DEFAULT_ID = 1L;
+class PassengerServiceTest {
 
     @InjectMocks
     private PassengerService passengerService;
@@ -50,26 +54,19 @@ public class PassengerServiceTest {
     @Mock
     private MessageSource messageSource;
 
-    private Passenger defaultPassenger;
-    private PassengerCreateEditDto createPassenger;
-    private PassengerReadDto readPassenger;
-
-    @BeforeEach
-    void init() {
-        defaultPassenger = new Passenger(DEFAULT_ID, "name", "name@gmail.com", "+375441234567", 5.0);
-        createPassenger = new PassengerCreateEditDto("name", "name@gmail.com", "+375441234567");
-        readPassenger = new PassengerReadDto(DEFAULT_ID, "name", "name@gmail.com", "+375441234567", 5.0);
-    }
+    private Passenger defaultPassenger = getPassenger().build();
+    private PassengerCreateEditDto createPassenger = getPassengerCreateEditDto();
+    private PassengerReadDto readPassenger = getPassengerReadDto();
 
     @Test
     void findAll_thenReturnPagePassengerReadDto() {
-        int page = 0, limit = 10;
-        Pageable request = PageRequest.of(page, limit);
+        Pageable request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
-        when(passengerRepository.findByIsDeletedFalse(request)).thenReturn(new PageImpl<>(List.of(defaultPassenger), request, 1));
+        when(passengerRepository.findByIsDeletedFalse(request)).thenReturn(
+                new PageImpl<>(List.of(defaultPassenger), request, 1));
         when(passengerMapper.toReadDto(defaultPassenger)).thenReturn(readPassenger);
 
-        Page<PassengerReadDto> result = passengerService.findAll(page, limit);
+        Page<PassengerReadDto> result = passengerService.findAll(PAGE_VALUE, LIMIT_VALUE);
 
         assertThat(result).isNotNull();
         assertThat(result.getTotalElements()).isEqualTo(1);
@@ -79,13 +76,13 @@ public class PassengerServiceTest {
 
     @Test
     void findAllWithDeleted_thenReturnPagePassengerReadDto() {
-        int page = 0, limit = 10;
-        Pageable request = PageRequest.of(page, limit);
+        Pageable request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
-        when(passengerRepository.findAll(request)).thenReturn(new PageImpl<>(List.of(defaultPassenger), request, 1));
+        when(passengerRepository.findAll(request)).thenReturn(
+                new PageImpl<>(List.of(defaultPassenger), request, 1));
         when(passengerMapper.toReadDto(defaultPassenger)).thenReturn(readPassenger);
 
-        Page<PassengerReadDto> result = passengerService.findAllWithDeleted(page, limit);
+        Page<PassengerReadDto> result = passengerService.findAllWithDeleted(PAGE_VALUE, LIMIT_VALUE);
 
         assertThat(result).isNotNull();
         assertThat(result.getTotalElements()).isEqualTo(1);
@@ -112,7 +109,8 @@ public class PassengerServiceTest {
                 LocaleContextHolder.getLocale()))
                 .thenReturn(ExceptionConstants.PASSENGER_NOT_FOUND_MESSAGE);
 
-        PassengerNotFoundException exception = assertThrows(PassengerNotFoundException.class, () -> passengerService.findById(DEFAULT_ID));
+        PassengerNotFoundException exception = assertThrows(PassengerNotFoundException.class,
+                () -> passengerService.findById(DEFAULT_ID));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.PASSENGER_NOT_FOUND_MESSAGE);
         verify(messageSource).getMessage(
@@ -148,7 +146,8 @@ public class PassengerServiceTest {
                 LocaleContextHolder.getLocale()))
                 .thenReturn(ExceptionConstants.PASSENGER_DUPlICATED_EMAIL_MESSAGE);
 
-        DuplicatedPassengerEmailException exception = assertThrows(DuplicatedPassengerEmailException.class, () -> passengerService.create(createPassenger));
+        DuplicatedPassengerEmailException exception = assertThrows(DuplicatedPassengerEmailException.class,
+                () -> passengerService.create(createPassenger));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.PASSENGER_DUPlICATED_EMAIL_MESSAGE);
         verify(messageSource).getMessage(
@@ -188,7 +187,8 @@ public class PassengerServiceTest {
                 LocaleContextHolder.getLocale()))
                 .thenReturn(ExceptionConstants.PASSENGER_DUPlICATED_EMAIL_MESSAGE);
 
-        DuplicatedPassengerEmailException exception = assertThrows(DuplicatedPassengerEmailException.class, () -> passengerService.update(2L, createPassenger));
+        DuplicatedPassengerEmailException exception = assertThrows(DuplicatedPassengerEmailException.class,
+                () -> passengerService.update(2L, createPassenger));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.PASSENGER_DUPlICATED_EMAIL_MESSAGE);
         verify(passengerRepository).findByEmailAndIsDeletedFalse(createPassenger.email());
@@ -210,7 +210,8 @@ public class PassengerServiceTest {
                 LocaleContextHolder.getLocale()))
                 .thenReturn(ExceptionConstants.PASSENGER_NOT_FOUND_MESSAGE);
 
-        PassengerNotFoundException exception = assertThrows(PassengerNotFoundException.class, () -> passengerService.update(DEFAULT_ID, createPassenger));
+        PassengerNotFoundException exception = assertThrows(PassengerNotFoundException.class,
+                () -> passengerService.update(DEFAULT_ID, createPassenger));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.PASSENGER_NOT_FOUND_MESSAGE);
         verify(passengerRepository).findByIdAndIsDeletedFalse(DEFAULT_ID);
@@ -245,7 +246,8 @@ public class PassengerServiceTest {
                 LocaleContextHolder.getLocale()))
                 .thenReturn(ExceptionConstants.PASSENGER_NOT_FOUND_MESSAGE);
 
-        PassengerNotFoundException exception = assertThrows(PassengerNotFoundException.class, () -> passengerService.update(DEFAULT_ID, createPassenger));
+        PassengerNotFoundException exception = assertThrows(PassengerNotFoundException.class,
+                () -> passengerService.update(DEFAULT_ID, createPassenger));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.PASSENGER_NOT_FOUND_MESSAGE);
         verify(passengerRepository).findByIdAndIsDeletedFalse(DEFAULT_ID);
