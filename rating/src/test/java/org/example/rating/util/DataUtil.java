@@ -22,36 +22,73 @@ public class DataUtil {
     public static final Integer PAGE_VALUE = 0;
     public static final Integer LIMIT_VALUE = 10;
 
-    public static RateReadDto getDriverRateReadDto() {
-        return new RateReadDto(DEFAULT_ID,
-                DEFAULT_ID, "Good", 4, DEFAULT_ID, UserType.PASSENGER);
+    public static RateReadDto.RateReadDtoBuilder getDriverRateReadDtoBuilder() {
+        return RateReadDto.builder()
+                .id(DEFAULT_ID)
+                .rideId(DEFAULT_ID)
+                .comment("Good")
+                .rating(4)
+                .userId(DEFAULT_ID)
+                .userType(UserType.PASSENGER);
     }
 
-    public static RateReadDto getPassengerRateReadDto() {
-        return new RateReadDto(DEFAULT_ID,
-                DEFAULT_ID, "Good", 4, DEFAULT_ID, UserType.DRIVER);
+    public static RateReadDto.RateReadDtoBuilder getPassengerRateReadDtoBuilder() {
+        return RateReadDto.builder()
+                .id(DEFAULT_ID)
+                .rideId(DEFAULT_ID)
+                .comment("Good")
+                .rating(4)
+                .userId(DEFAULT_ID)
+                .userType(UserType.DRIVER);
     }
 
-    public static RateCreateEditDto getPassengerRateCreateEditDto() {
-        return new RateCreateEditDto(DEFAULT_ID, "Good", 4, DEFAULT_ID, UserType.DRIVER);
+    public static RateCreateEditDto.RateCreateEditDtoBuilder getPassengerRateCreateEditDtoBuilder() {
+        return RateCreateEditDto.builder()
+                .rideId(DEFAULT_ID)
+                .comment("Good")
+                .rating(4)
+                .userId(DEFAULT_ID)
+                .userType(UserType.DRIVER);
     }
 
-    public static RateCreateEditDto getDriverRateCreateEditDto() {
-        return new RateCreateEditDto(DEFAULT_ID, "Good", 4, DEFAULT_ID, UserType.PASSENGER);
+    public static RateCreateEditDto.RateCreateEditDtoBuilder getDriverRateCreateEditDtoBuilder() {
+        return RateCreateEditDto.builder()
+                .rideId(DEFAULT_ID)
+                .comment("Good")
+                .rating(4)
+                .userId(DEFAULT_ID)
+                .userType(UserType.PASSENGER);
     }
 
-    public static RideReadDto getRideReadDto() {
-        return new RideReadDto(DEFAULT_ID, DEFAULT_ID, DEFAULT_ID, "from", "to",
-                "ACCEPTED", "WAITING", new BigDecimal("123.45"));
+    public static RideReadDto.RideReadDtoBuilder getRideReadDtoBuilder() {
+        return RideReadDto.builder()
+                .id(DEFAULT_ID)
+                .driverId(DEFAULT_ID)
+                .passengerId(DEFAULT_ID)
+                .addressFrom("from")
+                .addressTo("to")
+                .driverRideStatus("ACCEPTED")
+                .passengerRideStatus("WAITING")
+                .cost(new BigDecimal("123.45"));
     }
 
-    public static DriverRate getDriverRate() {
-        return new DriverRate(DEFAULT_ID,
-                DEFAULT_ID, "Good", 4, DEFAULT_ID, UserType.PASSENGER);
+    public static DriverRate.DriverRateBuilder getDriverRateBuilder() {
+        return DriverRate.builder()
+                .id(DEFAULT_ID)
+                .rideId(DEFAULT_ID)
+                .comment("Good")
+                .rating(4)
+                .userId(DEFAULT_ID)
+                .userType(UserType.PASSENGER);
     }
 
-    public static PassengerRate getPassengerRate() {
-        return new PassengerRate(DEFAULT_ID,
-                DEFAULT_ID, "Good", 4, DEFAULT_ID, UserType.DRIVER);
+    public static PassengerRate.PassengerRateBuilder getPassengerRateBuilder() {
+        return PassengerRate.builder()
+                .id(DEFAULT_ID)
+                .rideId(DEFAULT_ID)
+                .comment("Good")
+                .rating(4)
+                .userId(DEFAULT_ID)
+                .userType(UserType.DRIVER);
     }
 }

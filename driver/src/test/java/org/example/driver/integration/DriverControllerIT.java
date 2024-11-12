@@ -34,7 +34,8 @@ import static org.example.driver.util.DataUtil.PAGE_VALUE;
 import static org.example.driver.util.DataUtil.URL;
 import static org.example.driver.util.DataUtil.URL_WITH_ID;
 import static org.example.driver.util.DataUtil.getCar;
-import static org.example.driver.util.DataUtil.getDriver;
+import static org.example.driver.util.DataUtil.getDriverBuilder;
+import static org.example.driver.util.DataUtil.getDriverCreateEditDtoBuilder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -78,7 +79,7 @@ public class DriverControllerIT {
     private Car defaultCar;
 
     @BeforeAll
-    static  void setUp() {
+    static void setUp() {
         kafkaContainer.start();
     }
 
@@ -91,7 +92,7 @@ public class DriverControllerIT {
         jdbcTemplate.execute("ALTER SEQUENCE drivers_id_seq RESTART WITH 1");
         defaultCar = getCar().build();
         carRepository.save(defaultCar);
-        defaultDriver = getDriver()
+        defaultDriver = getDriverBuilder()
                 .car(defaultCar)
                 .build();
         driverRepository.save(defaultDriver);
@@ -137,8 +138,13 @@ public class DriverControllerIT {
 
     @Test
     void create_whenValidInput_thenReturn200AndDriverReadDto() {
-        DriverCreateEditDto createDriver = new DriverCreateEditDto("name", "name@gmail.com",
-                "+375291122334", Gender.MALE, 1L);
+        DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
+                                            .name("name")
+                                            .email("name@gmail.com")
+                                            .phone("+375291122334")
+                                            .gender(Gender.MALE)
+                                            .carId(DEFAULT_ID)
+                                            .build();
 
         RestAssuredMockMvc
                 .given()
@@ -153,8 +159,7 @@ public class DriverControllerIT {
 
     @Test
     void create_whenEmailIsDuplicated_thenReturn409() {
-        DriverCreateEditDto createDriver = new DriverCreateEditDto("test", "test@gmail.com",
-                "+375291122334", Gender.MALE, 1L);
+        DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
 
         RestAssuredMockMvc
                 .given()
@@ -169,8 +174,10 @@ public class DriverControllerIT {
 
     @Test
     void create_whenCarIdNotFound_thenReturn404() {
-        DriverCreateEditDto createDriver = new DriverCreateEditDto("name", "name@gmail.com",
-                "+375291122334", Gender.MALE, 2L);
+        DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
+                                            .email("name@gmail.com")
+                                            .carId(2L)
+                                            .build();
 
         RestAssuredMockMvc
                 .given()
@@ -185,8 +192,10 @@ public class DriverControllerIT {
 
     @Test
     void update_whenValidInput_thenReturn200AndDriverReadDto() {
-        DriverCreateEditDto updateDriver =  new DriverCreateEditDto("testing", "test@gmail.com",
-                "+375297654321", Gender.FEMALE, 1L);
+        DriverCreateEditDto updateDriver = getDriverCreateEditDtoBuilder()
+                                            .name("testing")
+                                            .gender(Gender.FEMALE)
+                                            .build();
 
         RestAssuredMockMvc
                 .given()
@@ -206,8 +215,7 @@ public class DriverControllerIT {
 
     @Test
     void update_whenDriverIsNotFound_thenReturn404() {
-        DriverCreateEditDto updateDriver =  new DriverCreateEditDto("testing", "testing@gmail.com",
-                "+375297654321", Gender.FEMALE, 1L);
+        DriverCreateEditDto updateDriver = getDriverCreateEditDtoBuilder().build();
 
         RestAssuredMockMvc
                 .given()
@@ -222,12 +230,16 @@ public class DriverControllerIT {
 
     @Test
     void update_whenEmailIsDuplicated_thenReturn409() {
-        Driver createDriver = new Driver(2L, "name", "name@gmail.com",
-                "+375291122334", Gender.MALE, defaultCar, 5.0);
+        Driver createDriver = getDriverBuilder()
+                                .id(2L)
+                                .email("name@gmail.com")
+                                .build();
         driverRepository.save(createDriver);
 
-        DriverCreateEditDto updateDriver =  new DriverCreateEditDto("testing", "name@gmail.com",
-                "+375297654321", Gender.FEMALE, 1L);
+        DriverCreateEditDto updateDriver = getDriverCreateEditDtoBuilder()
+                                            .name("testing")
+                                            .email("name@gmail.com")
+                                            .build();
 
         RestAssuredMockMvc
                 .given()
@@ -242,8 +254,9 @@ public class DriverControllerIT {
 
     @Test
     void update_whenCarIsNotFound_thenReturn404() {
-        DriverCreateEditDto updateDriver =  new DriverCreateEditDto("testing", "test@gmail.com",
-                "+375297654321", Gender.FEMALE, 2L);
+        DriverCreateEditDto updateDriver = getDriverCreateEditDtoBuilder()
+                                            .carId(2L)
+                                            .build();
 
         RestAssuredMockMvc
                 .given()
@@ -265,14 +278,14 @@ public class DriverControllerIT {
                 .statusCode(204);
 
         assertThat(0, equalTo(driverRepository.findByIsDeletedFalse(
-                PageRequest.of(0, 10)).getNumberOfElements()));
+                PageRequest.of(PAGE_VALUE, LIMIT_VALUE)).getNumberOfElements()));
     }
 
     @Test
     void safeDelete_whenDriverIsNotFound_thenReturn404() {
         RestAssuredMockMvc
                 .when()
-                .delete(URL_WITH_ID,DRIVER_ENTITY, "2")
+                .delete(URL_WITH_ID, DRIVER_ENTITY, "2")
                 .then()
                 .statusCode(404)
                 .body("message", equalTo("Driver was not found"));

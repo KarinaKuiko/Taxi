@@ -22,8 +22,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import java.util.List;
-
 import static org.example.driver.util.DataUtil.CAR_ENTITY;
 import static org.example.driver.util.DataUtil.DEFAULT_ID;
 import static org.example.driver.util.DataUtil.LIMIT;
@@ -33,6 +31,7 @@ import static org.example.driver.util.DataUtil.PAGE_VALUE;
 import static org.example.driver.util.DataUtil.URL;
 import static org.example.driver.util.DataUtil.URL_WITH_ID;
 import static org.example.driver.util.DataUtil.getCar;
+import static org.example.driver.util.DataUtil.getCarCreateEditDtoBuilder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -125,7 +124,9 @@ public class CarControllerIT {
 
     @Test
     void create_whenValidInput_thenReturn200AndCarReadDto() {
-        CarCreateEditDto createCar = new CarCreateEditDto("yellow", "Peugeot", "LK124AS", 2014);
+        CarCreateEditDto createCar = getCarCreateEditDtoBuilder()
+                                        .number("LK124AS")
+                                        .build();
 
         RestAssuredMockMvc
                 .given()
@@ -140,7 +141,7 @@ public class CarControllerIT {
 
     @Test
     void create_whenDuplicatedNumber_thenReturn409() {
-        CarCreateEditDto createCar = new CarCreateEditDto("red", "BMW", "AB123CD", 2023);
+        CarCreateEditDto createCar = getCarCreateEditDtoBuilder().build();
 
         RestAssuredMockMvc
                 .given()
@@ -155,7 +156,10 @@ public class CarControllerIT {
 
     @Test
     void update_whenValidInput_thenReturn200AndCarReadDto() {
-        CarCreateEditDto updateCar = new CarCreateEditDto("yellow", "BMW", "AB123CD", 2020);
+        CarCreateEditDto updateCar = getCarCreateEditDtoBuilder()
+                .color("yellow")
+                .year(2020)
+                .build();
 
         RestAssuredMockMvc
                 .given()
@@ -174,10 +178,17 @@ public class CarControllerIT {
 
     @Test
     void update_whenCarNumberIsDuplicatedAndDifferentIds_thenThrowDuplicatedCarNumberException() {
-        Car createCar = new Car(2L, "yellow", "Peugeot", "LK124AS", 2014, List.of());
+        Car createCar = getCar()
+                        .id(2L)
+                        .number("LK124AS")
+                        .build();
         carRepository.save(createCar);
 
-        CarCreateEditDto updateCar = new CarCreateEditDto("yellow", "BMW", "LK124AS", 2020);
+        CarCreateEditDto updateCar = getCarCreateEditDtoBuilder()
+                                    .color("yellow")
+                                    .number("LK124AS")
+                                    .year(2020)
+                                    .build();
 
         RestAssuredMockMvc
                 .given()
@@ -192,7 +203,7 @@ public class CarControllerIT {
 
     @Test
     void update_whenCarNotFound_thenThrowCarNotFoundException() {
-        CarCreateEditDto updateCar = new CarCreateEditDto("yellow", "BMW", "LK124AS", 2020);
+        CarCreateEditDto updateCar = getCarCreateEditDtoBuilder().build();
 
         RestAssuredMockMvc
                 .given()

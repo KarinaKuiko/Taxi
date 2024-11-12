@@ -1,12 +1,14 @@
 package org.example.rating.dto.read;
 
+import lombok.Builder;
 import org.example.rating.entity.enumeration.UserType;
 
+@Builder
 public record RateReadDto(
-        Long id,
-        Long rideId,
+        long id,
+        long rideId,
         String comment,
-        Integer rating,
+        int rating,
         Long userId,
         UserType userType
 ) {

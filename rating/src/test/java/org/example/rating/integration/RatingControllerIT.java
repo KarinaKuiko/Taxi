@@ -6,7 +6,6 @@ import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.example.rating.dto.create.RateCreateEditDto;
 import org.example.rating.entity.DriverRate;
 import org.example.rating.entity.PassengerRate;
-import org.example.rating.entity.enumeration.UserType;
 import org.example.rating.repository.DriverRateRepository;
 import org.example.rating.repository.PassengerRateRepository;
 import org.junit.jupiter.api.BeforeAll;
@@ -40,9 +39,9 @@ import static org.example.rating.util.DataUtil.PASSENGER_URL;
 import static org.example.rating.util.DataUtil.PASSENGER_URL_WITH_ID;
 import static org.example.rating.util.DataUtil.URL;
 import static org.example.rating.util.DataUtil.URL_WITH_ID;
-import static org.example.rating.util.DataUtil.getDriverRate;
-import static org.example.rating.util.DataUtil.getPassengerRate;
-import static org.example.rating.util.DataUtil.getPassengerRateCreateEditDto;
+import static org.example.rating.util.DataUtil.getDriverRateBuilder;
+import static org.example.rating.util.DataUtil.getPassengerRateBuilder;
+import static org.example.rating.util.DataUtil.getPassengerRateCreateEditDtoBuilder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
@@ -101,8 +100,8 @@ public class RatingControllerIT {
         passengerRateRepository.deleteAll();
         jdbcTemplate.execute("ALTER SEQUENCE passenger_rates_id_seq RESTART WITH 1");
         jdbcTemplate.execute("ALTER SEQUENCE rating_id_seq RESTART WITH 1");
-        defaultDriverRate = getDriverRate();
-        defaultPassengerRate = getPassengerRate();
+        defaultDriverRate = getDriverRateBuilder().build();
+        defaultPassengerRate = getPassengerRateBuilder().build();
         passengerRateRepository.save(defaultPassengerRate);
         driverRateRepository.save(defaultDriverRate);
     }
@@ -178,7 +177,7 @@ public class RatingControllerIT {
 
     @Test
     void create_whenRideIsFound_thenReturn200AndRateReadDto() {
-        RateCreateEditDto createRate = getPassengerRateCreateEditDto();
+        RateCreateEditDto createRate = getPassengerRateCreateEditDtoBuilder().build();
 
         getRide();
 
@@ -195,7 +194,7 @@ public class RatingControllerIT {
 
     @Test
     void create_whenRideIsNotFound_thenReturn404() {
-        RateCreateEditDto createRate = getPassengerRateCreateEditDto();
+        RateCreateEditDto createRate = getPassengerRateCreateEditDtoBuilder().build();
 
         getNonexistentRide();
 
@@ -212,7 +211,9 @@ public class RatingControllerIT {
 
     @Test
     void update_whenRideAndRateIsFound_thenReturn200AndRateReadDto() {
-        RateCreateEditDto updateRate = new RateCreateEditDto(1L, "Good", 5, 1L, UserType.DRIVER);
+        RateCreateEditDto updateRate = getPassengerRateCreateEditDtoBuilder()
+                                        .rating(5)
+                                        .build();
 
         getRide();
 
@@ -232,7 +233,7 @@ public class RatingControllerIT {
 
     @Test
     void update_whenRideIsNotFound_thenReturn404() {
-        RateCreateEditDto updateRate = getPassengerRateCreateEditDto();
+        RateCreateEditDto updateRate = getPassengerRateCreateEditDtoBuilder().build();
 
         getNonexistentRide();
 
@@ -249,7 +250,7 @@ public class RatingControllerIT {
 
     @Test
     void update_whenRateIsNotFound_thenReturn404() {
-        RateCreateEditDto updateRate = getPassengerRateCreateEditDto();
+        RateCreateEditDto updateRate = getPassengerRateCreateEditDtoBuilder().build();
 
         RestAssuredMockMvc
                 .given()

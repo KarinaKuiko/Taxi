@@ -29,7 +29,8 @@ import static org.example.passenger.util.DataUtil.PAGE;
 import static org.example.passenger.util.DataUtil.PAGE_VALUE;
 import static org.example.passenger.util.DataUtil.URL;
 import static org.example.passenger.util.DataUtil.URL_WITH_ID;
-import static org.example.passenger.util.DataUtil.getPassenger;
+import static org.example.passenger.util.DataUtil.getPassengerBuilder;
+import static org.example.passenger.util.DataUtil.getPassengerCreateEditDtoBuilder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -37,7 +38,6 @@ import static org.hamcrest.Matchers.notNullValue;
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class PassengerControllerIT {
-//    private static final String URL = "/api/v1/passengers";
 
     @Container
     public static PostgreSQLContainer postgreSQLContainer =
@@ -80,7 +80,7 @@ public class PassengerControllerIT {
         RestAssuredMockMvc.mockMvc(MockMvcBuilders.webAppContextSetup(webApplicationContext).build());
         passengerRepository.deleteAll();
         jdbcTemplate.execute("ALTER SEQUENCE passengers_id_seq RESTART WITH 1");
-        defaultPassenger = getPassenger().build();
+        defaultPassenger = getPassengerBuilder().build();
         passengerRepository.save(defaultPassenger);
     }
 
@@ -122,8 +122,9 @@ public class PassengerControllerIT {
 
     @Test
     void create_whenValidInput_thenReturn201AndPassengerReadDto() {
-        PassengerCreateEditDto createPassenger = new PassengerCreateEditDto("test",
-                "test@gmail.com", "+375291112223");
+        PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder()
+                                                .email("test@gmail.com")
+                                                .build();
 
         RestAssuredMockMvc
                 .given()
@@ -138,8 +139,7 @@ public class PassengerControllerIT {
 
     @Test
     void create_whenDuplicatedEmail_thenReturn409() {
-        PassengerCreateEditDto createPassenger = new PassengerCreateEditDto("test",
-                "passenger@gmail.com", "+375291112223");
+        PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
 
         RestAssuredMockMvc
                 .given()
@@ -154,8 +154,9 @@ public class PassengerControllerIT {
 
     @Test
     void update_whenValidInput_thenReturn200AndPassengerReadDto() {
-        PassengerCreateEditDto updatePassenger = new PassengerCreateEditDto("naming",
-                "passenger@gmail.com", "+375441234567");
+        PassengerCreateEditDto updatePassenger = getPassengerCreateEditDtoBuilder()
+                                                    .name("naming")
+                                                    .build();
 
         RestAssuredMockMvc
                 .given()
@@ -173,12 +174,16 @@ public class PassengerControllerIT {
 
     @Test
     void update_whenEmailIsDuplicated_thenReturn409() {
-        Passenger createPassenger = new Passenger(2L, "test",
-                "test@gmail.com", "+375291112223", 5.0);
+        Passenger createPassenger = getPassengerBuilder()
+                                    .id(2L)
+                                    .email("test@gmail.com")
+                                    .build();
         passengerRepository.save(createPassenger);
 
-        PassengerCreateEditDto updatePassenger = new PassengerCreateEditDto("naming",
-                "test@gmail.com", "+375441234567");
+        PassengerCreateEditDto updatePassenger = getPassengerCreateEditDtoBuilder()
+                                                    .name("naming")
+                                                    .email("test@gmail.com")
+                                                    .build();
 
         RestAssuredMockMvc
                 .given()
@@ -193,8 +198,7 @@ public class PassengerControllerIT {
 
     @Test
     void update_whenPassengerIsNotFound_thenReturn404() {
-        PassengerCreateEditDto updatePassenger = new PassengerCreateEditDto("naming",
-                "test@gmail.com", "+375441234567");
+        PassengerCreateEditDto updatePassenger = getPassengerCreateEditDtoBuilder().build();
 
         RestAssuredMockMvc
                 .given()

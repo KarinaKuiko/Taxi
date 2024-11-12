@@ -33,7 +33,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.example.ride.util.DataUtil.DEFAULT_ID;
 import static org.example.ride.util.DataUtil.URL;
 import static org.example.ride.util.DataUtil.URL_WITH_ID;
-import static org.example.ride.util.DataUtil.getRide;
+import static org.example.ride.util.DataUtil.getRideBuilder;
+import static org.example.ride.util.DataUtil.getRideCreateEditDtoBuilder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
@@ -90,7 +91,7 @@ public class RideControllerIT {
         RestAssuredMockMvc.mockMvc(MockMvcBuilders.webAppContextSetup(webApplicationContext).build());
         rideRepository.deleteAll();
         jdbcTemplate.execute("ALTER SEQUENCE rides_id_seq RESTART WITH 1");
-        defaultRide = getRide();
+        defaultRide = getRideBuilder().build();
         rideRepository.save(defaultRide);
     }
 
@@ -223,7 +224,7 @@ public class RideControllerIT {
 
     @Test
     void create_whenValidInput_thenReturn201AndRideReadDto() {
-        RideCreateEditDto createRide = new RideCreateEditDto(1L, 1L, "From", "To");
+        RideCreateEditDto createRide = getRideCreateEditDtoBuilder().build();
 
         getDriver();
         getPassenger();
@@ -242,7 +243,7 @@ public class RideControllerIT {
 
     @Test
     void create_whenDriverIsNotFound_thenReturn404() {
-        RideCreateEditDto createRide = new RideCreateEditDto(1L, 1L, "From", "To");
+        RideCreateEditDto createRide = getRideCreateEditDtoBuilder().build();
 
         getNonexistentDriver();
         getPassenger();
@@ -260,7 +261,7 @@ public class RideControllerIT {
 
     @Test
     void create_whenPassengerIsNotFound_thenReturn404() {
-        RideCreateEditDto createRide = new RideCreateEditDto(1L, 1L, "From", "To");
+        RideCreateEditDto createRide = getRideCreateEditDtoBuilder().build();
 
         getDriver();
         getNonexistentPassenger();
@@ -278,7 +279,10 @@ public class RideControllerIT {
 
     @Test
     void update_whenValidInput_thenReturn200AndRideReadDto(){
-        RideCreateEditDto updateRide = new RideCreateEditDto(1L, 1L, "Minsk", "To");
+        RideCreateEditDto updateRide = getRideCreateEditDtoBuilder()
+                                        .addressFrom("Minsk")
+                                        .addressTo("To")
+                                        .build();
 
         getDriver();
         getPassenger();
@@ -299,7 +303,10 @@ public class RideControllerIT {
 
     @Test
     void update_whenDriverIsNotFound_thenReturn404() {
-        RideCreateEditDto updateRide = new RideCreateEditDto(1L, 1L, "Minsk", "To");
+        RideCreateEditDto updateRide = getRideCreateEditDtoBuilder()
+                                        .addressFrom("Minsk")
+                                        .addressTo("To")
+                                        .build();
 
         getNonexistentDriver();
         getPassenger();
@@ -317,7 +324,10 @@ public class RideControllerIT {
 
     @Test
     void update_whenPassengerIsNotFound_thenReturn404() {
-        RideCreateEditDto updateRide = new RideCreateEditDto(1L, 1L, "Minsk", "To");
+        RideCreateEditDto updateRide = getRideCreateEditDtoBuilder()
+                                        .addressFrom("Minsk")
+                                        .addressTo("To")
+                                        .build();
 
         getDriver();
         getNonexistentPassenger();
@@ -335,7 +345,7 @@ public class RideControllerIT {
 
     @Test
     void update_whenRideIsNotFound() {
-        RideCreateEditDto updateRide = new RideCreateEditDto(1L, 1L, "Minsk", "To");
+        RideCreateEditDto updateRide = getRideCreateEditDtoBuilder().build();
 
         RestAssuredMockMvc
                 .given()
