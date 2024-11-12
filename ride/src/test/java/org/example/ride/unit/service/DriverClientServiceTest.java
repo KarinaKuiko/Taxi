@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.example.ride.util.DataUtil.DEFAULT_ID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.example.ride.util.DataUtil.getDriverReadDto;
+import static org.example.ride.util.DataUtil.getDriverReadDtoBuilder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -26,7 +26,7 @@ class DriverClientServiceTest {
 
     @Test
     void getDriver_thenReturnDriverReadDto() {
-        DriverReadDto readDriver = getDriverReadDto();
+        DriverReadDto readDriver = getDriverReadDtoBuilder().build();
 
         when(driverClient.findById(DEFAULT_ID)).thenReturn(readDriver);
 

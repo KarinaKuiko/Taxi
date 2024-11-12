@@ -3,8 +3,10 @@ package org.example.passenger.dto.create;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import lombok.Builder;
 import org.example.passenger.constants.ExceptionConstants;
 
+@Builder
 public record PassengerCreateEditDto (
 
         @NotBlank(message = "{name.blank}")

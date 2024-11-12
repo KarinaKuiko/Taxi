@@ -19,25 +19,55 @@ public class DataUtil {
     public static final Integer PAGE_VALUE = 0;
     public static final Integer LIMIT_VALUE = 10;
 
-    public static DriverReadDto getDriverReadDto () {
-        return new DriverReadDto(DEFAULT_ID, "name", "name@gmail.com", "+375441234567", "MALE", DEFAULT_ID, 5.0);
+    public static DriverReadDto.DriverReadDtoBuilder getDriverReadDtoBuilder() {
+        return DriverReadDto.builder()
+                .id(DEFAULT_ID)
+                .name("name")
+                .email("name@gmail.com")
+                .phone("+375441234567")
+                .gender("MALE")
+                .carId(DEFAULT_ID)
+                .rating(5.0);
     }
 
-    public static PassengerReadDto getPassengerReadDto() {
-        return new PassengerReadDto(DEFAULT_ID, "name", "name@email.com", "+375441234567", 5.0);
+    public static PassengerReadDto.PassengerReadDtoBuilder getPassengerReadDtoBuilder() {
+        return PassengerReadDto.builder()
+                .id(DEFAULT_ID)
+                .name("name")
+                .email("name@gmail.com")
+                .phone("+375441234567")
+                .rating(5.0);
     }
 
-    public static Ride getRide() {
-        return new Ride(DEFAULT_ID, DEFAULT_ID, DEFAULT_ID, "from",
-                "to", DriverRideStatus.ACCEPTED, PassengerRideStatus.WAITING, new BigDecimal("123.45"));
+    public static Ride.RideBuilder getRideBuilder() {
+        return Ride.builder()
+                .id(DEFAULT_ID)
+                .driverId(DEFAULT_ID)
+                .passengerId(DEFAULT_ID)
+                .addressFrom("from")
+                .addressTo("to")
+                .driverRideStatus(DriverRideStatus.ACCEPTED)
+                .passengerRideStatus(PassengerRideStatus.WAITING)
+                .cost(new BigDecimal("123.45"));
     }
 
-    public static RideCreateEditDto getRideCreateEditDto() {
-        return new RideCreateEditDto(DEFAULT_ID, DEFAULT_ID, "from", "to");
+    public static RideCreateEditDto.RideCreateEditDtoBuilder getRideCreateEditDtoBuilder() {
+        return RideCreateEditDto.builder()
+                .driverId(DEFAULT_ID)
+                .passengerId(DEFAULT_ID)
+                .addressFrom("from")
+                .addressTo("to");
     }
 
-    public static RideReadDto getRideReadDto() {
-        return new RideReadDto(DEFAULT_ID, DEFAULT_ID, DEFAULT_ID, "from",
-                "to", DriverRideStatus.ACCEPTED, PassengerRideStatus.WAITING, new BigDecimal("123.45"));
+    public static RideReadDto.RideReadDtoBuilder getRideReadDtoBuilder() {
+        return RideReadDto.builder()
+                .id(DEFAULT_ID)
+                .driverId(DEFAULT_ID)
+                .passengerId(DEFAULT_ID)
+                .addressFrom("from")
+                .addressTo("to")
+                .driverRideStatus(DriverRideStatus.ACCEPTED)
+                .passengerRideStatus(PassengerRideStatus.WAITING)
+                .cost(new BigDecimal("123.45"));
     }
 }

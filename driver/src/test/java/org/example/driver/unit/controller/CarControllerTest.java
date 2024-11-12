@@ -34,8 +34,8 @@ import static org.example.driver.util.DataUtil.PAGE;
 import static org.example.driver.util.DataUtil.PAGE_VALUE;
 import static org.example.driver.util.DataUtil.URL;
 import static org.example.driver.util.DataUtil.URL_WITH_ID;
-import static org.example.driver.util.DataUtil.getCarCreateEditDto;
-import static org.example.driver.util.DataUtil.getCarReadDto;
+import static org.example.driver.util.DataUtil.getCarCreateEditDtoBuilder;
+import static org.example.driver.util.DataUtil.getCarReadDtoBuilder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -58,8 +58,8 @@ class CarControllerTest {
     @MockBean
     private CarService carService;
 
-    private CarCreateEditDto createCar = getCarCreateEditDto();
-    private CarReadDto readCar = getCarReadDto();
+    private CarCreateEditDto createCar = getCarCreateEditDtoBuilder().build();
+    private CarReadDto readCar = getCarReadDtoBuilder().build();
 
     @Nested
     @DisplayName("Find all tests")
@@ -185,7 +185,12 @@ class CarControllerTest {
 
         @Test
         void create_whenInvalidInput_thenReturn400AndValidationResponse() throws Exception {
-            CarCreateEditDto createCar = new CarCreateEditDto(null, null, null, 2026);
+            createCar = getCarCreateEditDtoBuilder()
+                        .color(null)
+                        .brand(null)
+                        .number(null)
+                        .year(2026)
+                        .build();
 
             MvcResult mvcResult = mockMvc.perform(post(URL, CAR_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -207,7 +212,9 @@ class CarControllerTest {
 
         @Test
         void create_whenInvalidNumberPattern_thenReturn400AndValidationResponse() throws Exception {
-            CarCreateEditDto createCar = new CarCreateEditDto("red", "BMW", "45sssa", 2023);
+            createCar = getCarCreateEditDtoBuilder()
+                        .number("45sssa")
+                        .build();
 
             MvcResult mvcResult = mockMvc.perform(post(URL, CAR_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -226,7 +233,9 @@ class CarControllerTest {
 
         @Test
         void create_whenColorIsNull_thenReturn400AndValidationResponse() throws Exception {
-            CarCreateEditDto createCar = new CarCreateEditDto(null, "BMW", "AB123CD", 2023);
+            createCar = getCarCreateEditDtoBuilder()
+                        .color(null)
+                        .build();
 
             MvcResult mvcResult = mockMvc.perform(post(URL, CAR_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -245,7 +254,9 @@ class CarControllerTest {
 
         @Test
         void create_whenBrandIsNull_thenReturn400AndValidationResponse() throws Exception {
-            CarCreateEditDto createCar = new CarCreateEditDto("red", null, "AB123CD", 2023);
+            createCar = getCarCreateEditDtoBuilder()
+                        .brand(null)
+                        .build();
 
             MvcResult mvcResult = mockMvc.perform(post(URL, CAR_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -264,7 +275,9 @@ class CarControllerTest {
 
         @Test
         void create_whenNumberIsNull_thenReturn400AndValidationResponse() throws Exception {
-            CarCreateEditDto createCar = new CarCreateEditDto("red", "BMW", null, 2023);
+            createCar = getCarCreateEditDtoBuilder()
+                        .number(null)
+                        .build();
 
             MvcResult mvcResult = mockMvc.perform(post(URL, CAR_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -283,7 +296,9 @@ class CarControllerTest {
 
         @Test
         void create_whenYearIsNull_thenReturn400AndValidationResponse() throws Exception {
-            CarCreateEditDto createCar = new CarCreateEditDto("red", "BMW", "AB123CD", null);
+            createCar = getCarCreateEditDtoBuilder()
+                        .year(null)
+                        .build();
 
             MvcResult mvcResult = mockMvc.perform(post(URL, CAR_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -302,7 +317,9 @@ class CarControllerTest {
 
         @Test
         void create_whenYearIsLess_thenReturn400AndValidationResponse() throws Exception {
-            CarCreateEditDto createCar = new CarCreateEditDto("red", "BMW", "AB123CD", 1900);
+            createCar = getCarCreateEditDtoBuilder()
+                        .year(1900)
+                        .build();
 
             MvcResult mvcResult = mockMvc.perform(post(URL, CAR_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -335,6 +352,10 @@ class CarControllerTest {
 
         @Test
         void update_whenValidInput_thenMapsToBusinessModel() throws Exception {
+            createCar = getCarCreateEditDtoBuilder()
+                        .color("yellow")
+                        .build();
+
             mockMvc.perform(put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(createCar)))
@@ -345,7 +366,7 @@ class CarControllerTest {
 
             verify(carService, times(1)).update(idCaptor.capture(), carCaptor.capture());
             assertThat(idCaptor.getValue()).isEqualTo(DEFAULT_ID);
-            assertThat(carCaptor.getValue().color()).isEqualTo("red");
+            assertThat(carCaptor.getValue().color()).isEqualTo("yellow");
             assertThat(carCaptor.getValue().brand()).isEqualTo("BMW");
             assertThat(carCaptor.getValue().number()).isEqualTo("AB123CD");
             assertThat(carCaptor.getValue().year()).isEqualTo(2023);
@@ -368,11 +389,16 @@ class CarControllerTest {
 
         @Test
         void update_whenInvalidInput_thenReturn400AndValidationResponse() throws Exception {
-            CarCreateEditDto updateCar = new CarCreateEditDto(null, null, null, 2026);
+            createCar = getCarCreateEditDtoBuilder()
+                        .color(null)
+                        .brand(null)
+                        .number(null)
+                        .year(2026)
+                        .build();
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(updateCar)))
+                            .content(objectMapper.writeValueAsString(createCar)))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -390,7 +416,9 @@ class CarControllerTest {
 
         @Test
         void update_whenInvalidNumberPattern_thenReturn400AndValidationResponse() throws Exception {
-            CarCreateEditDto createCar = new CarCreateEditDto("red", "BMW", "45sssa", 2023);
+            createCar = getCarCreateEditDtoBuilder()
+                        .number("45sssa")
+                        .build();
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -409,7 +437,9 @@ class CarControllerTest {
 
         @Test
         void update_whenColorIsNull_thenReturn400AndValidationResponse() throws Exception {
-            CarCreateEditDto createCar = new CarCreateEditDto(null, "BMW", "AB123CD", 2023);
+            createCar = getCarCreateEditDtoBuilder()
+                        .color(null)
+                        .build();
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -428,7 +458,9 @@ class CarControllerTest {
 
         @Test
         void update_whenBrandIsNull_thenReturn400AndValidationResponse() throws Exception {
-            CarCreateEditDto createCar = new CarCreateEditDto("red", null, "AB123CD", 2023);
+            createCar = getCarCreateEditDtoBuilder()
+                        .brand(null)
+                        .build();
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -447,7 +479,9 @@ class CarControllerTest {
 
         @Test
         void update_whenNumberIsNull_thenReturn400AndValidationResponse() throws Exception {
-            CarCreateEditDto createCar = new CarCreateEditDto("red", "BMW", null, 2023);
+            createCar = getCarCreateEditDtoBuilder()
+                        .number(null)
+                        .build();
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -466,7 +500,9 @@ class CarControllerTest {
 
         @Test
         void update_whenYearIsNull_thenReturn400AndValidationResponse() throws Exception {
-            CarCreateEditDto createCar = new CarCreateEditDto("red", "BMW", "AB123CD", null);
+            createCar = getCarCreateEditDtoBuilder()
+                        .year(null)
+                        .build();
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -485,7 +521,9 @@ class CarControllerTest {
 
         @Test
         void update_whenYearIsLess_thenReturn400AndValidationResponse() throws Exception {
-            CarCreateEditDto createCar = new CarCreateEditDto("red", "BMW", "AB123CD", 1900);
+            createCar = getCarCreateEditDtoBuilder()
+                        .year(1900)
+                        .build();
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)

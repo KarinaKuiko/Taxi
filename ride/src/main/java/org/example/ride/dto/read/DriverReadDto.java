@@ -1,5 +1,8 @@
 package org.example.ride.dto.read;
 
+import lombok.Builder;
+
+@Builder
 public record DriverReadDto(
         long id,
         String name,

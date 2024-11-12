@@ -39,11 +39,11 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.example.ride.util.DataUtil.DEFAULT_ID;
 import static org.example.ride.util.DataUtil.LIMIT_VALUE;
 import static org.example.ride.util.DataUtil.PAGE_VALUE;
-import static org.example.ride.util.DataUtil.getDriverReadDto;
-import static org.example.ride.util.DataUtil.getPassengerReadDto;
-import static org.example.ride.util.DataUtil.getRide;
-import static org.example.ride.util.DataUtil.getRideCreateEditDto;
-import static org.example.ride.util.DataUtil.getRideReadDto;
+import static org.example.ride.util.DataUtil.getDriverReadDtoBuilder;
+import static org.example.ride.util.DataUtil.getPassengerReadDtoBuilder;
+import static org.example.ride.util.DataUtil.getRideBuilder;
+import static org.example.ride.util.DataUtil.getRideCreateEditDtoBuilder;
+import static org.example.ride.util.DataUtil.getRideReadDtoBuilder;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -81,9 +81,9 @@ class RideServiceTest {
     @Mock
     private KafkaProducer kafkaProducer;
 
-    private Ride defaultRide = getRide();
-    private RideCreateEditDto createRide = getRideCreateEditDto();
-    private RideReadDto readRide = getRideReadDto();
+    private Ride defaultRide = getRideBuilder().build();
+    private RideCreateEditDto createRide = getRideCreateEditDtoBuilder().build();
+    private RideReadDto readRide = getRideReadDtoBuilder().build();
 
     @Test
     void findRides_whenDriverAndPassengerIdsEnter_thenThrowInvalidCountParametersException() {
@@ -216,8 +216,8 @@ class RideServiceTest {
 
     @Test
     void create_whenRideCreateEditDtoEnter_thenReturnRideReadDto() {
-        DriverReadDto readDriver = getDriverReadDto();
-        PassengerReadDto readPassenger = getPassengerReadDto();
+        DriverReadDto readDriver = getDriverReadDtoBuilder().build();
+        PassengerReadDto readPassenger = getPassengerReadDtoBuilder().build();
 
         when(driverClient.getDriver(DEFAULT_ID)).thenReturn(readDriver);
         when(passengerClient.getPassenger(DEFAULT_ID)).thenReturn(readPassenger);
@@ -237,8 +237,8 @@ class RideServiceTest {
 
     @Test
     void update_whenRideIsFound_thenReturnRideReadDto() {
-        DriverReadDto readDriver = getDriverReadDto();
-        PassengerReadDto readPassenger = getPassengerReadDto();
+        DriverReadDto readDriver = getDriverReadDtoBuilder().build();
+        PassengerReadDto readPassenger = getPassengerReadDtoBuilder().build();
 
         when(rideRepository.findById(DEFAULT_ID)).thenReturn(Optional.of(defaultRide));
         when(driverClient.getDriver(DEFAULT_ID)).thenReturn(readDriver);

@@ -21,7 +21,7 @@ public class DataUtil {
     public static final String CAR_ENTITY = "cars";
     public static final String DRIVER_ENTITY = "drivers";
 
-    public static Car.CarBuilder getCar() {
+    public static Car.CarBuilder getCarBuilder() {
         return Car.builder()
                 .id(DEFAULT_ID)
                 .color("red")
@@ -31,33 +31,52 @@ public class DataUtil {
                 .drivers(List.of());
     }
 
-    public static CarReadDto getCarReadDto() {
-        return new CarReadDto(DEFAULT_ID, "red", "BMW", "AB123CD", 2023, List.of());
-
+    public static CarReadDto.CarReadDtoBuilder getCarReadDtoBuilder() {
+        return CarReadDto.builder()
+                .id(DEFAULT_ID)
+                .color("red")
+                .brand("BMW")
+                .number("AB123CD")
+                .year(2023)
+                .drivers(List.of());
     }
 
-    public static CarCreateEditDto getCarCreateEditDto() {
-        return new CarCreateEditDto("red", "BMW", "AB123CD", 2023);
+    public static CarCreateEditDto.CarCreateEditDtoBuilder getCarCreateEditDtoBuilder() {
+        return CarCreateEditDto.builder()
+                .color("red")
+                .brand("BMW")
+                .number("AB123CD")
+                .year(2023);
     }
 
-    public static DriverReadDto getDriverReadDto() {
-        return new DriverReadDto(DEFAULT_ID, "test",
-                "test@gmail.com", "+375297654321", Gender.MALE, 1L, 5.0);
+    public static DriverReadDto.DriverReadDtoBuilder getDriverReadDtoBuilder() {
+        return DriverReadDto.builder()
+                .id(DEFAULT_ID)
+                .name("test")
+                .email("test@gmail.com")
+                .phone("+375297654321")
+                .gender(Gender.MALE)
+                .carId(DEFAULT_ID)
+                .rating(5.0);
     }
 
-    public static DriverCreateEditDto getDriverCreateEditDto() {
-        return new DriverCreateEditDto("test",
-                "test@gmail.com", "+375297654321", Gender.MALE, 1L);
+    public static DriverCreateEditDto.DriverCreateEditDtoBuilder getDriverCreateEditDtoBuilder() {
+        return DriverCreateEditDto.builder()
+                .name("test")
+                .email("test@gmail.com")
+                .phone("+375297654321")
+                .gender(Gender.MALE)
+                .carId(DEFAULT_ID);
     }
 
-    public static Driver.DriverBuilder getDriver() {
+    public static Driver.DriverBuilder getDriverBuilder() {
         return Driver.builder()
                 .id(DEFAULT_ID)
                 .name("test")
                 .email("test@gmail.com")
                 .phone("+375297654321")
                 .gender(Gender.MALE)
-                .car(getCar().build())
+                .car(getCarBuilder().build())
                 .rating(5.0);
     }
 }

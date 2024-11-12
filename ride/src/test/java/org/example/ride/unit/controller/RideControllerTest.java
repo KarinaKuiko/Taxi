@@ -38,8 +38,8 @@ import static org.example.ride.util.DataUtil.PAGE;
 import static org.example.ride.util.DataUtil.PAGE_VALUE;
 import static org.example.ride.util.DataUtil.URL;
 import static org.example.ride.util.DataUtil.URL_WITH_ID;
-import static org.example.ride.util.DataUtil.getRideCreateEditDto;
-import static org.example.ride.util.DataUtil.getRideReadDto;
+import static org.example.ride.util.DataUtil.getRideCreateEditDtoBuilder;
+import static org.example.ride.util.DataUtil.getRideReadDtoBuilder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -61,8 +61,8 @@ class RideControllerTest {
     @MockBean
     private RideService rideService;
 
-    private RideReadDto readRide = getRideReadDto();
-    private RideCreateEditDto createRide = getRideCreateEditDto();
+    private RideReadDto readRide = getRideReadDtoBuilder().build();
+    private RideCreateEditDto createRide = getRideCreateEditDtoBuilder().build();
 
 
     @Nested
@@ -220,7 +220,12 @@ class RideControllerTest {
 
         @Test
         void create_whenInvalidInputMinAndNull_thenReturn400AndValidationResponse() throws Exception {
-            RideCreateEditDto createRide = new RideCreateEditDto(0L, 0L, null, null);
+            createRide = getRideCreateEditDtoBuilder()
+                            .driverId(0L)
+                            .passengerId(0L)
+                            .addressFrom(null)
+                            .addressTo(null)
+                            .build();
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -242,7 +247,9 @@ class RideControllerTest {
 
         @Test
         void create_whenInvalidInputNull_thenReturn400AndValidationResponse() throws Exception {
-            RideCreateEditDto createRide = new RideCreateEditDto(null, null, "from", "to");
+            createRide = getRideCreateEditDtoBuilder()
+                            .passengerId(null)
+                            .build();
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -308,11 +315,16 @@ class RideControllerTest {
 
         @Test
         void update_whenInvalidInputMinAndNull_thenReturn400AndValidationResponse() throws Exception {
-            RideCreateEditDto updateRide = new RideCreateEditDto(0L, 0L, null, null);
+            createRide = getRideCreateEditDtoBuilder()
+                            .driverId(0L)
+                            .passengerId(0L)
+                            .addressFrom(null)
+                            .addressTo(null)
+                            .build();
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(updateRide)))
+                            .content(objectMapper.writeValueAsString(createRide)))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -330,11 +342,14 @@ class RideControllerTest {
 
         @Test
         void update_whenInvalidInputNull_thenReturn400AndValidationResponse() throws Exception {
-            RideCreateEditDto updateRide = new RideCreateEditDto(null, null, "from", "to");
+            createRide = getRideCreateEditDtoBuilder()
+                            .driverId(null)
+                            .passengerId(null)
+                            .build();
 
             MvcResult mvcResult = mockMvc.perform(put(URL + "/{id}", DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(updateRide)))
+                            .content(objectMapper.writeValueAsString(createRide)))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -381,8 +396,7 @@ class RideControllerTest {
         @Test
         void updateDriverStatus_whenValidInput_thenReturn200AndCarReadDto() throws Exception {
             DriverRideStatusDto driverRideStatusDto = new DriverRideStatusDto(DriverRideStatus.ON_WAY_FOR_PASSENGER);
-            RideReadDto readRide = new RideReadDto(DEFAULT_ID, DEFAULT_ID, DEFAULT_ID, "From", "To",
-                    DriverRideStatus.ON_WAY_FOR_PASSENGER, PassengerRideStatus.WAITING, new BigDecimal("123.43"));
+            RideReadDto readRide = getRideReadDtoBuilder().build();
 
             when(rideService.updateDriverStatus(DEFAULT_ID, driverRideStatusDto)).thenReturn(readRide);
 
@@ -406,7 +420,8 @@ class RideControllerTest {
                             .content(objectMapper.writeValueAsString(passengerRideStatusDto)))
                     .andExpect(status().isOk());
 
-            verify(rideService, times(1)).updatePassengerStatus(DEFAULT_ID, passengerRideStatusDto);
+            verify(rideService, times(1)).updatePassengerStatus(
+                    DEFAULT_ID, passengerRideStatusDto);
         }
 
         @Test
@@ -418,7 +433,8 @@ class RideControllerTest {
                             .content(objectMapper.writeValueAsString(passengerRideStatusDto)))
                     .andExpect(status().isOk());
 
-            ArgumentCaptor<PassengerRideStatusDto> passengerStatusCaptor = ArgumentCaptor.forClass(PassengerRideStatusDto.class);
+            ArgumentCaptor<PassengerRideStatusDto> passengerStatusCaptor =
+                    ArgumentCaptor.forClass(PassengerRideStatusDto.class);
             ArgumentCaptor<Long> idCaptor = ArgumentCaptor.forClass(Long.class);
 
             verify(rideService, times(1))
@@ -431,8 +447,7 @@ class RideControllerTest {
         @Test
         void updatePassengerStatus_whenValidInput_thenReturn200AndCarReadDto() throws Exception {
             PassengerRideStatusDto passengerRideStatusDto = new PassengerRideStatusDto(PassengerRideStatus.GETTING_OUT);
-            RideReadDto readRide = new RideReadDto(DEFAULT_ID, 1L, 1L, "From", "To",
-                    DriverRideStatus.ACCEPTED, PassengerRideStatus.GETTING_OUT, new BigDecimal("123.43"));
+            RideReadDto readRide = getRideReadDtoBuilder().build();
 
             when(rideService.updatePassengerStatus(DEFAULT_ID, passengerRideStatusDto)).thenReturn(readRide);
 

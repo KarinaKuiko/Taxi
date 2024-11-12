@@ -39,10 +39,10 @@ import static org.example.rating.util.DataUtil.PASSENGER_URL;
 import static org.example.rating.util.DataUtil.PASSENGER_URL_WITH_ID;
 import static org.example.rating.util.DataUtil.URL;
 import static org.example.rating.util.DataUtil.URL_WITH_ID;
-import static org.example.rating.util.DataUtil.getDriverRateCreateEditDto;
-import static org.example.rating.util.DataUtil.getDriverRateReadDto;
-import static org.example.rating.util.DataUtil.getPassengerRateCreateEditDto;
-import static org.example.rating.util.DataUtil.getPassengerRateReadDto;
+import static org.example.rating.util.DataUtil.getDriverRateCreateEditDtoBuilder;
+import static org.example.rating.util.DataUtil.getDriverRateReadDtoBuilder;
+import static org.example.rating.util.DataUtil.getPassengerRateCreateEditDtoBuilder;
+import static org.example.rating.util.DataUtil.getPassengerRateReadDtoBuilder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,10 +67,10 @@ class RateControllerTest {
     @MockBean
     private PassengerRateService passengerRateService;
 
-    private RateReadDto passengerRateReadDto = getPassengerRateReadDto();
-    private RateReadDto driverRateReadDto = getDriverRateReadDto();
-    private RateCreateEditDto passengerCreateEditDto = getPassengerRateCreateEditDto();
-    private RateCreateEditDto driverCreateEditDto = getDriverRateCreateEditDto();
+    private RateReadDto passengerRateReadDto = getPassengerRateReadDtoBuilder().build();
+    private RateReadDto driverRateReadDto = getDriverRateReadDtoBuilder().build();
+    private RateCreateEditDto passengerCreateEditDto = getPassengerRateCreateEditDtoBuilder().build();
+    private RateCreateEditDto driverCreateEditDto = getDriverRateCreateEditDtoBuilder().build();
 
 
     @Nested
@@ -305,11 +305,14 @@ class RateControllerTest {
 
         @Test
         void create_whenInvalidInputNullAndMax_thenReturn400AndValidationResponse() throws Exception {
-            RateCreateEditDto createRate = new RateCreateEditDto(null, "Good", 6, DEFAULT_ID, UserType.PASSENGER);
+            driverCreateEditDto = getDriverRateCreateEditDtoBuilder()
+                                    .rideId(null)
+                                    .rating(6)
+                                    .build();
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createRate)))
+                            .content(objectMapper.writeValueAsString(driverCreateEditDto)))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -324,12 +327,14 @@ class RateControllerTest {
         }
 
         @Test
-        void create_whenInvalidInputNullAndMin_thenReturn400AndValidationResponse() throws Exception {
-            RateCreateEditDto createRate = new RateCreateEditDto(DEFAULT_ID, "Good", 0, 2L, UserType.PASSENGER);
+        void create_whenInvalidInputMin_thenReturn400AndValidationResponse() throws Exception {
+            driverCreateEditDto = getDriverRateCreateEditDtoBuilder()
+                                    .rating(0)
+                                    .build();
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createRate)))
+                            .content(objectMapper.writeValueAsString(driverCreateEditDto)))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -427,11 +432,14 @@ class RateControllerTest {
 
         @Test
         void update_whenInvalidInputNullAndMax_thenReturn400AndValidationResponse() throws Exception {
-            RateCreateEditDto updateRate = new RateCreateEditDto(null, "Good", 6, 2L, UserType.PASSENGER);
+            driverCreateEditDto = getDriverRateCreateEditDtoBuilder()
+                                    .rideId(null)
+                                    .rating(6)
+                                    .build();
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(updateRate)))
+                            .content(objectMapper.writeValueAsString(driverCreateEditDto)))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -446,12 +454,14 @@ class RateControllerTest {
         }
 
         @Test
-        void update_whenInvalidInputNullAndMin_thenReturn400AndValidationResponse() throws Exception {
-            RateCreateEditDto updateRate = new RateCreateEditDto(DEFAULT_ID, "Good", 0, 2L, UserType.PASSENGER);
+        void update_whenInvalidInputMin_thenReturn400AndValidationResponse() throws Exception {
+            driverCreateEditDto = getDriverRateCreateEditDtoBuilder()
+                                    .rating(0)
+                                    .build();
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(updateRate)))
+                            .content(objectMapper.writeValueAsString(driverCreateEditDto)))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 

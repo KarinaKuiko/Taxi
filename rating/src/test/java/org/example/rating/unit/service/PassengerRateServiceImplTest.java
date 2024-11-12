@@ -32,10 +32,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.example.rating.util.DataUtil.DEFAULT_ID;
 import static org.example.rating.util.DataUtil.LIMIT_VALUE;
 import static org.example.rating.util.DataUtil.PAGE_VALUE;
-import static org.example.rating.util.DataUtil.getPassengerRate;
-import static org.example.rating.util.DataUtil.getPassengerRateCreateEditDto;
-import static org.example.rating.util.DataUtil.getPassengerRateReadDto;
-import static org.example.rating.util.DataUtil.getRideReadDto;
+import static org.example.rating.util.DataUtil.getPassengerRateBuilder;
+import static org.example.rating.util.DataUtil.getPassengerRateCreateEditDtoBuilder;
+import static org.example.rating.util.DataUtil.getPassengerRateReadDtoBuilder;
+import static org.example.rating.util.DataUtil.getRideReadDtoBuilder;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -66,10 +66,10 @@ class PassengerRateServiceImplTest {
     @Mock
     private KafkaProducer kafkaProducer;
 
-    private PassengerRate defaultRate = getPassengerRate();
-    private RateCreateEditDto createRate = getPassengerRateCreateEditDto();
-    private RateReadDto readRate = getPassengerRateReadDto();
-    private RideReadDto readRide = getRideReadDto();
+    private PassengerRate defaultRate = getPassengerRateBuilder().build();
+    private RateCreateEditDto createRate = getPassengerRateCreateEditDtoBuilder().build();
+    private RateReadDto readRate = getPassengerRateReadDtoBuilder().build();
+    private RideReadDto readRide = getRideReadDtoBuilder().build();
 
     @Test
     void findAll_thenReturnPageRateReadDto() {

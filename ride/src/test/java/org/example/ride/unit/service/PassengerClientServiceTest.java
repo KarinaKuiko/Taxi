@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.example.ride.util.DataUtil.DEFAULT_ID;
-import static org.example.ride.util.DataUtil.getPassengerReadDto;
+import static org.example.ride.util.DataUtil.getPassengerReadDtoBuilder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -26,7 +26,7 @@ class PassengerClientServiceTest {
 
     @Test
     void checkExistingPassenger_thenReturnPassengerReadDto() {
-        PassengerReadDto readPassenger = getPassengerReadDto();
+        PassengerReadDto readPassenger = getPassengerReadDtoBuilder().build();
 
         when(passengerClient.findById(DEFAULT_ID)).thenReturn(readPassenger);
 

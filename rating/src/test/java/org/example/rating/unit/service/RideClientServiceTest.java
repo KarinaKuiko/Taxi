@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.example.rating.util.DataUtil.DEFAULT_ID;
-import static org.example.rating.util.DataUtil.getRideReadDto;
+import static org.example.rating.util.DataUtil.getRideReadDtoBuilder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -26,7 +26,7 @@ class RideClientServiceTest {
 
     @Test
     void getRide_thenReturnRideReadDto() {
-        RideReadDto readRide = getRideReadDto();
+        RideReadDto readRide = getRideReadDtoBuilder().build();
         when(rideClient.findById(DEFAULT_ID)).thenReturn(readRide);
 
         assertThat(rideClientService.getRide(DEFAULT_ID)).isNotNull();

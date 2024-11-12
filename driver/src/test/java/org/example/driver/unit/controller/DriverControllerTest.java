@@ -35,8 +35,8 @@ import static org.example.driver.util.DataUtil.PAGE;
 import static org.example.driver.util.DataUtil.PAGE_VALUE;
 import static org.example.driver.util.DataUtil.URL;
 import static org.example.driver.util.DataUtil.URL_WITH_ID;
-import static org.example.driver.util.DataUtil.getDriverCreateEditDto;
-import static org.example.driver.util.DataUtil.getDriverReadDto;
+import static org.example.driver.util.DataUtil.getDriverCreateEditDtoBuilder;
+import static org.example.driver.util.DataUtil.getDriverReadDtoBuilder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -59,15 +59,16 @@ class DriverControllerTest {
     @MockBean
     private DriverService driverService;
 
-    private DriverReadDto readDriver = getDriverReadDto();
-    private DriverCreateEditDto createDriver = getDriverCreateEditDto();
+    private DriverReadDto readDriver = getDriverReadDtoBuilder().build();
+    private DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
 
     @Nested
     @DisplayName("Find all tests")
     public class findAllTests {
         @Test
         void findAll_whenVerifyingRequestMatchingWithoutParams_thenReturn200() throws Exception {
-            Page<DriverReadDto> driverPage = new PageImpl<>(List.of(readDriver), PageRequest.of(PAGE_VALUE, LIMIT_VALUE), 1);
+            Page<DriverReadDto> driverPage = new PageImpl<>(List.of(readDriver),
+                    PageRequest.of(PAGE_VALUE, LIMIT_VALUE), 1);
 
             when(driverService.findAll(PAGE_VALUE, LIMIT_VALUE)).thenReturn(driverPage);
 
@@ -77,7 +78,8 @@ class DriverControllerTest {
 
         @Test
         void findAll_whenCorrectParams_thenReturn200() throws Exception {
-            Page<DriverReadDto> driverPage = new PageImpl<>(List.of(readDriver), PageRequest.of(PAGE_VALUE, LIMIT_VALUE), 1);
+            Page<DriverReadDto> driverPage = new PageImpl<>(List.of(readDriver),
+                    PageRequest.of(PAGE_VALUE, LIMIT_VALUE), 1);
 
             when(driverService.findAll(PAGE_VALUE, LIMIT_VALUE)).thenReturn(driverPage);
 
@@ -187,7 +189,11 @@ class DriverControllerTest {
 
         @Test
         void create_whenInvalidInput_thenReturn400AndValidationResponse() throws Exception {
-            DriverCreateEditDto createDriver = new DriverCreateEditDto(null, null, null, Gender.MALE, 2L);
+            createDriver = getDriverCreateEditDtoBuilder()
+                            .name(null)
+                            .email(null)
+                            .phone(null)
+                            .build();
 
             MvcResult mvcResult = mockMvc.perform(post(URL, DRIVER_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -208,8 +214,9 @@ class DriverControllerTest {
 
         @Test
         void create_whenInvalidEmailPattern_thenReturn400AndValidationResponse() throws Exception {
-            DriverCreateEditDto createDriver = new DriverCreateEditDto("name",
-                    "test.gmail", "+375297654321", Gender.MALE, 2L);
+            createDriver = getDriverCreateEditDtoBuilder()
+                            .email("test.gmail")
+                            .build();
 
             MvcResult mvcResult = mockMvc.perform(post(URL, DRIVER_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -228,8 +235,9 @@ class DriverControllerTest {
 
         @Test
         void create_whenInvalidPhonePattern_thenReturn400AndValidationResponse() throws Exception {
-            DriverCreateEditDto createDriver = new DriverCreateEditDto("name",
-                    "test@gmail.com", "+375294321", Gender.MALE, 2L);
+            createDriver = getDriverCreateEditDtoBuilder()
+                            .phone("+375995")
+                            .build();
 
             MvcResult mvcResult = mockMvc.perform(post(URL, DRIVER_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -238,7 +246,8 @@ class DriverControllerTest {
                     .andReturn();
 
             ValidationResponse expectedValidationResponse = new ValidationResponse(
-                    List.of(new Violation("phone", "Invalid phone. Possible form: +375-(XX)-XXX-XX-XX or 80(XX)-XXX-XX-XX")));
+                    List.of(new Violation("phone",
+                            "Invalid phone. Possible form: +375-(XX)-XXX-XX-XX or 80(XX)-XXX-XX-XX")));
             ValidationResponse actualResponse = objectMapper.readValue(
                     mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
@@ -295,11 +304,15 @@ class DriverControllerTest {
 
         @Test
         void update_whenInvalidInput_thenReturn400AndValidationResponse() throws Exception {
-            DriverCreateEditDto updateDriver = new DriverCreateEditDto(null, null, null, Gender.MALE, 2L);
+            createDriver = getDriverCreateEditDtoBuilder()
+                            .name(null)
+                            .email(null)
+                            .phone(null)
+                            .build();
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(updateDriver)))
+                            .content(objectMapper.writeValueAsString(createDriver)))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -316,8 +329,9 @@ class DriverControllerTest {
 
         @Test
         void update_whenInvalidEmailPattern_thenReturn400AndValidationResponse() throws Exception {
-            DriverCreateEditDto createDriver = new DriverCreateEditDto("name",
-                    "test.gmail", "+375297654321", Gender.MALE, 2L);
+            createDriver = getDriverCreateEditDtoBuilder()
+                            .email("test.gmail")
+                            .build();
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -336,8 +350,9 @@ class DriverControllerTest {
 
         @Test
         void update_whenInvalidPhonePattern_thenReturn400AndValidationResponse() throws Exception {
-            DriverCreateEditDto createDriver = new DriverCreateEditDto("name",
-                    "test@gmail.com", "+375294321", Gender.MALE, 2L);
+            createDriver = getDriverCreateEditDtoBuilder()
+                            .phone("+375996")
+                            .build();
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -346,7 +361,8 @@ class DriverControllerTest {
                     .andReturn();
 
             ValidationResponse expectedValidationResponse = new ValidationResponse(
-                    List.of(new Violation("phone", "Invalid phone. Possible form: +375-(XX)-XXX-XX-XX or 80(XX)-XXX-XX-XX")));
+                    List.of(new Violation("phone",
+                            "Invalid phone. Possible form: +375-(XX)-XXX-XX-XX or 80(XX)-XXX-XX-XX")));
             ValidationResponse actualResponse = objectMapper.readValue(
                     mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 

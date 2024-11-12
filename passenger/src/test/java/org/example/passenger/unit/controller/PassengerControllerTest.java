@@ -33,8 +33,8 @@ import static org.example.passenger.util.DataUtil.PAGE;
 import static org.example.passenger.util.DataUtil.PAGE_VALUE;
 import static org.example.passenger.util.DataUtil.URL;
 import static org.example.passenger.util.DataUtil.URL_WITH_ID;
-import static org.example.passenger.util.DataUtil.getPassengerCreateEditDto;
-import static org.example.passenger.util.DataUtil.getPassengerReadDto;
+import static org.example.passenger.util.DataUtil.getPassengerCreateEditDtoBuilder;
+import static org.example.passenger.util.DataUtil.getPassengerReadDtoBuilder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,8 +57,8 @@ class PassengerControllerTest {
     @MockBean
     private PassengerService passengerService;
 
-    private PassengerReadDto readPassenger = getPassengerReadDto();
-    private PassengerCreateEditDto createPassenger = getPassengerCreateEditDto();
+    private PassengerReadDto readPassenger = getPassengerReadDtoBuilder().build();
+    private PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
 
     @Nested
     @DisplayName("Find all tests")
@@ -185,11 +185,15 @@ class PassengerControllerTest {
 
         @Test
         void create_whenInvalidInput_thenReturn400AndValidationResponse() throws Exception {
-            PassengerCreateEditDto passengerCreate = new PassengerCreateEditDto(null, null, null);
+            createPassenger = getPassengerCreateEditDtoBuilder()
+                                .name(null)
+                                .email(null)
+                                .phone(null)
+                                .build();
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(passengerCreate)))
+                            .content(objectMapper.writeValueAsString(createPassenger)))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -206,17 +210,19 @@ class PassengerControllerTest {
 
         @Test
         void create_whenInvalidPhonePattern_thenReturn400AndValidationResponse() throws Exception {
-            PassengerCreateEditDto passengerCreate = new PassengerCreateEditDto("passenger",
-                    "passenger@gmail.com", "+45619");
+            createPassenger = getPassengerCreateEditDtoBuilder()
+                                .phone("+85699")
+                                .build();
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(passengerCreate)))
+                            .content(objectMapper.writeValueAsString(createPassenger)))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
             ValidationResponse expectedValidationResponse = new ValidationResponse(
-                    List.of(new Violation("phone", "Invalid phone. Possible form: +375-(XX)-XXX-XX-XX or 80(XX)-XXX-XX-XX")));
+                    List.of(new Violation("phone",
+                            "Invalid phone. Possible form: +375-(XX)-XXX-XX-XX or 80(XX)-XXX-XX-XX")));
             ValidationResponse actualResponse = objectMapper.readValue(
                     mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
@@ -226,12 +232,13 @@ class PassengerControllerTest {
 
         @Test
         void create_whenInvalidEmailPattern_thenReturn400AndValidationResponse() throws Exception {
-            PassengerCreateEditDto passengerCreate = new PassengerCreateEditDto("passenger",
-                    "passenger.com", "+375441234567");
+            createPassenger = getPassengerCreateEditDtoBuilder()
+                                .email("passenger.gmail")
+                                .build();
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(passengerCreate)))
+                            .content(objectMapper.writeValueAsString(createPassenger)))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -265,10 +272,12 @@ class PassengerControllerTest {
                             .content(objectMapper.writeValueAsString(createPassenger)))
                     .andExpect(status().isOk());
 
-            ArgumentCaptor<PassengerCreateEditDto> passengerCaptor = ArgumentCaptor.forClass(PassengerCreateEditDto.class);
+            ArgumentCaptor<PassengerCreateEditDto> passengerCaptor =
+                    ArgumentCaptor.forClass(PassengerCreateEditDto.class);
             ArgumentCaptor<Long> idCaptor = ArgumentCaptor.forClass(Long.class);
 
-            verify(passengerService, times(1)).update(idCaptor.capture(), passengerCaptor.capture());
+            verify(passengerService, times(1)).update(
+                    idCaptor.capture(), passengerCaptor.capture());
             assertThat(idCaptor.getValue()).isEqualTo(DEFAULT_ID);
             assertThat(passengerCaptor.getValue().name()).isEqualTo("passenger");
             assertThat(passengerCaptor.getValue().email()).isEqualTo("passenger@gmail.com");
@@ -292,11 +301,15 @@ class PassengerControllerTest {
 
         @Test
         void update_whenInvalidInput_thenReturn400AndValidationResponse() throws Exception {
-            PassengerCreateEditDto updatePassenger = new PassengerCreateEditDto(null, null, null);
+            createPassenger = getPassengerCreateEditDtoBuilder()
+                                .name(null)
+                                .email(null)
+                                .phone(null)
+                                .build();
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(updatePassenger)))
+                            .content(objectMapper.writeValueAsString(createPassenger)))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -313,17 +326,19 @@ class PassengerControllerTest {
 
         @Test
         void update_whenInvalidPhonePattern_thenReturn400AndValidationResponse() throws Exception {
-            PassengerCreateEditDto passengerCreate = new PassengerCreateEditDto("passenger",
-                    "passenger@gmail.com", "+45619");
+            createPassenger = getPassengerCreateEditDtoBuilder()
+                                .phone("+87522")
+                                .build();
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(passengerCreate)))
+                            .content(objectMapper.writeValueAsString(createPassenger)))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
             ValidationResponse expectedValidationResponse = new ValidationResponse(
-                    List.of(new Violation("phone", "Invalid phone. Possible form: +375-(XX)-XXX-XX-XX or 80(XX)-XXX-XX-XX")));
+                    List.of(new Violation("phone",
+                            "Invalid phone. Possible form: +375-(XX)-XXX-XX-XX or 80(XX)-XXX-XX-XX")));
             ValidationResponse actualResponse = objectMapper.readValue(
                     mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
@@ -333,12 +348,13 @@ class PassengerControllerTest {
 
         @Test
         void update_whenInvalidEmailPattern_thenReturn400AndValidationResponse() throws Exception {
-            PassengerCreateEditDto passengerCreate = new PassengerCreateEditDto("passenger",
-                    "passenger.com", "+375441234567");
+            createPassenger = getPassengerCreateEditDtoBuilder()
+                                .email("passenger.gmail")
+                                .build();
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(passengerCreate)))
+                            .content(objectMapper.writeValueAsString(createPassenger)))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 

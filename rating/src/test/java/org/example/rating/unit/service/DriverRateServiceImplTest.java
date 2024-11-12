@@ -31,10 +31,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.example.rating.util.DataUtil.DEFAULT_ID;
 import static org.example.rating.util.DataUtil.LIMIT_VALUE;
 import static org.example.rating.util.DataUtil.PAGE_VALUE;
-import static org.example.rating.util.DataUtil.getDriverRate;
-import static org.example.rating.util.DataUtil.getDriverRateCreateEditDto;
-import static org.example.rating.util.DataUtil.getDriverRateReadDto;
-import static org.example.rating.util.DataUtil.getRideReadDto;
+import static org.example.rating.util.DataUtil.getDriverRateBuilder;
+import static org.example.rating.util.DataUtil.getDriverRateCreateEditDtoBuilder;
+import static org.example.rating.util.DataUtil.getDriverRateReadDtoBuilder;
+import static org.example.rating.util.DataUtil.getRideReadDtoBuilder;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -65,10 +65,10 @@ class DriverRateServiceImplTest {
     @Mock
     private KafkaProducer kafkaProducer;
 
-    private DriverRate defaultRate = getDriverRate();
-    private RateCreateEditDto createRate = getDriverRateCreateEditDto();
-    private RateReadDto readRate = getDriverRateReadDto();
-    private RideReadDto readRide = getRideReadDto();
+    private DriverRate defaultRate = getDriverRateBuilder().build();
+    private RateCreateEditDto createRate = getDriverRateCreateEditDtoBuilder().build();
+    private RateReadDto readRate = getDriverRateReadDtoBuilder().build();
+    private RideReadDto readRide = getRideReadDtoBuilder().build();
 
     @Test
     void findAll_thenReturnPageRateReadDto() {

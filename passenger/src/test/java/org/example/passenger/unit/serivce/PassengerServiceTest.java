@@ -10,7 +10,6 @@ import org.example.passenger.exception.passenger.PassengerNotFoundException;
 import org.example.passenger.mapper.PassengerMapper;
 import org.example.passenger.repository.PassengerRepository;
 import org.example.passenger.service.PassengerService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -30,9 +29,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.example.passenger.util.DataUtil.DEFAULT_ID;
 import static org.example.passenger.util.DataUtil.LIMIT_VALUE;
 import static org.example.passenger.util.DataUtil.PAGE_VALUE;
-import static org.example.passenger.util.DataUtil.getPassenger;
-import static org.example.passenger.util.DataUtil.getPassengerCreateEditDto;
-import static org.example.passenger.util.DataUtil.getPassengerReadDto;
+import static org.example.passenger.util.DataUtil.getPassengerBuilder;
+import static org.example.passenger.util.DataUtil.getPassengerCreateEditDtoBuilder;
+import static org.example.passenger.util.DataUtil.getPassengerReadDtoBuilder;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -54,9 +53,9 @@ class PassengerServiceTest {
     @Mock
     private MessageSource messageSource;
 
-    private Passenger defaultPassenger = getPassenger().build();
-    private PassengerCreateEditDto createPassenger = getPassengerCreateEditDto();
-    private PassengerReadDto readPassenger = getPassengerReadDto();
+    private Passenger defaultPassenger = getPassengerBuilder().build();
+    private PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
+    private PassengerReadDto readPassenger = getPassengerReadDtoBuilder().build();
 
     @Test
     void findAll_thenReturnPagePassengerReadDto() {

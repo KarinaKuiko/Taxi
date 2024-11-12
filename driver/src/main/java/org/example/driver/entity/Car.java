@@ -46,5 +46,6 @@ public class Car extends AuditingEntity {
                     CascadeType.REMOVE},
             orphanRemoval = true,
             fetch = FetchType.EAGER)
+    @Builder.Default
     private List<Driver> drivers = new ArrayList<>();
 }

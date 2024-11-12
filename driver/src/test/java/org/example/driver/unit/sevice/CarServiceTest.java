@@ -29,10 +29,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.example.driver.util.DataUtil.DEFAULT_ID;
 import static org.example.driver.util.DataUtil.LIMIT_VALUE;
 import static org.example.driver.util.DataUtil.PAGE_VALUE;
-import static org.example.driver.util.DataUtil.getCar;
-import static org.example.driver.util.DataUtil.getCarCreateEditDto;
-import static org.example.driver.util.DataUtil.getCarReadDto;
-import static org.example.driver.util.DataUtil.getDriver;
+import static org.example.driver.util.DataUtil.getCarBuilder;
+import static org.example.driver.util.DataUtil.getCarCreateEditDtoBuilder;
+import static org.example.driver.util.DataUtil.getCarReadDtoBuilder;
+import static org.example.driver.util.DataUtil.getDriverBuilder;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -57,10 +57,10 @@ class CarServiceTest {
     @InjectMocks
     private CarService carService;
 
-    private Car defaultCar = getCar().build();
-    private CarCreateEditDto createCar = getCarCreateEditDto();
-    private CarReadDto readCar = getCarReadDto();
-    private Driver driver = getDriver().build();
+    private Car defaultCar = getCarBuilder().build();
+    private CarCreateEditDto createCar = getCarCreateEditDtoBuilder().build();
+    private CarReadDto readCar = getCarReadDtoBuilder().build();
+    private Driver driver = getDriverBuilder().build();
 
     @Test
     void create_whenCarNumberIsNotDuplicated_thenReturnCarReadDto() {
