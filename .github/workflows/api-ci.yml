@@ -35,7 +35,8 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-      - uses: dorny/paths-filter@v3
+      - name: Set filters
+        uses: dorny/paths-filter@v3
         id: changes
         with:
           filters: |
