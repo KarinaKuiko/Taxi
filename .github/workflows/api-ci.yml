@@ -1,0 +1,48 @@
+name: API CI
+
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'driver/**'
+      - 'passenger/**'
+      - 'rating/**'
+      - 'ride/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+      - name: Set filters
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            driver:
+              - 'driver/**'
+            passenger:
+              - 'passenger/**'
+            rating:
+              - 'rating/**'
+            ride:
+              - 'ride/**'
+      - name: Run unit and integration tests DRIVER
+        if: steps.changes.outputs.driver == 'true'
+        run:  mvn -B clean install --file driver/pom.xml
+      - name: Run unit and integration tests PASSENGER
+        if: steps.changes.outputs.passenger = 'true'
+        run:  mvn -B clean install --file passenger/pom.xml
+      - name: Run unit and integration tests RATING
+        if: steps.changes.outputs.rating == 'true'
+        run:  mvn -B clean install --file rating/pom.xml
+      - name: Run unit and integration tests RIDE
+        if: steps.changes.outputs.ride == 'true'
+        run:  mvn -B clean install --file ride/pom.xml
