@@ -53,13 +53,11 @@ class PassengerServiceTest {
     @Mock
     private MessageSource messageSource;
 
-    private Passenger defaultPassenger = getPassengerBuilder().build();
-    private PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
-    private PassengerReadDto readPassenger = getPassengerReadDtoBuilder().build();
-
     @Test
     void findAll_thenReturnPagePassengerReadDto() {
+        Passenger defaultPassenger = getPassengerBuilder().build();
         Pageable request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
+        PassengerReadDto readPassenger = getPassengerReadDtoBuilder().build();
 
         when(passengerRepository.findByIsDeletedFalse(request)).thenReturn(
                 new PageImpl<>(List.of(defaultPassenger), request, 1));
@@ -75,7 +73,9 @@ class PassengerServiceTest {
 
     @Test
     void findAllWithDeleted_thenReturnPagePassengerReadDto() {
+        Passenger defaultPassenger = getPassengerBuilder().build();
         Pageable request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
+        PassengerReadDto readPassenger = getPassengerReadDtoBuilder().build();
 
         when(passengerRepository.findAll(request)).thenReturn(
                 new PageImpl<>(List.of(defaultPassenger), request, 1));
@@ -91,6 +91,9 @@ class PassengerServiceTest {
 
     @Test
     void findById_whenPassengerIsFound_thenReturnPassengerReadDto() {
+        Passenger defaultPassenger = getPassengerBuilder().build();
+        PassengerReadDto readPassenger = getPassengerReadDtoBuilder().build();
+
         when(passengerRepository.findByIdAndIsDeletedFalse(DEFAULT_ID)).thenReturn(Optional.of(defaultPassenger));
         when(passengerMapper.toReadDto(defaultPassenger)).thenReturn(readPassenger);
 
@@ -122,6 +125,10 @@ class PassengerServiceTest {
 
     @Test
     void create_whenEmailIsNotDuplicated_thenReturnPassengerReadDto() {
+        Passenger defaultPassenger = getPassengerBuilder().build();
+        PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
+        PassengerReadDto readPassenger = getPassengerReadDtoBuilder().build();
+
         when(passengerRepository.findByEmailAndIsDeletedFalse(createPassenger.email()))
                 .thenReturn(Optional.empty());
         when(passengerMapper.toPassenger(createPassenger)).thenReturn(defaultPassenger);
@@ -137,6 +144,9 @@ class PassengerServiceTest {
 
     @Test
     void create_whenEmailIsDuplicated_thenThrowDuplicatedPassengerEmailException() {
+        Passenger defaultPassenger = getPassengerBuilder().build();
+        PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
+
         when(passengerRepository.findByEmailAndIsDeletedFalse(createPassenger.email()))
                 .thenReturn(Optional.of(defaultPassenger));
         when(messageSource.getMessage(
@@ -161,6 +171,10 @@ class PassengerServiceTest {
 
     @Test
     void update_whenEmailIsDuplicatedWithSameIds_thenReturnPassengerReadDto() {
+        Passenger defaultPassenger = getPassengerBuilder().build();
+        PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
+        PassengerReadDto readPassenger = getPassengerReadDtoBuilder().build();
+
         when(passengerRepository.findByIdAndIsDeletedFalse(DEFAULT_ID)).thenReturn(Optional.of(defaultPassenger));
         when(passengerRepository.findByEmailAndIsDeletedFalse(createPassenger.email()))
                 .thenReturn(Optional.of(defaultPassenger));
@@ -177,6 +191,9 @@ class PassengerServiceTest {
 
     @Test
     void update_whenEmailIsDuplicatedWithDifferentIds_thenThrowDuplicatedPassengerEmailException() {
+        Passenger defaultPassenger = getPassengerBuilder().build();
+        PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
+
         when(passengerRepository.findByIdAndIsDeletedFalse(2L)).thenReturn(Optional.of(defaultPassenger));
         when(passengerRepository.findByEmailAndIsDeletedFalse(createPassenger.email()))
                 .thenReturn(Optional.of(defaultPassenger));
@@ -202,6 +219,8 @@ class PassengerServiceTest {
 
     @Test
     void update_whenPassengerIsNotFound_thenThrowPassengerNotFoundException() {
+        PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
+
         when(passengerRepository.findByIdAndIsDeletedFalse(DEFAULT_ID)).thenReturn(Optional.empty());
         when(messageSource.getMessage(
                 ExceptionConstants.PASSENGER_NOT_FOUND_MESSAGE,
@@ -226,6 +245,8 @@ class PassengerServiceTest {
 
     @Test
     void safeDelete_whenPassengerIsFound_thenMarkAsDeleted() {
+        Passenger defaultPassenger = getPassengerBuilder().build();
+
         when(passengerRepository.findByIdAndIsDeletedFalse(DEFAULT_ID)).thenReturn(Optional.of(defaultPassenger));
         when(passengerRepository.save(defaultPassenger)).thenReturn(defaultPassenger);
 
@@ -246,7 +267,7 @@ class PassengerServiceTest {
                 .thenReturn(ExceptionConstants.PASSENGER_NOT_FOUND_MESSAGE);
 
         PassengerNotFoundException exception = assertThrows(PassengerNotFoundException.class,
-                () -> passengerService.update(DEFAULT_ID, createPassenger));
+                () -> passengerService.safeDelete(DEFAULT_ID));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.PASSENGER_NOT_FOUND_MESSAGE);
         verify(passengerRepository).findByIdAndIsDeletedFalse(DEFAULT_ID);
@@ -259,6 +280,7 @@ class PassengerServiceTest {
 
     @Test
     void updateRating_thenUpdateRating() {
+        Passenger defaultPassenger = getPassengerBuilder().build();
         UserRateDto rateDto = new UserRateDto(DEFAULT_ID, 4.0);
 
         when(passengerRepository.findById(DEFAULT_ID)).thenReturn(Optional.of(defaultPassenger));

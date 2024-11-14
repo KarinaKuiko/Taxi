@@ -57,13 +57,12 @@ class CarServiceTest {
     @InjectMocks
     private CarService carService;
 
-    private Car defaultCar = getCarBuilder().build();
-    private CarCreateEditDto createCar = getCarCreateEditDtoBuilder().build();
-    private CarReadDto readCar = getCarReadDtoBuilder().build();
-    private Driver driver = getDriverBuilder().build();
-
     @Test
     void create_whenCarNumberIsNotDuplicated_thenReturnCarReadDto() {
+        Car defaultCar = getCarBuilder().build();
+        CarCreateEditDto createCar = getCarCreateEditDtoBuilder().build();
+        CarReadDto readCar = getCarReadDtoBuilder().build();
+
         when(carRepository.findByNumberAndIsDeletedFalse(createCar.number()))
                 .thenReturn(Optional.empty());
         when(carRepository.save(defaultCar)).thenReturn(defaultCar);
@@ -79,6 +78,9 @@ class CarServiceTest {
 
     @Test
     void create_whenCarNumberIsDuplicated_thenThrowDuplicatedCarNumberException() {
+        Car defaultCar = getCarBuilder().build();
+        CarCreateEditDto createCar = getCarCreateEditDtoBuilder().build();
+
         when(carRepository.findByNumberAndIsDeletedFalse(createCar.number()))
                 .thenReturn(Optional.of(defaultCar));
         when(messageSource.getMessage(
@@ -103,6 +105,10 @@ class CarServiceTest {
 
     @Test
     void update_whenCarNumberIsNotDuplicatedAndCarIsFound_thenReturnCarReadDto() {
+        Car defaultCar = getCarBuilder().build();
+        CarCreateEditDto createCar = getCarCreateEditDtoBuilder().build();
+        CarReadDto readCar = getCarReadDtoBuilder().build();
+
         when(carRepository.findByIdAndIsDeletedFalse(DEFAULT_ID)).thenReturn(Optional.of(defaultCar));
         when(carRepository.findByNumberAndIsDeletedFalse(createCar.number()))
                 .thenReturn(Optional.empty());
@@ -120,6 +126,9 @@ class CarServiceTest {
 
     @Test
     void update_whenCarNumberIsDuplicatedAndDifferentIds_thenThrowDuplicatedCarNumberException() {
+        Car defaultCar = getCarBuilder().build();
+        CarCreateEditDto createCar = getCarCreateEditDtoBuilder().build();
+
         when(carRepository.findByIdAndIsDeletedFalse(2L)).thenReturn(Optional.of(defaultCar));
         when(carRepository.findByNumberAndIsDeletedFalse(createCar.number()))
                 .thenReturn(Optional.of(defaultCar));
@@ -146,6 +155,10 @@ class CarServiceTest {
 
     @Test
     void update_whenCarNumberIsDuplicatedAndSameIds_thenReturnCarReadDto() {
+        Car defaultCar = getCarBuilder().build();
+        CarCreateEditDto createCar = getCarCreateEditDtoBuilder().build();
+        CarReadDto readCar = getCarReadDtoBuilder().build();
+
         when(carRepository.findByIdAndIsDeletedFalse(DEFAULT_ID)).thenReturn(Optional.of(defaultCar));
         when(carRepository.findByNumberAndIsDeletedFalse(createCar.number()))
                 .thenReturn(Optional.of(defaultCar));
@@ -162,6 +175,8 @@ class CarServiceTest {
 
     @Test
     void update_whenCarNotFound_thenThrowCarNotFoundException() {
+        CarCreateEditDto createCar = getCarCreateEditDtoBuilder().build();
+
         when(carRepository.findByIdAndIsDeletedFalse(2L)).thenReturn(Optional.empty());
         when(messageSource.getMessage(
                 ExceptionConstants.CAR_NOT_FOUND,
@@ -186,6 +201,9 @@ class CarServiceTest {
 
     @Test
     void safeDelete_whenCarIsFoundWithDrivers_thenUnsetDrivers() {
+        Car defaultCar = getCarBuilder().build();
+        Driver driver = getDriverBuilder().build();
+
         when(carRepository.findByIdAndIsDeletedFalse(DEFAULT_ID)).thenReturn(Optional.of(defaultCar));
         when(carRepository.save(defaultCar)).thenReturn(defaultCar);
         when(driverRepository.save(driver)).thenReturn(driver);
@@ -203,6 +221,8 @@ class CarServiceTest {
 
     @Test
     void safeDelete_whenCarIsFoundWithoutDrivers_thenMarkAsDeleted() {
+        Car defaultCar = getCarBuilder().build();
+
         when(carRepository.findByIdAndIsDeletedFalse(DEFAULT_ID)).thenReturn(Optional.of(defaultCar));
         when(carRepository.save(defaultCar)).thenReturn(defaultCar);
         when(driverRepository.findByCarIdAndIsDeletedFalse(DEFAULT_ID)).thenReturn(List.of());
@@ -218,6 +238,8 @@ class CarServiceTest {
 
     @Test
     void safeDelete_whenCarIsNotFound_thenThrowCarNotFoundException() {
+        Car defaultCar = getCarBuilder().build();
+
         when(carRepository.findByIdAndIsDeletedFalse(DEFAULT_ID)).thenReturn(Optional.empty());
         when(messageSource.getMessage(
                 ExceptionConstants.CAR_NOT_FOUND,
@@ -242,6 +264,8 @@ class CarServiceTest {
 
     @Test
     void findAll_thenReturnPageCarReadDto() {
+        Car defaultCar = getCarBuilder().build();
+        CarReadDto readCar = getCarReadDtoBuilder().build();
         PageRequest request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
         when(carRepository.findByIsDeletedFalse(request)).thenReturn(
@@ -258,6 +282,8 @@ class CarServiceTest {
 
     @Test
     void findAllWithDeleted_thenReturnPageCarReadDto() {
+        Car defaultCar = getCarBuilder().build();
+        CarReadDto readCar = getCarReadDtoBuilder().build();
         PageRequest request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
         when(carRepository.findAll(request)).thenReturn(new PageImpl<>(List.of(defaultCar), request, 1));
@@ -273,6 +299,9 @@ class CarServiceTest {
 
     @Test
     void findById_whenCarIsFound_thenReturnCarReadDto() {
+        Car defaultCar = getCarBuilder().build();
+        CarReadDto readCar = getCarReadDtoBuilder().build();
+
         when(carRepository.findByIdAndIsDeletedFalse(DEFAULT_ID)).thenReturn(Optional.of(defaultCar));
         when(carMapper.toReadDto(defaultCar)).thenReturn(readCar);
 

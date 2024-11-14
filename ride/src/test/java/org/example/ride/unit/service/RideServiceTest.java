@@ -81,10 +81,6 @@ class RideServiceTest {
     @Mock
     private KafkaProducer kafkaProducer;
 
-    private Ride defaultRide = getRideBuilder().build();
-    private RideCreateEditDto createRide = getRideCreateEditDtoBuilder().build();
-    private RideReadDto readRide = getRideReadDtoBuilder().build();
-
     @Test
     void findRides_whenDriverAndPassengerIdsEnter_thenThrowInvalidCountParametersException() {
         when(messageSource.getMessage(
@@ -105,6 +101,8 @@ class RideServiceTest {
 
     @Test
     void findRides_whenDriverIdEnter_thenReturnPageRideReadDto() {
+        Ride defaultRide = getRideBuilder().build();
+        RideReadDto readRide = getRideReadDtoBuilder().build();
         Pageable request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
         when(rideRepository.findByDriverId(DEFAULT_ID, request))
@@ -121,6 +119,8 @@ class RideServiceTest {
 
     @Test
     void findRides_whenPassengerIdEnter_thenReturnPageRideReadDto() {
+        Ride defaultRide = getRideBuilder().build();
+        RideReadDto readRide = getRideReadDtoBuilder().build();
         Pageable request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
         when(rideRepository.findByPassengerId(DEFAULT_ID, request))
@@ -137,6 +137,8 @@ class RideServiceTest {
 
     @Test
     void findAll_thenReturnPageRideReadDto() {
+        Ride defaultRide = getRideBuilder().build();
+        RideReadDto readRide = getRideReadDtoBuilder().build();
         Pageable request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
         when(rideRepository.findAll(request))
@@ -153,6 +155,9 @@ class RideServiceTest {
 
     @Test
     void findById_whenRideIsFound_thenReturnRideReadDto() {
+        Ride defaultRide = getRideBuilder().build();
+        RideReadDto readRide = getRideReadDtoBuilder().build();
+
         when(rideRepository.findById(DEFAULT_ID)).thenReturn(Optional.of(defaultRide));
         when(rideMapper.toReadDto(defaultRide)).thenReturn(readRide);
 
@@ -184,6 +189,8 @@ class RideServiceTest {
 
     @Test
     void findByPassengerId_whenIdEnter_thenReturnPageRideReadDto() {
+        Ride defaultRide = getRideBuilder().build();
+        RideReadDto readRide = getRideReadDtoBuilder().build();
         Pageable request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
         when(rideRepository.findByPassengerId(DEFAULT_ID, request))
@@ -200,6 +207,8 @@ class RideServiceTest {
 
     @Test
     void findByDriverId_whenIdEnter_thenReturnPageRideReadDto() {
+        Ride defaultRide = getRideBuilder().build();
+        RideReadDto readRide = getRideReadDtoBuilder().build();
         Pageable request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
         when(rideRepository.findByDriverId(DEFAULT_ID, request))
@@ -216,6 +225,9 @@ class RideServiceTest {
 
     @Test
     void create_whenRideCreateEditDtoEnter_thenReturnRideReadDto() {
+        Ride defaultRide = getRideBuilder().build();
+        RideCreateEditDto createRide = getRideCreateEditDtoBuilder().build();
+        RideReadDto readRide = getRideReadDtoBuilder().build();
         DriverReadDto readDriver = getDriverReadDtoBuilder().build();
         PassengerReadDto readPassenger = getPassengerReadDtoBuilder().build();
 
@@ -237,6 +249,9 @@ class RideServiceTest {
 
     @Test
     void update_whenRideIsFound_thenReturnRideReadDto() {
+        Ride defaultRide = getRideBuilder().build();
+        RideCreateEditDto createRide = getRideCreateEditDtoBuilder().build();
+        RideReadDto readRide = getRideReadDtoBuilder().build();
         DriverReadDto readDriver = getDriverReadDtoBuilder().build();
         PassengerReadDto readPassenger = getPassengerReadDtoBuilder().build();
 
@@ -281,6 +296,9 @@ class RideServiceTest {
 
     @Test
     void updateDriverStatus_whenProposedStatusIsOnWayToDestination_thenChangeStatusAndReturnRideReadDto() {
+        Ride defaultRide = getRideBuilder().build();
+        RideReadDto readRide = getRideReadDtoBuilder().build();
+
         defaultRide.setDriverRideStatus(DriverRideStatus.WAITING);
         DriverRideStatus proposed = DriverRideStatus.ON_WAY_TO_DESTINATION;
 
@@ -303,6 +321,8 @@ class RideServiceTest {
 
     @Test
     void updateDriverStatus_whenRideIsFound_thenChangeStatusAndReturnRideReadDto() {
+        Ride defaultRide = getRideBuilder().build();
+        RideReadDto readRide = getRideReadDtoBuilder().build();
         DriverRideStatus proposed = DriverRideStatus.ON_WAY_FOR_PASSENGER;
 
         when(rideRepository.findById(DEFAULT_ID)).thenReturn(Optional.of(defaultRide));
@@ -347,6 +367,8 @@ class RideServiceTest {
 
     @Test
     void updatePassengerStatus_whenRideIsFound_thenChangeStatusAndReturnRideReadDto() {
+        Ride defaultRide = getRideBuilder().build();
+        RideReadDto readRide = getRideReadDtoBuilder().build();
         PassengerRideStatus proposed = PassengerRideStatus.GETTING_OUT;
 
         when(rideRepository.findById(DEFAULT_ID)).thenReturn(Optional.of(defaultRide));

@@ -1,5 +1,7 @@
 package org.example.rating.util;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.example.rating.dto.create.RateCreateEditDto;
 import org.example.rating.dto.read.RateReadDto;
 import org.example.rating.dto.read.RideReadDto;
@@ -9,6 +11,7 @@ import org.example.rating.entity.enumeration.UserType;
 
 import java.math.BigDecimal;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DataUtil {
     public static final String URL = "/api/v1/rates";
     public static final String URL_WITH_ID = URL + "/{id}";
@@ -22,12 +25,16 @@ public class DataUtil {
     public static final Integer PAGE_VALUE = 0;
     public static final Integer LIMIT_VALUE = 10;
 
+    //Rate
+    public static final int DEFAULT_RATE = 4;
+    public static final String DEFAULT_COMMENT = "Good";
+
     public static RateReadDto.RateReadDtoBuilder getDriverRateReadDtoBuilder() {
         return RateReadDto.builder()
                 .id(DEFAULT_ID)
                 .rideId(DEFAULT_ID)
-                .comment("Good")
-                .rating(4)
+                .comment(DEFAULT_COMMENT)
+                .rating(DEFAULT_RATE)
                 .userId(DEFAULT_ID)
                 .userType(UserType.PASSENGER);
     }
@@ -36,8 +43,8 @@ public class DataUtil {
         return RateReadDto.builder()
                 .id(DEFAULT_ID)
                 .rideId(DEFAULT_ID)
-                .comment("Good")
-                .rating(4)
+                .comment(DEFAULT_COMMENT)
+                .rating(DEFAULT_RATE)
                 .userId(DEFAULT_ID)
                 .userType(UserType.DRIVER);
     }
@@ -45,8 +52,8 @@ public class DataUtil {
     public static RateCreateEditDto.RateCreateEditDtoBuilder getPassengerRateCreateEditDtoBuilder() {
         return RateCreateEditDto.builder()
                 .rideId(DEFAULT_ID)
-                .comment("Good")
-                .rating(4)
+                .comment(DEFAULT_COMMENT)
+                .rating(DEFAULT_RATE)
                 .userId(DEFAULT_ID)
                 .userType(UserType.DRIVER);
     }
@@ -54,8 +61,8 @@ public class DataUtil {
     public static RateCreateEditDto.RateCreateEditDtoBuilder getDriverRateCreateEditDtoBuilder() {
         return RateCreateEditDto.builder()
                 .rideId(DEFAULT_ID)
-                .comment("Good")
-                .rating(4)
+                .comment(DEFAULT_COMMENT)
+                .rating(DEFAULT_RATE)
                 .userId(DEFAULT_ID)
                 .userType(UserType.PASSENGER);
     }
@@ -76,8 +83,8 @@ public class DataUtil {
         return DriverRate.builder()
                 .id(DEFAULT_ID)
                 .rideId(DEFAULT_ID)
-                .comment("Good")
-                .rating(4)
+                .comment(DEFAULT_COMMENT)
+                .rating(DEFAULT_RATE)
                 .userId(DEFAULT_ID)
                 .userType(UserType.PASSENGER);
     }
@@ -86,8 +93,8 @@ public class DataUtil {
         return PassengerRate.builder()
                 .id(DEFAULT_ID)
                 .rideId(DEFAULT_ID)
-                .comment("Good")
-                .rating(4)
+                .comment(DEFAULT_COMMENT)
+                .rating(DEFAULT_RATE)
                 .userId(DEFAULT_ID)
                 .userType(UserType.DRIVER);
     }

@@ -11,6 +11,8 @@ import org.example.passenger.service.PassengerService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -26,7 +28,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.example.passenger.util.DataUtil.DEFAULT_EMAIL;
 import static org.example.passenger.util.DataUtil.DEFAULT_ID;
+import static org.example.passenger.util.DataUtil.DEFAULT_NAME;
+import static org.example.passenger.util.DataUtil.DEFAULT_PHONE;
 import static org.example.passenger.util.DataUtil.LIMIT;
 import static org.example.passenger.util.DataUtil.LIMIT_VALUE;
 import static org.example.passenger.util.DataUtil.PAGE;
@@ -57,14 +62,12 @@ class PassengerControllerTest {
     @MockBean
     private PassengerService passengerService;
 
-    private PassengerReadDto readPassenger = getPassengerReadDtoBuilder().build();
-    private PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
-
     @Nested
     @DisplayName("Find all tests")
     public class findAllTests {
         @Test
         void findAll_whenVerifyingRequestMatchingWithoutParams_thenReturn200() throws Exception {
+            PassengerReadDto readPassenger = getPassengerReadDtoBuilder().build();
             Page<PassengerReadDto> passengerPage = new PageImpl<>(List.of(readPassenger),
                     PageRequest.of(PAGE_VALUE, LIMIT_VALUE), 1);
 
@@ -76,6 +79,7 @@ class PassengerControllerTest {
 
         @Test
         void findAll_whenCorrectParams_thenReturn200() throws Exception {
+            PassengerReadDto readPassenger = getPassengerReadDtoBuilder().build();
             Page<PassengerReadDto> passengerPage = new PageImpl<>(List.of(readPassenger),
                     PageRequest.of(PAGE_VALUE, LIMIT_VALUE), 1);
 
@@ -125,6 +129,8 @@ class PassengerControllerTest {
     public class findByIdTests {
         @Test
         void findById_whenVerifyingRequestMatching_thenReturn200() throws Exception {
+            PassengerReadDto readPassenger = getPassengerReadDtoBuilder().build();
+
             when(passengerService.findById(DEFAULT_ID)).thenReturn(readPassenger);
 
             MvcResult mvcResult = mockMvc.perform(get(URL_WITH_ID, DEFAULT_ID))
@@ -143,6 +149,8 @@ class PassengerControllerTest {
     public class createTests {
         @Test
         void create_whenVerifyingRequestMatching_thenReturn200() throws Exception {
+            PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
+
             mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(createPassenger)))
@@ -154,6 +162,8 @@ class PassengerControllerTest {
 
         @Test
         void create_whenValidInput_thenMapsToBusinessModel() throws Exception {
+            PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
+
             mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(createPassenger)))
@@ -163,13 +173,16 @@ class PassengerControllerTest {
             ArgumentCaptor<PassengerCreateEditDto> carCaptor = ArgumentCaptor.forClass(PassengerCreateEditDto.class);
 
             verify(passengerService, times(1)).create(carCaptor.capture());
-            assertThat(carCaptor.getValue().name()).isEqualTo("passenger");
-            assertThat(carCaptor.getValue().email()).isEqualTo("passenger@gmail.com");
-            assertThat(carCaptor.getValue().phone()).isEqualTo("+375441234567");
+            assertThat(carCaptor.getValue().name()).isEqualTo(DEFAULT_NAME);
+            assertThat(carCaptor.getValue().email()).isEqualTo(DEFAULT_EMAIL);
+            assertThat(carCaptor.getValue().phone()).isEqualTo(DEFAULT_PHONE);
         }
 
         @Test
         void create_whenValidInput_thenReturn201AndCarReadDto() throws Exception {
+            PassengerReadDto readPassenger = getPassengerReadDtoBuilder().build();
+            PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
+
             when(passengerService.create(createPassenger)).thenReturn(readPassenger);
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -185,7 +198,7 @@ class PassengerControllerTest {
 
         @Test
         void create_whenInvalidInput_thenReturn400AndValidationResponse() throws Exception {
-            createPassenger = getPassengerCreateEditDtoBuilder()
+            PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder()
                                 .name(null)
                                 .email(null)
                                 .phone(null)
@@ -208,10 +221,11 @@ class PassengerControllerTest {
                     expectedValidationResponse.violations());
         }
 
-        @Test
-        void create_whenInvalidPhonePattern_thenReturn400AndValidationResponse() throws Exception {
-            createPassenger = getPassengerCreateEditDtoBuilder()
-                                .phone("+85699")
+        @ParameterizedTest
+        @ValueSource(strings = {"375441234567", "+37544123456", "+375551234567", "+546", "8079265"})
+        void create_whenInvalidPhonePattern_thenReturn400AndValidationResponse(String number) throws Exception {
+            PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder()
+                                .phone(number)
                                 .build();
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -222,7 +236,7 @@ class PassengerControllerTest {
 
             ValidationResponse expectedValidationResponse = new ValidationResponse(
                     List.of(new Violation("phone",
-                            "Invalid phone. Possible form: +375-(XX)-XXX-XX-XX or 80(XX)-XXX-XX-XX")));
+                            "Invalid phone. Possible form: +375XXXXXXXXX or 80XXXXXXXXX")));
             ValidationResponse actualResponse = objectMapper.readValue(
                     mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
@@ -232,7 +246,7 @@ class PassengerControllerTest {
 
         @Test
         void create_whenInvalidEmailPattern_thenReturn400AndValidationResponse() throws Exception {
-            createPassenger = getPassengerCreateEditDtoBuilder()
+            PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder()
                                 .email("passenger.gmail")
                                 .build();
 
@@ -257,6 +271,8 @@ class PassengerControllerTest {
     public class updateTests {
         @Test
         void update_whenVerifyingRequestMatching_thenReturn200() throws Exception {
+            PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
+
             mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(createPassenger)))
@@ -267,6 +283,8 @@ class PassengerControllerTest {
 
         @Test
         void update_whenValidInput_thenMapsToBusinessModel() throws Exception {
+            PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
+
             mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(createPassenger)))
@@ -279,13 +297,16 @@ class PassengerControllerTest {
             verify(passengerService, times(1)).update(
                     idCaptor.capture(), passengerCaptor.capture());
             assertThat(idCaptor.getValue()).isEqualTo(DEFAULT_ID);
-            assertThat(passengerCaptor.getValue().name()).isEqualTo("passenger");
-            assertThat(passengerCaptor.getValue().email()).isEqualTo("passenger@gmail.com");
-            assertThat(passengerCaptor.getValue().phone()).isEqualTo("+375441234567");
+            assertThat(passengerCaptor.getValue().name()).isEqualTo(DEFAULT_NAME);
+            assertThat(passengerCaptor.getValue().email()).isEqualTo(DEFAULT_EMAIL);
+            assertThat(passengerCaptor.getValue().phone()).isEqualTo(DEFAULT_PHONE);
         }
 
         @Test
         void update_whenValidInput_thenReturn200AndCarReadDto() throws Exception {
+            PassengerReadDto readPassenger = getPassengerReadDtoBuilder().build();
+            PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
+
             when(passengerService.update(DEFAULT_ID, createPassenger)).thenReturn(readPassenger);
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
@@ -301,7 +322,7 @@ class PassengerControllerTest {
 
         @Test
         void update_whenInvalidInput_thenReturn400AndValidationResponse() throws Exception {
-            createPassenger = getPassengerCreateEditDtoBuilder()
+            PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder()
                                 .name(null)
                                 .email(null)
                                 .phone(null)
@@ -324,10 +345,11 @@ class PassengerControllerTest {
                     expectedValidationResponse.violations());
         }
 
-        @Test
-        void update_whenInvalidPhonePattern_thenReturn400AndValidationResponse() throws Exception {
-            createPassenger = getPassengerCreateEditDtoBuilder()
-                                .phone("+87522")
+        @ParameterizedTest
+        @ValueSource(strings = {"375441234567", "+37544123456", "+375551234567", "+546", "8079265"})
+        void update_whenInvalidPhonePattern_thenReturn400AndValidationResponse(String number) throws Exception {
+            PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder()
+                                .phone(number)
                                 .build();
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
@@ -338,7 +360,7 @@ class PassengerControllerTest {
 
             ValidationResponse expectedValidationResponse = new ValidationResponse(
                     List.of(new Violation("phone",
-                            "Invalid phone. Possible form: +375-(XX)-XXX-XX-XX or 80(XX)-XXX-XX-XX")));
+                            "Invalid phone. Possible form: +375XXXXXXXXX or 80XXXXXXXXX")));
             ValidationResponse actualResponse = objectMapper.readValue(
                     mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
@@ -348,7 +370,7 @@ class PassengerControllerTest {
 
         @Test
         void update_whenInvalidEmailPattern_thenReturn400AndValidationResponse() throws Exception {
-            createPassenger = getPassengerCreateEditDtoBuilder()
+            PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder()
                                 .email("passenger.gmail")
                                 .build();
 

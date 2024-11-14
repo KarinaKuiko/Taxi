@@ -12,6 +12,8 @@ import org.example.driver.service.DriverService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -27,7 +29,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.example.driver.util.DataUtil.DEFAULT_EMAIL;
 import static org.example.driver.util.DataUtil.DEFAULT_ID;
+import static org.example.driver.util.DataUtil.DEFAULT_PHONE;
+import static org.example.driver.util.DataUtil.DEFAUlT_NAME;
 import static org.example.driver.util.DataUtil.DRIVER_ENTITY;
 import static org.example.driver.util.DataUtil.LIMIT;
 import static org.example.driver.util.DataUtil.LIMIT_VALUE;
@@ -59,14 +64,12 @@ class DriverControllerTest {
     @MockBean
     private DriverService driverService;
 
-    private DriverReadDto readDriver = getDriverReadDtoBuilder().build();
-    private DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
-
     @Nested
     @DisplayName("Find all tests")
     public class findAllTests {
         @Test
         void findAll_whenVerifyingRequestMatchingWithoutParams_thenReturn200() throws Exception {
+            DriverReadDto readDriver = getDriverReadDtoBuilder().build();
             Page<DriverReadDto> driverPage = new PageImpl<>(List.of(readDriver),
                     PageRequest.of(PAGE_VALUE, LIMIT_VALUE), 1);
 
@@ -78,6 +81,7 @@ class DriverControllerTest {
 
         @Test
         void findAll_whenCorrectParams_thenReturn200() throws Exception {
+            DriverReadDto readDriver = getDriverReadDtoBuilder().build();
             Page<DriverReadDto> driverPage = new PageImpl<>(List.of(readDriver),
                     PageRequest.of(PAGE_VALUE, LIMIT_VALUE), 1);
 
@@ -127,6 +131,8 @@ class DriverControllerTest {
     public class findByIdTests {
         @Test
         void findById_whenVerifyingRequestMatching_thenReturn200() throws Exception {
+            DriverReadDto readDriver = getDriverReadDtoBuilder().build();
+
             when(driverService.findById(DEFAULT_ID)).thenReturn(readDriver);
 
             MvcResult mvcResult = mockMvc.perform(get(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID))
@@ -145,6 +151,8 @@ class DriverControllerTest {
     public class createTests {
         @Test
         void create_whenVerifyingRequestMatching_thenReturn200() throws Exception {
+            DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
+
             mockMvc.perform(post(URL, DRIVER_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(createDriver)))
@@ -156,6 +164,8 @@ class DriverControllerTest {
 
         @Test
         void create_whenValidInput_thenMapsToBusinessModel() throws Exception {
+            DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
+
             mockMvc.perform(post(URL, DRIVER_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(createDriver)))
@@ -165,15 +175,18 @@ class DriverControllerTest {
             ArgumentCaptor<DriverCreateEditDto> driverCaptor = ArgumentCaptor.forClass(DriverCreateEditDto.class);
 
             verify(driverService, times(1)).create(driverCaptor.capture());
-            assertThat(driverCaptor.getValue().name()).isEqualTo("test");
-            assertThat(driverCaptor.getValue().email()).isEqualTo("test@gmail.com");
-            assertThat(driverCaptor.getValue().phone()).isEqualTo("+375297654321");
+            assertThat(driverCaptor.getValue().name()).isEqualTo(DEFAUlT_NAME);
+            assertThat(driverCaptor.getValue().email()).isEqualTo(DEFAULT_EMAIL);
+            assertThat(driverCaptor.getValue().phone()).isEqualTo(DEFAULT_PHONE);
             assertThat(driverCaptor.getValue().gender()).isEqualTo(Gender.MALE);
             assertThat(driverCaptor.getValue().carId()).isEqualTo(1L);
         }
 
         @Test
         void create_whenValidInput_thenReturn201AndCarReadDto() throws Exception {
+            DriverReadDto readDriver = getDriverReadDtoBuilder().build();
+            DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
+
             when(driverService.create(createDriver)).thenReturn(readDriver);
 
             MvcResult mvcResult = mockMvc.perform(post(URL, DRIVER_ENTITY)
@@ -189,7 +202,7 @@ class DriverControllerTest {
 
         @Test
         void create_whenInvalidInput_thenReturn400AndValidationResponse() throws Exception {
-            createDriver = getDriverCreateEditDtoBuilder()
+            DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
                             .name(null)
                             .email(null)
                             .phone(null)
@@ -214,7 +227,7 @@ class DriverControllerTest {
 
         @Test
         void create_whenInvalidEmailPattern_thenReturn400AndValidationResponse() throws Exception {
-            createDriver = getDriverCreateEditDtoBuilder()
+            DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
                             .email("test.gmail")
                             .build();
 
@@ -233,10 +246,11 @@ class DriverControllerTest {
                     expectedValidationResponse.violations());
         }
 
-        @Test
-        void create_whenInvalidPhonePattern_thenReturn400AndValidationResponse() throws Exception {
-            createDriver = getDriverCreateEditDtoBuilder()
-                            .phone("+375995")
+        @ParameterizedTest
+        @ValueSource(strings = {"375441234567", "+37544123456", "+375551234567", "+546", "8079265"})
+        void create_whenInvalidPhonePattern_thenReturn400AndValidationResponse(String number) throws Exception {
+            DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
+                            .phone(number)
                             .build();
 
             MvcResult mvcResult = mockMvc.perform(post(URL, DRIVER_ENTITY)
@@ -247,7 +261,7 @@ class DriverControllerTest {
 
             ValidationResponse expectedValidationResponse = new ValidationResponse(
                     List.of(new Violation("phone",
-                            "Invalid phone. Possible form: +375-(XX)-XXX-XX-XX or 80(XX)-XXX-XX-XX")));
+                            "Invalid phone. Possible form: +375XXXXXXXXX or 80XXXXXXXXX")));
             ValidationResponse actualResponse = objectMapper.readValue(
                     mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 
@@ -261,6 +275,8 @@ class DriverControllerTest {
     public class updateTests {
         @Test
         void update_whenValidInput_thenReturn200() throws Exception {
+            DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
+
             mockMvc.perform(put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(createDriver)))
@@ -271,6 +287,8 @@ class DriverControllerTest {
 
         @Test
         void update_whenValidInput_thenMapsToBusinessModel() throws Exception {
+            DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
+
             mockMvc.perform(put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(createDriver)))
@@ -281,14 +299,17 @@ class DriverControllerTest {
 
             verify(driverService, times(1)).update(idCaptor.capture(), driverCaptor.capture());
             assertThat(idCaptor.getValue()).isEqualTo(DEFAULT_ID);
-            assertThat(driverCaptor.getValue().name()).isEqualTo("test");
-            assertThat(driverCaptor.getValue().email()).isEqualTo("test@gmail.com");
-            assertThat(driverCaptor.getValue().phone()).isEqualTo("+375297654321");
+            assertThat(driverCaptor.getValue().name()).isEqualTo(DEFAUlT_NAME);
+            assertThat(driverCaptor.getValue().email()).isEqualTo(DEFAULT_EMAIL);
+            assertThat(driverCaptor.getValue().phone()).isEqualTo(DEFAULT_PHONE);
             assertThat(driverCaptor.getValue().gender()).isEqualTo(Gender.MALE);
         }
 
         @Test
         void update_whenValidInput_thenReturn200AndCarReadDto() throws Exception {
+            DriverReadDto readDriver = getDriverReadDtoBuilder().build();
+            DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
+
             when(driverService.update(DEFAULT_ID, createDriver)).thenReturn(readDriver);
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
@@ -304,7 +325,7 @@ class DriverControllerTest {
 
         @Test
         void update_whenInvalidInput_thenReturn400AndValidationResponse() throws Exception {
-            createDriver = getDriverCreateEditDtoBuilder()
+            DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
                             .name(null)
                             .email(null)
                             .phone(null)
@@ -329,7 +350,7 @@ class DriverControllerTest {
 
         @Test
         void update_whenInvalidEmailPattern_thenReturn400AndValidationResponse() throws Exception {
-            createDriver = getDriverCreateEditDtoBuilder()
+            DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
                             .email("test.gmail")
                             .build();
 
@@ -348,10 +369,11 @@ class DriverControllerTest {
                     expectedValidationResponse.violations());
         }
 
-        @Test
-        void update_whenInvalidPhonePattern_thenReturn400AndValidationResponse() throws Exception {
-            createDriver = getDriverCreateEditDtoBuilder()
-                            .phone("+375996")
+        @ParameterizedTest
+        @ValueSource(strings = {"375441234567", "+37544123456", "+375551234567", "+546", "8079265"})
+        void update_whenInvalidPhonePattern_thenReturn400AndValidationResponse(String number) throws Exception {
+            DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
+                            .phone(number)
                             .build();
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
@@ -362,7 +384,7 @@ class DriverControllerTest {
 
             ValidationResponse expectedValidationResponse = new ValidationResponse(
                     List.of(new Violation("phone",
-                            "Invalid phone. Possible form: +375-(XX)-XXX-XX-XX or 80(XX)-XXX-XX-XX")));
+                            "Invalid phone. Possible form: +375XXXXXXXXX or 80XXXXXXXXX")));
             ValidationResponse actualResponse = objectMapper.readValue(
                     mvcResult.getResponse().getContentAsString(), ValidationResponse.class);
 

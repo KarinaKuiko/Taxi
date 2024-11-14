@@ -66,13 +66,10 @@ class PassengerRateServiceImplTest {
     @Mock
     private KafkaProducer kafkaProducer;
 
-    private PassengerRate defaultRate = getPassengerRateBuilder().build();
-    private RateCreateEditDto createRate = getPassengerRateCreateEditDtoBuilder().build();
-    private RateReadDto readRate = getPassengerRateReadDtoBuilder().build();
-    private RideReadDto readRide = getRideReadDtoBuilder().build();
-
     @Test
     void findAll_thenReturnPageRateReadDto() {
+        PassengerRate defaultRate = getPassengerRateBuilder().build();
+        RateReadDto readRate = getPassengerRateReadDtoBuilder().build();
         Pageable request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
         when(passengerRateRepository.findAll(request)).thenReturn(
@@ -89,6 +86,9 @@ class PassengerRateServiceImplTest {
 
     @Test
     void findById_whenRateIsFound_thenReturnRateReadDto() {
+        PassengerRate defaultRate = getPassengerRateBuilder().build();
+        RateReadDto readRate = getPassengerRateReadDtoBuilder().build();
+
         when(passengerRateRepository.findById(DEFAULT_ID)).thenReturn(Optional.of(defaultRate));
         when(rateMapper.toReadDto(defaultRate)).thenReturn(readRate);
 
@@ -120,6 +120,11 @@ class PassengerRateServiceImplTest {
 
     @Test
     void create_whenRideIsExists_thenReturnRateReadDto() {
+        PassengerRate defaultRate = getPassengerRateBuilder().build();
+        RateCreateEditDto createRate = getPassengerRateCreateEditDtoBuilder().build();
+        RateReadDto readRate = getPassengerRateReadDtoBuilder().build();
+        RideReadDto readRide = getRideReadDtoBuilder().build();
+
         when(rateMapper.toPassengerRate(createRate)).thenReturn(defaultRate);
         when(rideClient.getRide(DEFAULT_ID)).thenReturn(readRide);
         when(passengerRateRepository.save(defaultRate)).thenReturn(defaultRate);
@@ -134,6 +139,11 @@ class PassengerRateServiceImplTest {
 
     @Test
     void update_whenRateIsFound_thenReturnRateReadDto() {
+        PassengerRate defaultRate = getPassengerRateBuilder().build();
+        RateCreateEditDto createRate = getPassengerRateCreateEditDtoBuilder().build();
+        RateReadDto readRate = getPassengerRateReadDtoBuilder().build();
+        RideReadDto readRide = getRideReadDtoBuilder().build();
+
         when(passengerRateRepository.findById(DEFAULT_ID)).thenReturn(Optional.of(defaultRate));
         when(rideClient.getRide(DEFAULT_ID)).thenReturn(readRide);
         when(passengerRateRepository.save(defaultRate)).thenReturn(defaultRate);
@@ -149,6 +159,8 @@ class PassengerRateServiceImplTest {
 
     @Test
     void update_whenRateIsNotFound_thenThrowRateNotFoundException() {
+        RateCreateEditDto createRate = getPassengerRateCreateEditDtoBuilder().build();
+
         when(passengerRateRepository.findById(DEFAULT_ID)).thenReturn(Optional.empty());
         when(messageSource.getMessage(
                 ExceptionConstants.RATE_NOT_FOUND,
@@ -173,6 +185,9 @@ class PassengerRateServiceImplTest {
 
     @Test
     void findByUserId_thenReturnListRateReadDto() {
+        PassengerRate defaultRate = getPassengerRateBuilder().build();
+        RateReadDto readRate = getPassengerRateReadDtoBuilder().build();
+
         when(passengerRateRepository.findByUserId(DEFAULT_ID)).thenReturn(List.of(defaultRate));
         when(rateMapper.toReadDto(defaultRate)).thenReturn(readRate);
 

@@ -1,9 +1,12 @@
 package org.example.passenger.util;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.example.passenger.dto.create.PassengerCreateEditDto;
 import org.example.passenger.dto.read.PassengerReadDto;
 import org.example.passenger.entity.Passenger;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DataUtil {
     public static final String URL = "/api/v1/passengers";
     public static final String URL_WITH_ID = URL + "/{id}";
@@ -13,28 +16,35 @@ public class DataUtil {
     public static final Integer PAGE_VALUE = 0;
     public static final Integer LIMIT_VALUE = 10;
 
+    //Passenger
+    public static final String DEFAULT_NAME = "passenger";
+    public static final String DEFAULT_EMAIL = "passenger@gmail.com";
+    public static final String DEFAULT_PHONE = "+375441234567";
+    public static final double DEFAULT_RATING = 5.0;
+
+
     public static PassengerReadDto.PassengerReadDtoBuilder getPassengerReadDtoBuilder() {
         return PassengerReadDto.builder()
                 .id(DEFAULT_ID)
-                .name("passenger")
-                .email("passenger@gmail.com")
-                .phone("+375441234567")
-                .rating(5.0);
+                .name(DEFAULT_NAME)
+                .email(DEFAULT_EMAIL)
+                .phone(DEFAULT_PHONE)
+                .rating(DEFAULT_RATING);
     }
 
     public static PassengerCreateEditDto.PassengerCreateEditDtoBuilder getPassengerCreateEditDtoBuilder() {
         return PassengerCreateEditDto.builder()
-                .name("passenger")
-                .email("passenger@gmail.com")
-                .phone("+375441234567");
+                .name(DEFAULT_NAME)
+                .email(DEFAULT_EMAIL)
+                .phone(DEFAULT_PHONE);
     }
 
     public static Passenger.PassengerBuilder getPassengerBuilder () {
         return Passenger.builder()
                 .id(DEFAULT_ID)
-                .name("passenger")
-                .email("passenger@gmail.com")
-                .phone("+375441234567")
-                .rating(5.0);
+                .name(DEFAULT_NAME)
+                .email(DEFAULT_EMAIL)
+                .phone(DEFAULT_PHONE)
+                .rating(DEFAULT_RATING);
     }
 }

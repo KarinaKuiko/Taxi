@@ -27,7 +27,11 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.example.driver.util.DataUtil.CAR_ENTITY;
+import static org.example.driver.util.DataUtil.DEFAULT_BRAND;
+import static org.example.driver.util.DataUtil.DEFAULT_COLOR;
 import static org.example.driver.util.DataUtil.DEFAULT_ID;
+import static org.example.driver.util.DataUtil.DEFAULT_NUMBER;
+import static org.example.driver.util.DataUtil.DEFAULT_YEAR;
 import static org.example.driver.util.DataUtil.LIMIT;
 import static org.example.driver.util.DataUtil.LIMIT_VALUE;
 import static org.example.driver.util.DataUtil.PAGE;
@@ -58,14 +62,12 @@ class CarControllerTest {
     @MockBean
     private CarService carService;
 
-    private CarCreateEditDto createCar = getCarCreateEditDtoBuilder().build();
-    private CarReadDto readCar = getCarReadDtoBuilder().build();
-
     @Nested
     @DisplayName("Find all tests")
     public class findAllTests {
         @Test
         void findAll_whenVerifyingRequestMatchingWithoutParams_thenReturn200() throws Exception {
+            CarReadDto readCar = getCarReadDtoBuilder().build();
             Page<CarReadDto> carPage = new PageImpl<>(List.of(readCar), PageRequest.of(PAGE_VALUE, LIMIT_VALUE), 1);
 
             when(carService.findAll(PAGE_VALUE, LIMIT_VALUE)).thenReturn(carPage);
@@ -76,6 +78,7 @@ class CarControllerTest {
 
         @Test
         void findAll_whenCorrectParams_thenReturn200() throws Exception {
+            CarReadDto readCar = getCarReadDtoBuilder().build();
             Page<CarReadDto> carPage = new PageImpl<>(List.of(readCar), PageRequest.of(PAGE_VALUE, LIMIT_VALUE), 1);
 
             when(carService.findAll(PAGE_VALUE, LIMIT_VALUE)).thenReturn(carPage);
@@ -124,6 +127,8 @@ class CarControllerTest {
     public class findByIdTests {
         @Test
         void findById_whenVerifyingRequestMatching_thenReturn200() throws Exception {
+            CarReadDto readCar = getCarReadDtoBuilder().build();
+
             when(carService.findById(DEFAULT_ID)).thenReturn(readCar);
 
             MvcResult mvcResult = mockMvc.perform(get(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID))
@@ -142,6 +147,8 @@ class CarControllerTest {
     public class createTests {
         @Test
         void create_whenVerifyingRequestMatching_thenReturn200() throws Exception {
+            CarCreateEditDto createCar = getCarCreateEditDtoBuilder().build();
+
             mockMvc.perform(post(URL, CAR_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(createCar)))
@@ -153,6 +160,8 @@ class CarControllerTest {
 
         @Test
         void create_whenValidInput_thenMapsToBusinessModel() throws Exception {
+            CarCreateEditDto createCar = getCarCreateEditDtoBuilder().build();
+
             mockMvc.perform(post(URL, CAR_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(createCar)))
@@ -162,14 +171,17 @@ class CarControllerTest {
             ArgumentCaptor<CarCreateEditDto> carCaptor = ArgumentCaptor.forClass(CarCreateEditDto.class);
 
             verify(carService, times(1)).create(carCaptor.capture());
-            assertThat(carCaptor.getValue().color()).isEqualTo("red");
-            assertThat(carCaptor.getValue().brand()).isEqualTo("BMW");
-            assertThat(carCaptor.getValue().number()).isEqualTo("AB123CD");
-            assertThat(carCaptor.getValue().year()).isEqualTo(2023);
+            assertThat(carCaptor.getValue().color()).isEqualTo(DEFAULT_COLOR);
+            assertThat(carCaptor.getValue().brand()).isEqualTo(DEFAULT_BRAND);
+            assertThat(carCaptor.getValue().number()).isEqualTo(DEFAULT_NUMBER);
+            assertThat(carCaptor.getValue().year()).isEqualTo(DEFAULT_YEAR);
         }
 
         @Test
         void create_whenValidInput_thenReturn201AndCarReadDto() throws Exception {
+            CarReadDto readCar = getCarReadDtoBuilder().build();
+            CarCreateEditDto createCar = getCarCreateEditDtoBuilder().build();
+
             when(carService.create(createCar)).thenReturn(readCar);
 
             MvcResult mvcResult = mockMvc.perform(post(URL, CAR_ENTITY)
@@ -185,7 +197,7 @@ class CarControllerTest {
 
         @Test
         void create_whenInvalidInput_thenReturn400AndValidationResponse() throws Exception {
-            createCar = getCarCreateEditDtoBuilder()
+            CarCreateEditDto createCar = getCarCreateEditDtoBuilder()
                         .color(null)
                         .brand(null)
                         .number(null)
@@ -212,7 +224,7 @@ class CarControllerTest {
 
         @Test
         void create_whenInvalidNumberPattern_thenReturn400AndValidationResponse() throws Exception {
-            createCar = getCarCreateEditDtoBuilder()
+            CarCreateEditDto createCar = getCarCreateEditDtoBuilder()
                         .number("45sssa")
                         .build();
 
@@ -233,7 +245,7 @@ class CarControllerTest {
 
         @Test
         void create_whenColorIsNull_thenReturn400AndValidationResponse() throws Exception {
-            createCar = getCarCreateEditDtoBuilder()
+            CarCreateEditDto createCar = getCarCreateEditDtoBuilder()
                         .color(null)
                         .build();
 
@@ -254,7 +266,7 @@ class CarControllerTest {
 
         @Test
         void create_whenBrandIsNull_thenReturn400AndValidationResponse() throws Exception {
-            createCar = getCarCreateEditDtoBuilder()
+            CarCreateEditDto createCar = getCarCreateEditDtoBuilder()
                         .brand(null)
                         .build();
 
@@ -275,7 +287,7 @@ class CarControllerTest {
 
         @Test
         void create_whenNumberIsNull_thenReturn400AndValidationResponse() throws Exception {
-            createCar = getCarCreateEditDtoBuilder()
+            CarCreateEditDto createCar = getCarCreateEditDtoBuilder()
                         .number(null)
                         .build();
 
@@ -296,7 +308,7 @@ class CarControllerTest {
 
         @Test
         void create_whenYearIsNull_thenReturn400AndValidationResponse() throws Exception {
-            createCar = getCarCreateEditDtoBuilder()
+            CarCreateEditDto createCar = getCarCreateEditDtoBuilder()
                         .year(null)
                         .build();
 
@@ -317,7 +329,7 @@ class CarControllerTest {
 
         @Test
         void create_whenYearIsLess_thenReturn400AndValidationResponse() throws Exception {
-            createCar = getCarCreateEditDtoBuilder()
+            CarCreateEditDto createCar = getCarCreateEditDtoBuilder()
                         .year(1900)
                         .build();
 
@@ -342,6 +354,8 @@ class CarControllerTest {
     public class updateTests {
         @Test
         void update_whenVerifyingRequestMatching_thenReturn200() throws Exception {
+            CarCreateEditDto createCar = getCarCreateEditDtoBuilder().build();
+
             mockMvc.perform(put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(createCar)))
@@ -352,7 +366,7 @@ class CarControllerTest {
 
         @Test
         void update_whenValidInput_thenMapsToBusinessModel() throws Exception {
-            createCar = getCarCreateEditDtoBuilder()
+            CarCreateEditDto createCar = getCarCreateEditDtoBuilder()
                         .color("yellow")
                         .build();
 
@@ -367,13 +381,16 @@ class CarControllerTest {
             verify(carService, times(1)).update(idCaptor.capture(), carCaptor.capture());
             assertThat(idCaptor.getValue()).isEqualTo(DEFAULT_ID);
             assertThat(carCaptor.getValue().color()).isEqualTo("yellow");
-            assertThat(carCaptor.getValue().brand()).isEqualTo("BMW");
-            assertThat(carCaptor.getValue().number()).isEqualTo("AB123CD");
-            assertThat(carCaptor.getValue().year()).isEqualTo(2023);
+            assertThat(carCaptor.getValue().brand()).isEqualTo(DEFAULT_BRAND);
+            assertThat(carCaptor.getValue().number()).isEqualTo(DEFAULT_NUMBER);
+            assertThat(carCaptor.getValue().year()).isEqualTo(DEFAULT_YEAR);
         }
 
         @Test
         void update_whenValidInput_thenReturn200AndCarReadDto() throws Exception {
+            CarReadDto readCar = getCarReadDtoBuilder().build();
+            CarCreateEditDto createCar = getCarCreateEditDtoBuilder().build();
+
             when(carService.update(DEFAULT_ID, createCar)).thenReturn(readCar);
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID)
@@ -389,7 +406,7 @@ class CarControllerTest {
 
         @Test
         void update_whenInvalidInput_thenReturn400AndValidationResponse() throws Exception {
-            createCar = getCarCreateEditDtoBuilder()
+            CarCreateEditDto createCar = getCarCreateEditDtoBuilder()
                         .color(null)
                         .brand(null)
                         .number(null)
@@ -416,7 +433,7 @@ class CarControllerTest {
 
         @Test
         void update_whenInvalidNumberPattern_thenReturn400AndValidationResponse() throws Exception {
-            createCar = getCarCreateEditDtoBuilder()
+            CarCreateEditDto createCar = getCarCreateEditDtoBuilder()
                         .number("45sssa")
                         .build();
 
@@ -437,7 +454,7 @@ class CarControllerTest {
 
         @Test
         void update_whenColorIsNull_thenReturn400AndValidationResponse() throws Exception {
-            createCar = getCarCreateEditDtoBuilder()
+            CarCreateEditDto createCar = getCarCreateEditDtoBuilder()
                         .color(null)
                         .build();
 
@@ -458,7 +475,7 @@ class CarControllerTest {
 
         @Test
         void update_whenBrandIsNull_thenReturn400AndValidationResponse() throws Exception {
-            createCar = getCarCreateEditDtoBuilder()
+            CarCreateEditDto createCar = getCarCreateEditDtoBuilder()
                         .brand(null)
                         .build();
 
@@ -479,7 +496,7 @@ class CarControllerTest {
 
         @Test
         void update_whenNumberIsNull_thenReturn400AndValidationResponse() throws Exception {
-            createCar = getCarCreateEditDtoBuilder()
+            CarCreateEditDto createCar = getCarCreateEditDtoBuilder()
                         .number(null)
                         .build();
 
@@ -500,7 +517,7 @@ class CarControllerTest {
 
         @Test
         void update_whenYearIsNull_thenReturn400AndValidationResponse() throws Exception {
-            createCar = getCarCreateEditDtoBuilder()
+            CarCreateEditDto createCar = getCarCreateEditDtoBuilder()
                         .year(null)
                         .build();
 
@@ -521,7 +538,7 @@ class CarControllerTest {
 
         @Test
         void update_whenYearIsLess_thenReturn400AndValidationResponse() throws Exception {
-            createCar = getCarCreateEditDtoBuilder()
+            CarCreateEditDto createCar = getCarCreateEditDtoBuilder()
                         .year(1900)
                         .build();
 
@@ -545,7 +562,7 @@ class CarControllerTest {
     @DisplayName("Delete tests")
     public class deleteTests {
         @Test
-        void delete_whenVerifyingRequestMatching_thenReturn401() throws Exception {
+        void delete_whenVerifyingRequestMatching_thenReturn204() throws Exception {
             mockMvc.perform(delete(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID))
                     .andExpect(status().isNoContent());
 

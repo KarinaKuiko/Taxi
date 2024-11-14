@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -57,7 +56,7 @@ class RateCounterServiceTest {
                 "Okay experience.", 3, 1001L, UserType.PASSENGER);
         RateReadDto rating3 = new RateReadDto(3L, 103L,
                 "Worst ride ever.", 1, 1001L, UserType.PASSENGER);
-        List<RateReadDto> ratings = Arrays.asList(rating1, rating2, rating3);
+        List<RateReadDto> ratings = List.of(rating1, rating2, rating3);
 
         double result = rateCounterService.countRating(ratings);
 

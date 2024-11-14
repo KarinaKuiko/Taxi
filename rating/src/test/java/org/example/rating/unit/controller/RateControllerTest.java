@@ -28,7 +28,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.example.rating.util.DataUtil.DEFAULT_COMMENT;
 import static org.example.rating.util.DataUtil.DEFAULT_ID;
+import static org.example.rating.util.DataUtil.DEFAULT_RATE;
 import static org.example.rating.util.DataUtil.DRIVER_URL;
 import static org.example.rating.util.DataUtil.DRIVER_URL_WITH_ID;
 import static org.example.rating.util.DataUtil.LIMIT;
@@ -67,17 +69,12 @@ class RateControllerTest {
     @MockBean
     private PassengerRateService passengerRateService;
 
-    private RateReadDto passengerRateReadDto = getPassengerRateReadDtoBuilder().build();
-    private RateReadDto driverRateReadDto = getDriverRateReadDtoBuilder().build();
-    private RateCreateEditDto passengerCreateEditDto = getPassengerRateCreateEditDtoBuilder().build();
-    private RateCreateEditDto driverCreateEditDto = getDriverRateCreateEditDtoBuilder().build();
-
-
     @Nested
     @DisplayName("Find all tests")
     public class findAllTests {
         @Test
         void findAllDriversRates_whenVerifyingRequestMatchingWithoutParams_thenReturn200() throws Exception {
+            RateReadDto driverRateReadDto = getDriverRateReadDtoBuilder().build();
             Page<RateReadDto> ratePage = new PageImpl<>(List.of(driverRateReadDto),
                     PageRequest.of(PAGE_VALUE, LIMIT_VALUE), 1);
 
@@ -89,6 +86,7 @@ class RateControllerTest {
 
         @Test
         void findAllDriversRates_whenCorrectParams_thenReturn200() throws Exception {
+            RateReadDto driverRateReadDto = getDriverRateReadDtoBuilder().build();
             Page<RateReadDto> ratePage = new PageImpl<>(List.of(driverRateReadDto),
                     PageRequest.of(PAGE_VALUE, LIMIT_VALUE), 1);
 
@@ -134,6 +132,7 @@ class RateControllerTest {
 
         @Test
         void findAllPassengersRates_whenVerifyingRequestMatchingWithoutParams_thenReturn200() throws Exception {
+            RateReadDto passengerRateReadDto = getPassengerRateReadDtoBuilder().build();
             Page<RateReadDto> ratePage = new PageImpl<>(List.of(passengerRateReadDto),
                     PageRequest.of(PAGE_VALUE, LIMIT_VALUE), 1);
 
@@ -145,6 +144,7 @@ class RateControllerTest {
 
         @Test
         void findAllPassengersRates_whenCorrectParams_thenReturn200() throws Exception {
+            RateReadDto passengerRateReadDto = getPassengerRateReadDtoBuilder().build();
             Page<RateReadDto> ratePage = new PageImpl<>(List.of(passengerRateReadDto),
                     PageRequest.of(PAGE_VALUE, LIMIT_VALUE), 1);
 
@@ -195,6 +195,8 @@ class RateControllerTest {
 
         @Test
         void findDriverRateById_whenVerifyingRequestMatching_thenReturn200() throws Exception {
+            RateReadDto driverRateReadDto = getDriverRateReadDtoBuilder().build();
+
             when(driverRateService.findById(DEFAULT_ID)).thenReturn(driverRateReadDto);
 
             MvcResult mvcResult = mockMvc.perform(get(DRIVER_URL_WITH_ID, DEFAULT_ID))
@@ -209,6 +211,8 @@ class RateControllerTest {
 
         @Test
         void findPassengerRateById_whenVerifyingRequestMatching_thenReturn200() throws Exception {
+            RateReadDto passengerRateReadDto = getPassengerRateReadDtoBuilder().build();
+
             when(passengerRateService.findById(DEFAULT_ID)).thenReturn(passengerRateReadDto);
 
             MvcResult mvcResult = mockMvc.perform(get(PASSENGER_URL_WITH_ID, DEFAULT_ID))
@@ -227,6 +231,8 @@ class RateControllerTest {
     public class createTests {
         @Test
         void create_whenVerifyingRequestMatching_thenReturn200() throws Exception {
+            RateCreateEditDto driverCreateEditDto = getDriverRateCreateEditDtoBuilder().build();
+
             mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(driverCreateEditDto)))
@@ -239,6 +245,8 @@ class RateControllerTest {
 
         @Test
         void createDriverRate_whenValidInput_thenMapsToBusinessModel() throws Exception {
+            RateCreateEditDto driverCreateEditDto = getDriverRateCreateEditDtoBuilder().build();
+
             mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(driverCreateEditDto)))
@@ -249,14 +257,17 @@ class RateControllerTest {
 
             verify(driverRateService, times(1)).create(rateCaptor.capture());
             assertThat(rateCaptor.getValue().rideId()).isEqualTo(DEFAULT_ID);
-            assertThat(rateCaptor.getValue().comment()).isEqualTo("Good");
-            assertThat(rateCaptor.getValue().rating()).isEqualTo(4);
+            assertThat(rateCaptor.getValue().comment()).isEqualTo(DEFAULT_COMMENT);
+            assertThat(rateCaptor.getValue().rating()).isEqualTo(DEFAULT_RATE);
             assertThat(rateCaptor.getValue().userId()).isEqualTo(DEFAULT_ID);
             assertThat(rateCaptor.getValue().userType()).isEqualTo(UserType.PASSENGER);
         }
 
         @Test
         void createDriverRate_whenValidInput_thenReturn201AndCarReadDto() throws Exception {
+            RateReadDto driverRateReadDto = getDriverRateReadDtoBuilder().build();
+            RateCreateEditDto driverCreateEditDto = getDriverRateCreateEditDtoBuilder().build();
+
             when(driverRateService.create(driverCreateEditDto)).thenReturn(driverRateReadDto);
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -272,6 +283,8 @@ class RateControllerTest {
 
         @Test
         void createPassengerRate_whenValidInput_thenMapsToBusinessModel() throws Exception {
+            RateCreateEditDto passengerCreateEditDto = getPassengerRateCreateEditDtoBuilder().build();
+
             mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(passengerCreateEditDto)))
@@ -282,14 +295,17 @@ class RateControllerTest {
 
             verify(passengerRateService, times(1)).create(rateCaptor.capture());
             assertThat(rateCaptor.getValue().rideId()).isEqualTo(DEFAULT_ID);
-            assertThat(rateCaptor.getValue().comment()).isEqualTo("Good");
-            assertThat(rateCaptor.getValue().rating()).isEqualTo(4);
+            assertThat(rateCaptor.getValue().comment()).isEqualTo(DEFAULT_COMMENT);
+            assertThat(rateCaptor.getValue().rating()).isEqualTo(DEFAULT_RATE);
             assertThat(rateCaptor.getValue().userId()).isEqualTo(DEFAULT_ID);
             assertThat(rateCaptor.getValue().userType()).isEqualTo(UserType.DRIVER);
         }
 
         @Test
         void createPassengerRate_whenValidInput_thenReturn201AndCarReadDto() throws Exception {
+            RateReadDto passengerRateReadDto = getPassengerRateReadDtoBuilder().build();
+            RateCreateEditDto passengerCreateEditDto = getPassengerRateCreateEditDtoBuilder().build();
+
             when(passengerRateService.create(passengerCreateEditDto)).thenReturn(passengerRateReadDto);
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
@@ -305,7 +321,7 @@ class RateControllerTest {
 
         @Test
         void create_whenInvalidInputNullAndMax_thenReturn400AndValidationResponse() throws Exception {
-            driverCreateEditDto = getDriverRateCreateEditDtoBuilder()
+            RateCreateEditDto driverCreateEditDto = getDriverRateCreateEditDtoBuilder()
                                     .rideId(null)
                                     .rating(6)
                                     .build();
@@ -328,7 +344,7 @@ class RateControllerTest {
 
         @Test
         void create_whenInvalidInputMin_thenReturn400AndValidationResponse() throws Exception {
-            driverCreateEditDto = getDriverRateCreateEditDtoBuilder()
+            RateCreateEditDto driverCreateEditDto = getDriverRateCreateEditDtoBuilder()
                                     .rating(0)
                                     .build();
 
@@ -353,6 +369,8 @@ class RateControllerTest {
     public class updateTests {
         @Test
         void update_whenVerifyingRequestMatching_thenReturn200() throws Exception {
+            RateCreateEditDto driverCreateEditDto = getDriverRateCreateEditDtoBuilder().build();
+
             mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(driverCreateEditDto)))
@@ -364,6 +382,8 @@ class RateControllerTest {
 
         @Test
         void updateDriverRate_whenValidInput_thenMapsToBusinessModel() throws Exception {
+            RateCreateEditDto driverCreateEditDto = getDriverRateCreateEditDtoBuilder().build();
+
             mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(driverCreateEditDto)))
@@ -375,14 +395,17 @@ class RateControllerTest {
             verify(driverRateService, times(1)).update(idCaptor.capture(), rateCaptor.capture());
             assertThat(idCaptor.getValue()).isEqualTo(DEFAULT_ID);
             assertThat(rateCaptor.getValue().rideId()).isEqualTo(DEFAULT_ID);
-            assertThat(rateCaptor.getValue().comment()).isEqualTo("Good");
-            assertThat(rateCaptor.getValue().rating()).isEqualTo(4);
+            assertThat(rateCaptor.getValue().comment()).isEqualTo(DEFAULT_COMMENT);
+            assertThat(rateCaptor.getValue().rating()).isEqualTo(DEFAULT_RATE);
             assertThat(rateCaptor.getValue().userId()).isEqualTo(DEFAULT_ID);
             assertThat(rateCaptor.getValue().userType()).isEqualTo(UserType.PASSENGER);
         }
 
         @Test
         void updateDriverRate_whenValidInput_thenReturn200AndCarReadDto() throws Exception {
+            RateReadDto driverRateReadDto = getDriverRateReadDtoBuilder().build();
+            RateCreateEditDto driverCreateEditDto = getDriverRateCreateEditDtoBuilder().build();
+
             when(driverRateService.update(DEFAULT_ID, driverCreateEditDto)).thenReturn(driverRateReadDto);
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
@@ -398,6 +421,8 @@ class RateControllerTest {
 
         @Test
         void updatePassengerRate_whenValidInput_thenMapsToBusinessModel() throws Exception {
+            RateCreateEditDto passengerCreateEditDto = getPassengerRateCreateEditDtoBuilder().build();
+
             mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(passengerCreateEditDto)))
@@ -409,14 +434,17 @@ class RateControllerTest {
             verify(passengerRateService, times(1)).update(idCaptor.capture(), rateCaptor.capture());
             assertThat(idCaptor.getValue()).isEqualTo(DEFAULT_ID);
             assertThat(rateCaptor.getValue().rideId()).isEqualTo(DEFAULT_ID);
-            assertThat(rateCaptor.getValue().comment()).isEqualTo("Good");
-            assertThat(rateCaptor.getValue().rating()).isEqualTo(4);
+            assertThat(rateCaptor.getValue().comment()).isEqualTo(DEFAULT_COMMENT);
+            assertThat(rateCaptor.getValue().rating()).isEqualTo(DEFAULT_RATE);
             assertThat(rateCaptor.getValue().userId()).isEqualTo(DEFAULT_ID);
             assertThat(rateCaptor.getValue().userType()).isEqualTo(UserType.DRIVER);
         }
 
         @Test
         void updatePassengerRate_whenValidInput_thenReturn200AndCarReadDto() throws Exception {
+            RateReadDto passengerRateReadDto = getPassengerRateReadDtoBuilder().build();
+            RateCreateEditDto passengerCreateEditDto = getPassengerRateCreateEditDtoBuilder().build();
+
             when(passengerRateService.update(DEFAULT_ID, passengerCreateEditDto)).thenReturn(passengerRateReadDto);
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
@@ -432,7 +460,7 @@ class RateControllerTest {
 
         @Test
         void update_whenInvalidInputNullAndMax_thenReturn400AndValidationResponse() throws Exception {
-            driverCreateEditDto = getDriverRateCreateEditDtoBuilder()
+            RateCreateEditDto driverCreateEditDto = getDriverRateCreateEditDtoBuilder()
                                     .rideId(null)
                                     .rating(6)
                                     .build();
@@ -455,7 +483,7 @@ class RateControllerTest {
 
         @Test
         void update_whenInvalidInputMin_thenReturn400AndValidationResponse() throws Exception {
-            driverCreateEditDto = getDriverRateCreateEditDtoBuilder()
+            RateCreateEditDto driverCreateEditDto = getDriverRateCreateEditDtoBuilder()
                                     .rating(0)
                                     .build();
 

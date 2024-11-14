@@ -65,13 +65,10 @@ class DriverRateServiceImplTest {
     @Mock
     private KafkaProducer kafkaProducer;
 
-    private DriverRate defaultRate = getDriverRateBuilder().build();
-    private RateCreateEditDto createRate = getDriverRateCreateEditDtoBuilder().build();
-    private RateReadDto readRate = getDriverRateReadDtoBuilder().build();
-    private RideReadDto readRide = getRideReadDtoBuilder().build();
-
     @Test
     void findAll_thenReturnPageRateReadDto() {
+        DriverRate defaultRate = getDriverRateBuilder().build();
+        RateReadDto readRate = getDriverRateReadDtoBuilder().build();
         Pageable request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
         when(driverRateRepository.findAll(request)).thenReturn(new PageImpl<>(List.of(defaultRate), request, 1));
@@ -87,6 +84,9 @@ class DriverRateServiceImplTest {
 
     @Test
     void findById_whenRateIsFound_thenReturnRateReadDto() {
+        DriverRate defaultRate = getDriverRateBuilder().build();
+        RateReadDto readRate = getDriverRateReadDtoBuilder().build();
+
         when(driverRateRepository.findById(DEFAULT_ID)).thenReturn(Optional.of(defaultRate));
         when(rateMapper.toReadDto(defaultRate)).thenReturn(readRate);
 
@@ -118,6 +118,11 @@ class DriverRateServiceImplTest {
 
     @Test
     void create_whenRideIsExists_thenReturnRateReadDto() {
+        DriverRate defaultRate = getDriverRateBuilder().build();
+        RateCreateEditDto createRate = getDriverRateCreateEditDtoBuilder().build();
+        RateReadDto readRate = getDriverRateReadDtoBuilder().build();
+        RideReadDto readRide = getRideReadDtoBuilder().build();
+
         when(rateMapper.toDriverRate(createRate)).thenReturn(defaultRate);
         when(rideClient.getRide(DEFAULT_ID)).thenReturn(readRide);
         when(driverRateRepository.save(defaultRate)).thenReturn(defaultRate);
@@ -132,6 +137,11 @@ class DriverRateServiceImplTest {
 
     @Test
     void update_whenRateIsFound_thenReturnRateReadDto() {
+        DriverRate defaultRate = getDriverRateBuilder().build();
+        RateCreateEditDto createRate = getDriverRateCreateEditDtoBuilder().build();
+        RateReadDto readRate = getDriverRateReadDtoBuilder().build();
+        RideReadDto readRide = getRideReadDtoBuilder().build();
+
         when(driverRateRepository.findById(DEFAULT_ID)).thenReturn(Optional.of(defaultRate));
         when(rideClient.getRide(DEFAULT_ID)).thenReturn(readRide);
         when(driverRateRepository.save(defaultRate)).thenReturn(defaultRate);
@@ -147,6 +157,8 @@ class DriverRateServiceImplTest {
 
     @Test
     void update_whenRateIsNotFound_thenThrowRateNotFoundException() {
+        RateCreateEditDto createRate = getDriverRateCreateEditDtoBuilder().build();
+
         when(driverRateRepository.findById(DEFAULT_ID)).thenReturn(Optional.empty());
         when(messageSource.getMessage(
                 ExceptionConstants.RATE_NOT_FOUND,
@@ -171,6 +183,9 @@ class DriverRateServiceImplTest {
 
     @Test
     void findByUserId_thenReturnListRateReadDto() {
+        DriverRate defaultRate = getDriverRateBuilder().build();
+        RateReadDto readRate = getDriverRateReadDtoBuilder().build();
+
         when(driverRateRepository.findByUserId(DEFAULT_ID)).thenReturn(List.of(defaultRate));
         when(rateMapper.toReadDto(defaultRate)).thenReturn(readRate);
 

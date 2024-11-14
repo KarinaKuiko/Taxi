@@ -1,5 +1,7 @@
 package org.example.ride.util;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.example.ride.dto.create.RideCreateEditDto;
 import org.example.ride.dto.read.DriverReadDto;
 import org.example.ride.dto.read.PassengerReadDto;
@@ -10,14 +12,22 @@ import org.example.ride.entity.enumeration.PassengerRideStatus;
 
 import java.math.BigDecimal;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DataUtil {
     public static final String URL = "/api/v1/rides";
     public static final String URL_WITH_ID = URL + "/{id}";
+    public static final String DRIVER_STATUS = "/driver-status";
+    public static final String PASSENGER_STATUS = "/passenger-status";
     public static final Long DEFAULT_ID = 1L;
     public static final String PAGE = "page";
     public static final String LIMIT = "limit";
     public static final Integer PAGE_VALUE = 0;
     public static final Integer LIMIT_VALUE = 10;
+
+    //Ride
+    public static final String DEFAULT_ADDRESS_FROM = "from";
+    public static final String DEFAULT_ADDRESS_TO = "to";
+    public static final String DEFAULT_COST = "123.45";
 
     public static DriverReadDto.DriverReadDtoBuilder getDriverReadDtoBuilder() {
         return DriverReadDto.builder()
@@ -44,19 +54,19 @@ public class DataUtil {
                 .id(DEFAULT_ID)
                 .driverId(DEFAULT_ID)
                 .passengerId(DEFAULT_ID)
-                .addressFrom("from")
-                .addressTo("to")
+                .addressFrom(DEFAULT_ADDRESS_FROM)
+                .addressTo(DEFAULT_ADDRESS_TO)
                 .driverRideStatus(DriverRideStatus.ACCEPTED)
                 .passengerRideStatus(PassengerRideStatus.WAITING)
-                .cost(new BigDecimal("123.45"));
+                .cost(new BigDecimal(DEFAULT_COST));
     }
 
     public static RideCreateEditDto.RideCreateEditDtoBuilder getRideCreateEditDtoBuilder() {
         return RideCreateEditDto.builder()
                 .driverId(DEFAULT_ID)
                 .passengerId(DEFAULT_ID)
-                .addressFrom("from")
-                .addressTo("to");
+                .addressFrom(DEFAULT_ADDRESS_FROM)
+                .addressTo(DEFAULT_ADDRESS_TO);
     }
 
     public static RideReadDto.RideReadDtoBuilder getRideReadDtoBuilder() {
@@ -64,10 +74,10 @@ public class DataUtil {
                 .id(DEFAULT_ID)
                 .driverId(DEFAULT_ID)
                 .passengerId(DEFAULT_ID)
-                .addressFrom("from")
-                .addressTo("to")
+                .addressFrom(DEFAULT_ADDRESS_FROM)
+                .addressTo(DEFAULT_ADDRESS_TO)
                 .driverRideStatus(DriverRideStatus.ACCEPTED)
                 .passengerRideStatus(PassengerRideStatus.WAITING)
-                .cost(new BigDecimal("123.45"));
+                .cost(new BigDecimal(DEFAULT_COST));
     }
 }

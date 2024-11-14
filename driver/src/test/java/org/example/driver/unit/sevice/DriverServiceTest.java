@@ -60,13 +60,13 @@ class DriverServiceTest {
     @Mock
     private MessageSource messageSource;
 
-    private Driver defaultDriver = getDriverBuilder().build();
-    private DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
-    private DriverReadDto readDriver = getDriverReadDtoBuilder().build();
-    private Car car = getCarBuilder().build();
-
     @Test
     void create_whenEmailIsNotDuplicatedAndCarIsFound_thenReturnDriverReadDto() {
+        Driver defaultDriver = getDriverBuilder().build();
+        DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
+        DriverReadDto readDriver = getDriverReadDtoBuilder().build();
+        Car car = getCarBuilder().build();
+
         when(driverRepository.findByEmailAndIsDeletedFalse(createDriver.email()))
                 .thenReturn(Optional.empty());
         when(driverMapper.toDriver(createDriver)).thenReturn(defaultDriver);
@@ -84,6 +84,9 @@ class DriverServiceTest {
 
     @Test
     void create_whenCarIsNotFound_thenThrowCarNotFoundException() {
+        Driver defaultDriver = getDriverBuilder().build();
+        DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
+
         when(driverRepository.findByEmailAndIsDeletedFalse(createDriver.email()))
                 .thenReturn(Optional.empty());
         when(driverMapper.toDriver(createDriver)).thenReturn(defaultDriver);
@@ -111,6 +114,9 @@ class DriverServiceTest {
 
     @Test
     void create_whenEmailIsDuplicated_thenThrowDuplicatedDriverEmailException() {
+        Driver defaultDriver = getDriverBuilder().build();
+        DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
+
         when(driverRepository.findByEmailAndIsDeletedFalse(createDriver.email()))
                 .thenReturn(Optional.of(defaultDriver));
         when(messageSource.getMessage(
@@ -136,6 +142,11 @@ class DriverServiceTest {
 
     @Test
     void update_whenEmailIsDuplicatedWithSameIds_thenReturnDriverReadDto() {
+        Driver defaultDriver = getDriverBuilder().build();
+        DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
+        DriverReadDto readDriver = getDriverReadDtoBuilder().build();
+        Car car = getCarBuilder().build();
+
         when(driverRepository.findByIdAndIsDeletedFalse(DEFAULT_ID)).thenReturn(Optional.of(defaultDriver));
         when(driverRepository.findByEmailAndIsDeletedFalse(createDriver.email()))
                 .thenReturn(Optional.of(defaultDriver));
@@ -154,6 +165,9 @@ class DriverServiceTest {
 
     @Test
     void update_whenEmailIsDuplicatedWithDifferentIds_thenThrowDuplicatedDriverEmailException() {
+        Driver defaultDriver = getDriverBuilder().build();
+        DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
+
         when(driverRepository.findByIdAndIsDeletedFalse(2L)).thenReturn(Optional.of(defaultDriver));
         when(driverRepository.findByEmailAndIsDeletedFalse(createDriver.email()))
                 .thenReturn(Optional.of(defaultDriver));
@@ -180,6 +194,9 @@ class DriverServiceTest {
 
     @Test
     void update_whenCarIsNotFound_thenThrowCarNotFoundException() {
+        Driver defaultDriver = getDriverBuilder().build();
+        DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
+
         when(driverRepository.findByIdAndIsDeletedFalse(DEFAULT_ID)).thenReturn(Optional.of(defaultDriver));
         when(driverRepository.findByEmailAndIsDeletedFalse(createDriver.email()))
                 .thenReturn(Optional.empty());
@@ -208,6 +225,8 @@ class DriverServiceTest {
 
     @Test
     void update_whenDriverIsNotFound_thenThrowDriverNotFoundException() {
+        DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
+
         when(driverRepository.findByIdAndIsDeletedFalse(DEFAULT_ID)).thenReturn(Optional.empty());
         when(messageSource.getMessage(
                 ExceptionConstants.DRIVER_NOT_FOUND,
@@ -233,6 +252,8 @@ class DriverServiceTest {
 
     @Test
     void safeDelete_whenDriverIsFound_thenMarkAsDeleted() {
+        Driver defaultDriver = getDriverBuilder().build();
+
         when(driverRepository.findByIdAndIsDeletedFalse(DEFAULT_ID)).thenReturn(Optional.of(defaultDriver));
         when(driverRepository.save(defaultDriver)).thenReturn(defaultDriver);
 
@@ -254,7 +275,7 @@ class DriverServiceTest {
                 .thenReturn(ExceptionConstants.DRIVER_NOT_FOUND);
 
         DriverNotFoundException exception = assertThrows(DriverNotFoundException.class,
-                () -> driverService.update(DEFAULT_ID, createDriver));
+                () -> driverService.safeDelete(DEFAULT_ID));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.DRIVER_NOT_FOUND);
         verify(driverRepository).findByIdAndIsDeletedFalse(DEFAULT_ID);
@@ -267,6 +288,8 @@ class DriverServiceTest {
 
     @Test
     void findAll_thenReturnPageDriverReadDto() {
+        Driver defaultDriver = getDriverBuilder().build();
+        DriverReadDto readDriver = getDriverReadDtoBuilder().build();
         Pageable request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
         when(driverRepository.findByIsDeletedFalse(request)).thenReturn(
@@ -283,6 +306,8 @@ class DriverServiceTest {
 
     @Test
     void findAllWithDeleted_thenReturnPageDriverReadDto() {
+        Driver defaultDriver = getDriverBuilder().build();
+        DriverReadDto readDriver = getDriverReadDtoBuilder().build();
         Pageable request = PageRequest.of(PAGE_VALUE, LIMIT_VALUE);
 
         when(driverRepository.findAll(request)).thenReturn(new PageImpl<>(List.of(defaultDriver), request, 1));
@@ -298,6 +323,8 @@ class DriverServiceTest {
 
     @Test
     void findById_whenDriverIsFound_thenReturnDriverReadDto() {
+        Driver defaultDriver = getDriverBuilder().build();
+        DriverReadDto readDriver = getDriverReadDtoBuilder().build();
         when(driverRepository.findByIdAndIsDeletedFalse(DEFAULT_ID)).thenReturn(Optional.of(defaultDriver));
         when(driverMapper.toReadDto(defaultDriver)).thenReturn(readDriver);
 
@@ -329,6 +356,7 @@ class DriverServiceTest {
 
     @Test
     void updateRating_thenUpdateRating() {
+        Driver defaultDriver = getDriverBuilder().build();
         UserRateDto rateDto = new UserRateDto(DEFAULT_ID, 4.0);
 
         when(driverRepository.findById(DEFAULT_ID)).thenReturn(Optional.of(defaultDriver));
