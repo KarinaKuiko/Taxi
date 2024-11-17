@@ -10,10 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.containers.KafkaContainer;
@@ -22,7 +23,10 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import static org.example.passenger.util.DataUtil.DEFAULT_EMAIL;
 import static org.example.passenger.util.DataUtil.DEFAULT_ID;
+import static org.example.passenger.util.DataUtil.DEFAULT_NAME;
+import static org.example.passenger.util.DataUtil.DEFAULT_PHONE;
 import static org.example.passenger.util.DataUtil.LIMIT;
 import static org.example.passenger.util.DataUtil.LIMIT_VALUE;
 import static org.example.passenger.util.DataUtil.PAGE;
@@ -37,7 +41,8 @@ import static org.hamcrest.Matchers.notNullValue;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class PassengerControllerIT {
+@Sql(scripts = "/setup_passenger_table.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+public class PassengerControllerIntegrationTest {
 
     @Container
     public static PostgreSQLContainer postgreSQLContainer =
@@ -65,11 +70,6 @@ public class PassengerControllerIT {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    private Passenger defaultPassenger;
-
     @BeforeAll
     static void setUp() {
         kafkaContainer.start();
@@ -78,10 +78,6 @@ public class PassengerControllerIT {
     @BeforeEach
     void init() {
         RestAssuredMockMvc.mockMvc(MockMvcBuilders.webAppContextSetup(webApplicationContext).build());
-        passengerRepository.deleteAll();
-        jdbcTemplate.execute("ALTER SEQUENCE passengers_id_seq RESTART WITH 1");
-        defaultPassenger = getPassengerBuilder().build();
-        passengerRepository.save(defaultPassenger);
     }
 
     @Test
@@ -93,7 +89,7 @@ public class PassengerControllerIT {
                 .when()
                 .get(URL)
                 .then()
-                .statusCode(200)
+                .statusCode(HttpStatus.OK.value())
                 .body("content.size()", equalTo(1));
     }
 
@@ -103,11 +99,11 @@ public class PassengerControllerIT {
                 .when()
                 .get(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
-                .statusCode(200)
-                .body("id", equalTo(1))
-                .body("name", equalTo("passenger"))
-                .body("email", equalTo("passenger@gmail.com"))
-                .body("phone", equalTo("+375441234567"));
+                .statusCode(HttpStatus.OK.value())
+                .body("id", equalTo(DEFAULT_ID.intValue()))
+                .body("name", equalTo(DEFAULT_NAME))
+                .body("email", equalTo(DEFAULT_EMAIL))
+                .body("phone", equalTo(DEFAULT_PHONE));
     }
 
     @Test
@@ -116,7 +112,7 @@ public class PassengerControllerIT {
                 .when()
                 .get(URL_WITH_ID, "2")
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Passenger was not found"));
     }
 
@@ -133,7 +129,7 @@ public class PassengerControllerIT {
                 .when()
                 .post(URL)
                 .then()
-                .statusCode(201)
+                .statusCode(HttpStatus.CREATED.value())
                 .body("id", notNullValue());
     }
 
@@ -148,7 +144,7 @@ public class PassengerControllerIT {
                 .when()
                 .post(URL)
                 .then()
-                .statusCode(409)
+                .statusCode(HttpStatus.CONFLICT.value())
                 .body("message", equalTo("Passenger with this email already exists"));
     }
 
@@ -165,11 +161,11 @@ public class PassengerControllerIT {
                 .when()
                 .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
-                .statusCode(200)
-                .body("id", equalTo(1))
+                .statusCode(HttpStatus.OK.value())
+                .body("id", equalTo(DEFAULT_ID.intValue()))
                 .body("name", equalTo("naming"))
-                .body("email", equalTo("passenger@gmail.com"))
-                .body("phone", equalTo("+375441234567"));
+                .body("email", equalTo(DEFAULT_EMAIL))
+                .body("phone", equalTo(DEFAULT_PHONE));
     }
 
     @Test
@@ -192,7 +188,7 @@ public class PassengerControllerIT {
                 .when()
                 .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
-                .statusCode(409)
+                .statusCode(HttpStatus.CONFLICT.value())
                 .body("message", equalTo("Passenger with this email already exists"));
     }
 
@@ -207,7 +203,7 @@ public class PassengerControllerIT {
                 .when()
                 .put(URL_WITH_ID, "2")
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Passenger was not found"));
     }
 
@@ -217,7 +213,7 @@ public class PassengerControllerIT {
                 .when()
                 .delete(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
-                .statusCode(204);
+                .statusCode(HttpStatus.NO_CONTENT.value());
 
         assertThat(0, equalTo(passengerRepository.findByIsDeletedFalse(
                 PageRequest.of(PAGE_VALUE, LIMIT_VALUE)).getNumberOfElements()));
@@ -229,7 +225,7 @@ public class PassengerControllerIT {
                 .when()
                 .delete(URL_WITH_ID,"2")
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Passenger was not found"));
     }
 }

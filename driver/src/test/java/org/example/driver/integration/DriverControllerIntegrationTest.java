@@ -2,10 +2,8 @@ package org.example.driver.integration;
 
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.example.driver.dto.create.DriverCreateEditDto;
-import org.example.driver.entity.Car;
 import org.example.driver.entity.Driver;
 import org.example.driver.entity.enumeration.Gender;
-import org.example.driver.repository.CarRepository;
 import org.example.driver.repository.DriverRepository;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,10 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.containers.KafkaContainer;
@@ -25,7 +24,10 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import static org.example.driver.util.DataUtil.DEFAULT_EMAIL;
 import static org.example.driver.util.DataUtil.DEFAULT_ID;
+import static org.example.driver.util.DataUtil.DEFAULT_PHONE;
+import static org.example.driver.util.DataUtil.DEFAUlT_NAME;
 import static org.example.driver.util.DataUtil.DRIVER_ENTITY;
 import static org.example.driver.util.DataUtil.LIMIT;
 import static org.example.driver.util.DataUtil.LIMIT_VALUE;
@@ -33,7 +35,6 @@ import static org.example.driver.util.DataUtil.PAGE;
 import static org.example.driver.util.DataUtil.PAGE_VALUE;
 import static org.example.driver.util.DataUtil.URL;
 import static org.example.driver.util.DataUtil.URL_WITH_ID;
-import static org.example.driver.util.DataUtil.getCar;
 import static org.example.driver.util.DataUtil.getDriverBuilder;
 import static org.example.driver.util.DataUtil.getDriverCreateEditDtoBuilder;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -42,7 +43,9 @@ import static org.hamcrest.Matchers.notNullValue;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class DriverControllerIT {
+@Sql(scripts = {"/setup_car_table.sql", "/setup_driver_table.sql"},
+        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+public class DriverControllerIntegrationTest {
     @Container
     public static PostgreSQLContainer postgreSQLContainer =
             new PostgreSQLContainer<>("postgres:15-alpine");
@@ -67,16 +70,7 @@ public class DriverControllerIT {
     private DriverRepository driverRepository;
 
     @Autowired
-    private CarRepository carRepository;
-
-    @Autowired
     private WebApplicationContext webApplicationContext;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    private Driver defaultDriver;
-    private Car defaultCar;
 
     @BeforeAll
     static void setUp() {
@@ -86,16 +80,6 @@ public class DriverControllerIT {
     @BeforeEach
     void init() {
         RestAssuredMockMvc.mockMvc(MockMvcBuilders.webAppContextSetup(webApplicationContext).build());
-        driverRepository.deleteAll();
-        carRepository.deleteAll();
-        jdbcTemplate.execute("ALTER SEQUENCE cars_id_seq RESTART WITH 1");
-        jdbcTemplate.execute("ALTER SEQUENCE drivers_id_seq RESTART WITH 1");
-        defaultCar = getCar().build();
-        carRepository.save(defaultCar);
-        defaultDriver = getDriverBuilder()
-                .car(defaultCar)
-                .build();
-        driverRepository.save(defaultDriver);
     }
 
     @Test
@@ -107,7 +91,7 @@ public class DriverControllerIT {
                 .when()
                 .get(URL, DRIVER_ENTITY)
                 .then()
-                .statusCode(200)
+                .statusCode(HttpStatus.OK.value())
                 .body("content.size()", equalTo(1));
     }
 
@@ -117,13 +101,13 @@ public class DriverControllerIT {
                 .when()
                 .get(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID.toString())
                 .then()
-                .statusCode(200)
-                .body("id", equalTo(1))
-                .body("name", equalTo("test"))
-                .body("email", equalTo("test@gmail.com"))
-                .body("phone", equalTo("+375297654321"))
-                .body("gender", equalTo("MALE"))
-                .body("carId", equalTo(1));
+                .statusCode(HttpStatus.OK.value())
+                .body("id", equalTo(DEFAULT_ID.intValue()))
+                .body("name", equalTo(DEFAUlT_NAME))
+                .body("email", equalTo(DEFAULT_EMAIL))
+                .body("phone", equalTo(DEFAULT_PHONE))
+                .body("gender", equalTo(Gender.MALE.name()))
+                .body("carId", equalTo(DEFAULT_ID.intValue()));
     }
 
     @Test
@@ -132,19 +116,19 @@ public class DriverControllerIT {
                 .when()
                 .get(URL_WITH_ID, DRIVER_ENTITY, "2")
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Driver was not found"));
     }
 
     @Test
-    void create_whenValidInput_thenReturn200AndDriverReadDto() {
+    void create_whenValidInput_thenReturn201AndDriverReadDto() {
         DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
-                                            .name("name")
-                                            .email("name@gmail.com")
-                                            .phone("+375291122334")
-                                            .gender(Gender.MALE)
-                                            .carId(DEFAULT_ID)
-                                            .build();
+                .name("name")
+                .email("name@gmail.com")
+                .phone("+375291122334")
+                .gender(Gender.MALE)
+                .carId(DEFAULT_ID)
+                .build();
 
         RestAssuredMockMvc
                 .given()
@@ -153,7 +137,7 @@ public class DriverControllerIT {
                 .when()
                 .post(URL, DRIVER_ENTITY)
                 .then()
-                .statusCode(201)
+                .statusCode(HttpStatus.CREATED.value())
                 .body("id", notNullValue());
     }
 
@@ -168,16 +152,16 @@ public class DriverControllerIT {
                 .when()
                 .post(URL, DRIVER_ENTITY)
                 .then()
-                .statusCode(409)
+                .statusCode(HttpStatus.CONFLICT.value())
                 .body("message", equalTo("Driver with this email already exists"));
     }
 
     @Test
     void create_whenCarIdNotFound_thenReturn404() {
         DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
-                                            .email("name@gmail.com")
-                                            .carId(2L)
-                                            .build();
+                .email("name@gmail.com")
+                .carId(2L)
+                .build();
 
         RestAssuredMockMvc
                 .given()
@@ -186,16 +170,16 @@ public class DriverControllerIT {
                 .when()
                 .post(URL, DRIVER_ENTITY)
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Car was not found"));
     }
 
     @Test
     void update_whenValidInput_thenReturn200AndDriverReadDto() {
         DriverCreateEditDto updateDriver = getDriverCreateEditDtoBuilder()
-                                            .name("testing")
-                                            .gender(Gender.FEMALE)
-                                            .build();
+                .name("testing")
+                .gender(Gender.FEMALE)
+                .build();
 
         RestAssuredMockMvc
                 .given()
@@ -204,13 +188,13 @@ public class DriverControllerIT {
                 .when()
                 .put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID.toString())
                 .then()
-                .statusCode(200)
-                .body("id", equalTo(1))
+                .statusCode(HttpStatus.OK.value())
+                .body("id", equalTo(DEFAULT_ID.intValue()))
                 .body("name", equalTo("testing"))
-                .body("email", equalTo("test@gmail.com"))
-                .body("phone", equalTo("+375297654321"))
-                .body("gender", equalTo("FEMALE"))
-                .body("carId", equalTo(1));
+                .body("email", equalTo(DEFAULT_EMAIL))
+                .body("phone", equalTo(DEFAULT_PHONE))
+                .body("gender", equalTo(Gender.FEMALE.name()))
+                .body("carId", equalTo(DEFAULT_ID.intValue()));
     }
 
     @Test
@@ -224,22 +208,22 @@ public class DriverControllerIT {
                 .when()
                 .put(URL_WITH_ID, DRIVER_ENTITY, "2")
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Driver was not found"));
     }
 
     @Test
     void update_whenEmailIsDuplicated_thenReturn409() {
         Driver createDriver = getDriverBuilder()
-                                .id(2L)
-                                .email("name@gmail.com")
-                                .build();
+                .id(2L)
+                .email("name@gmail.com")
+                .build();
         driverRepository.save(createDriver);
 
         DriverCreateEditDto updateDriver = getDriverCreateEditDtoBuilder()
-                                            .name("testing")
-                                            .email("name@gmail.com")
-                                            .build();
+                .name("testing")
+                .email("name@gmail.com")
+                .build();
 
         RestAssuredMockMvc
                 .given()
@@ -248,15 +232,15 @@ public class DriverControllerIT {
                 .when()
                 .put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID.toString())
                 .then()
-                .statusCode(409)
+                .statusCode(HttpStatus.CONFLICT.value())
                 .body("message", equalTo("Driver with this email already exists"));
     }
 
     @Test
     void update_whenCarIsNotFound_thenReturn404() {
         DriverCreateEditDto updateDriver = getDriverCreateEditDtoBuilder()
-                                            .carId(2L)
-                                            .build();
+                .carId(2L)
+                .build();
 
         RestAssuredMockMvc
                 .given()
@@ -265,7 +249,7 @@ public class DriverControllerIT {
                 .when()
                 .put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID.toString())
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Car was not found"));
     }
 
@@ -275,7 +259,7 @@ public class DriverControllerIT {
                 .when()
                 .delete(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID.toString())
                 .then()
-                .statusCode(204);
+                .statusCode(HttpStatus.NO_CONTENT.value());
 
         assertThat(0, equalTo(driverRepository.findByIsDeletedFalse(
                 PageRequest.of(PAGE_VALUE, LIMIT_VALUE)).getNumberOfElements()));
@@ -287,7 +271,7 @@ public class DriverControllerIT {
                 .when()
                 .delete(URL_WITH_ID, DRIVER_ENTITY, "2")
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Driver was not found"));
     }
 }

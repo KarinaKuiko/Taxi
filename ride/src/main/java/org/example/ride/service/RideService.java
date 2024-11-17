@@ -81,8 +81,8 @@ public class RideService {
 
     @Transactional
     public RideReadDto create(RideCreateEditDto rideDto) {
-        driverClient.checkExistingDriver(rideDto.driverId());
-        passengerClient.checkExistingPassenger(rideDto.passengerId());
+        driverClient.getDriver(rideDto.driverId());
+        passengerClient.getPassenger(rideDto.passengerId());
 
         Ride ride = rideMapper.toRide(rideDto);
         ride.setDriverRideStatus(DriverRideStatus.CREATED);
@@ -96,8 +96,8 @@ public class RideService {
     public RideReadDto update(Long id, RideCreateEditDto rideDto) {
         return rideRepository.findById(id)
                 .map(ride -> {
-                    driverClient.checkExistingDriver(rideDto.driverId());
-                    passengerClient.checkExistingPassenger(rideDto.passengerId());
+                    driverClient.getDriver(rideDto.driverId());
+                    passengerClient.getPassenger(rideDto.passengerId());
                     rideMapper.map(ride, rideDto);
                     return ride;
                 })

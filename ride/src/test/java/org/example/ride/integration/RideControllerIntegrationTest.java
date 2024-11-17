@@ -1,7 +1,6 @@
 package org.example.ride.integration;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.example.ride.dto.create.DriverRideStatusDto;
 import org.example.ride.dto.create.PassengerRideStatusDto;
@@ -10,15 +9,18 @@ import org.example.ride.entity.Ride;
 import org.example.ride.entity.enumeration.DriverRideStatus;
 import org.example.ride.entity.enumeration.PassengerRideStatus;
 import org.example.ride.repository.RideRepository;
+import org.example.ride.wireMock.DriverWireMock;
+import org.example.ride.wireMock.PassengerWireMock;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.containers.KafkaContainer;
@@ -27,10 +29,11 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.example.ride.util.DataUtil.DEFAULT_ADDRESS_FROM;
+import static org.example.ride.util.DataUtil.DEFAULT_ADDRESS_TO;
 import static org.example.ride.util.DataUtil.DEFAULT_ID;
+import static org.example.ride.util.DataUtil.DRIVER_STATUS;
+import static org.example.ride.util.DataUtil.PASSENGER_STATUS;
 import static org.example.ride.util.DataUtil.URL;
 import static org.example.ride.util.DataUtil.URL_WITH_ID;
 import static org.example.ride.util.DataUtil.getRideBuilder;
@@ -40,9 +43,10 @@ import static org.hamcrest.Matchers.notNullValue;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class RideControllerIT {
-    private static WireMockServer driverWireMockServer;
-    private static WireMockServer passengererWireMockServer;
+@WireMockTest
+@Sql(scripts = "/setup_ride_table.sql",
+        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+public class RideControllerIntegrationTest {
 
     @Container
     public static PostgreSQLContainer postgreSQLContainer =
@@ -70,29 +74,16 @@ public class RideControllerIT {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    private Ride defaultRide;
-
     @BeforeAll
     static void setUp() {
         kafkaContainer.start();
-        driverWireMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig()
-                .port(8081));
-        passengererWireMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig()
-                .port(8082));
-        driverWireMockServer.start();
-        passengererWireMockServer.start();
+        DriverWireMock.driverWireMockServer.start();
+        PassengerWireMock.passengerWireMockServer.start();
     }
 
     @BeforeEach
     void init() {
         RestAssuredMockMvc.mockMvc(MockMvcBuilders.webAppContextSetup(webApplicationContext).build());
-        rideRepository.deleteAll();
-        jdbcTemplate.execute("ALTER SEQUENCE rides_id_seq RESTART WITH 1");
-        defaultRide = getRideBuilder().build();
-        rideRepository.save(defaultRide);
     }
 
     @Test
@@ -101,7 +92,7 @@ public class RideControllerIT {
                 .when()
                 .get(URL)
                 .then()
-                .statusCode(200)
+                .statusCode(HttpStatus.OK.value())
                 .body("content.size()", equalTo(1));
     }
 
@@ -111,12 +102,12 @@ public class RideControllerIT {
                 .when()
                 .get(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
-                .statusCode(200)
-                .body("id", equalTo(1))
-                .body("driverId", equalTo(1))
-                .body("passengerId", equalTo(1))
-                .body("addressFrom", equalTo("from"))
-                .body("addressTo", equalTo("to"));
+                .statusCode(HttpStatus.OK.value())
+                .body("id", equalTo(DEFAULT_ID.intValue()))
+                .body("driverId", equalTo(DEFAULT_ID.intValue()))
+                .body("passengerId", equalTo(DEFAULT_ID.intValue()))
+                .body("addressFrom", equalTo(DEFAULT_ADDRESS_FROM))
+                .body("addressTo", equalTo(DEFAULT_ADDRESS_TO));
     }
 
     @Test
@@ -125,7 +116,7 @@ public class RideControllerIT {
                 .when()
                 .get(URL_WITH_ID, "2")
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Ride was not found"));
     }
 
@@ -138,10 +129,10 @@ public class RideControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
-                .put(URL_WITH_ID + "/driver-status", DEFAULT_ID.toString())
+                .put(URL_WITH_ID + DRIVER_STATUS, DEFAULT_ID.toString())
                 .then()
-                .statusCode(200)
-                .body("driverRideStatus", equalTo("ON_WAY_FOR_PASSENGER"));
+                .statusCode(HttpStatus.OK.value())
+                .body("driverRideStatus", equalTo(DriverRideStatus.ON_WAY_FOR_PASSENGER.name()));
     }
 
     @Test
@@ -153,9 +144,9 @@ public class RideControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
-                .put(URL_WITH_ID + "/driver-status", DEFAULT_ID.toString())
+                .put(URL_WITH_ID + DRIVER_STATUS, DEFAULT_ID.toString())
                 .then()
-                .statusCode(409)
+                .statusCode(HttpStatus.CONFLICT.value())
                 .body("message", equalTo("Cannot be updated to the proposed status"));
     }
 
@@ -168,14 +159,15 @@ public class RideControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
-                .put(URL_WITH_ID + "/driver-status", "2")
+                .put(URL_WITH_ID + DRIVER_STATUS, "2")
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Ride was not found"));
     }
 
     @Test
     void updatePassengerStatus_whenValidInput_thenReturn200AndRideReadDto() {
+        Ride defaultRide = getRideBuilder().build();
         defaultRide.setDriverRideStatus(DriverRideStatus.WAITING);
         rideRepository.save(defaultRide);
 
@@ -186,10 +178,10 @@ public class RideControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
-                .put(URL_WITH_ID + "/passenger-status", DEFAULT_ID.toString())
+                .put(URL_WITH_ID + PASSENGER_STATUS, DEFAULT_ID.toString())
                 .then()
-                .statusCode(200)
-                .body("passengerRideStatus", equalTo("GETTING_OUT"));
+                .statusCode(HttpStatus.OK.value())
+                .body("passengerRideStatus", equalTo(PassengerRideStatus.GETTING_OUT.name()));
     }
 
     @Test
@@ -201,9 +193,9 @@ public class RideControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
-                .put(URL_WITH_ID + "/passenger-status", DEFAULT_ID.toString())
+                .put(URL_WITH_ID + PASSENGER_STATUS, DEFAULT_ID.toString())
                 .then()
-                .statusCode(409)
+                .statusCode(HttpStatus.CONFLICT.value())
                 .body("message", equalTo("Status cannot be changed now"));
     }
 
@@ -216,9 +208,9 @@ public class RideControllerIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
-                .put(URL_WITH_ID + "/passenger-status", "2")
+                .put(URL_WITH_ID + PASSENGER_STATUS, "2")
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Ride was not found"));
     }
 
@@ -226,8 +218,8 @@ public class RideControllerIT {
     void create_whenValidInput_thenReturn201AndRideReadDto() {
         RideCreateEditDto createRide = getRideCreateEditDtoBuilder().build();
 
-        getDriver();
-        getPassenger();
+        DriverWireMock.getDriver();
+        PassengerWireMock.getPassenger();
 
         RestAssuredMockMvc
                 .given()
@@ -236,7 +228,7 @@ public class RideControllerIT {
                 .when()
                 .post(URL)
                 .then()
-                .statusCode(201)
+                .statusCode(HttpStatus.CREATED.value())
                 .body("id", notNullValue());
 
     }
@@ -245,8 +237,8 @@ public class RideControllerIT {
     void create_whenDriverIsNotFound_thenReturn404() {
         RideCreateEditDto createRide = getRideCreateEditDtoBuilder().build();
 
-        getNonexistentDriver();
-        getPassenger();
+        DriverWireMock.getNonexistentDriver();
+        PassengerWireMock.getPassenger();
 
         RestAssuredMockMvc
                 .given()
@@ -255,7 +247,7 @@ public class RideControllerIT {
                 .when()
                 .post(URL)
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Driver was not found"));
     }
 
@@ -263,8 +255,8 @@ public class RideControllerIT {
     void create_whenPassengerIsNotFound_thenReturn404() {
         RideCreateEditDto createRide = getRideCreateEditDtoBuilder().build();
 
-        getDriver();
-        getNonexistentPassenger();
+        DriverWireMock.getDriver();
+        PassengerWireMock.getNonexistentPassenger();
 
         RestAssuredMockMvc
                 .given()
@@ -273,7 +265,7 @@ public class RideControllerIT {
                 .when()
                 .post(URL)
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Passenger was not found"));
     }
 
@@ -284,8 +276,8 @@ public class RideControllerIT {
                                         .addressTo("To")
                                         .build();
 
-        getDriver();
-        getPassenger();
+        DriverWireMock.getDriver();
+        PassengerWireMock.getPassenger();
 
         RestAssuredMockMvc
                 .given()
@@ -294,11 +286,12 @@ public class RideControllerIT {
                 .when()
                 .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
-                .statusCode(200)
-                .body("driverId", equalTo(1))
-                .body("passengerId", equalTo(1))
+                .statusCode(HttpStatus.OK.value())
+                .body("driverId", equalTo(DEFAULT_ID.intValue()))
+                .body("passengerId", equalTo(DEFAULT_ID.intValue()))
                 .body("addressFrom", equalTo("Minsk"))
-                .body("addressTo", equalTo("To"));
+                .body("addressTo", equalTo("To"))
+                .log().all();
     }
 
     @Test
@@ -308,8 +301,8 @@ public class RideControllerIT {
                                         .addressTo("To")
                                         .build();
 
-        getNonexistentDriver();
-        getPassenger();
+        DriverWireMock.getNonexistentDriver();
+        PassengerWireMock.getPassenger();
 
         RestAssuredMockMvc
                 .given()
@@ -318,7 +311,7 @@ public class RideControllerIT {
                 .when()
                 .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Driver was not found"));
     }
 
@@ -329,8 +322,8 @@ public class RideControllerIT {
                                         .addressTo("To")
                                         .build();
 
-        getDriver();
-        getNonexistentPassenger();
+        DriverWireMock.getDriver();
+        PassengerWireMock.getNonexistentPassenger();
 
         RestAssuredMockMvc
                 .given()
@@ -339,7 +332,7 @@ public class RideControllerIT {
                 .when()
                 .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Passenger was not found"));
     }
 
@@ -354,61 +347,7 @@ public class RideControllerIT {
                 .when()
                 .put(URL_WITH_ID, "2")
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Ride was not found"));
-    }
-
-    private void getDriver() {
-        driverWireMockServer.stubFor(
-                get(urlEqualTo("/api/v1/drivers/1"))
-                        .willReturn(aResponse()
-                                .withHeader("Content-Type", "application/json")
-                                .withStatus(200)
-                                .withBody("""
-                                        {
-                                            "id": 1,
-                                            "name": "John Doe",
-                                            "email": "john.doe@example.com",
-                                            "phone": "+375441234567",
-                                            "gender": "MALE",
-                                            "carId": 1,
-                                            "rating": 4.5
-                                        }
-                                        """)));
-    }
-
-    private void getPassenger() {
-        passengererWireMockServer.stubFor(
-                get(urlEqualTo("/api/v1/passengers/1"))
-                        .willReturn(aResponse()
-                                .withHeader("Content-Type", "application/json")
-                                .withStatus(200)
-                                .withBody("""
-                                        {
-                                            "id": 1,
-                                            "name": "Jane Smith",
-                                            "email": "jane.smith@example.com",
-                                            "phone": "+375441234567",
-                                            "rating": 4.8
-                                        }
-                                        """)));
-    }
-
-    private void getNonexistentDriver() {
-        driverWireMockServer.stubFor(
-                get(urlEqualTo("/api/v1/drivers/1"))
-                        .willReturn(aResponse()
-                                .withHeader("Content-Type", "application/json")
-                                .withStatus(404)
-                                .withBody("{\"message\": \"Driver was not found\"}")));
-    }
-
-    private void getNonexistentPassenger() {
-        passengererWireMockServer.stubFor(
-                get(urlEqualTo("/api/v1/passengers/1"))
-                        .willReturn(aResponse()
-                                .withHeader("Content-Type", "application/json")
-                                .withStatus(404)
-                                .withBody("{\"message\": \"Passenger was not found\"}")));
     }
 }

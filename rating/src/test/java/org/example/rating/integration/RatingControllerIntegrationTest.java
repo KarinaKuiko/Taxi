@@ -1,22 +1,19 @@
 package org.example.rating.integration;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.example.rating.dto.create.RateCreateEditDto;
-import org.example.rating.entity.DriverRate;
-import org.example.rating.entity.PassengerRate;
-import org.example.rating.repository.DriverRateRepository;
-import org.example.rating.repository.PassengerRateRepository;
+import org.example.rating.wireMock.RideWireMock;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.containers.KafkaContainer;
@@ -25,10 +22,9 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.example.rating.util.DataUtil.DEFAULT_COMMENT;
 import static org.example.rating.util.DataUtil.DEFAULT_ID;
+import static org.example.rating.util.DataUtil.DEFAULT_RATE;
 import static org.example.rating.util.DataUtil.DRIVER_URL;
 import static org.example.rating.util.DataUtil.DRIVER_URL_WITH_ID;
 import static org.example.rating.util.DataUtil.LIMIT;
@@ -39,17 +35,16 @@ import static org.example.rating.util.DataUtil.PASSENGER_URL;
 import static org.example.rating.util.DataUtil.PASSENGER_URL_WITH_ID;
 import static org.example.rating.util.DataUtil.URL;
 import static org.example.rating.util.DataUtil.URL_WITH_ID;
-import static org.example.rating.util.DataUtil.getDriverRateBuilder;
-import static org.example.rating.util.DataUtil.getPassengerRateBuilder;
 import static org.example.rating.util.DataUtil.getPassengerRateCreateEditDtoBuilder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class RatingControllerIT {
-
-    private static WireMockServer wireMockServer;
+@WireMockTest
+@Sql(scripts = {"/setup_passenger_rate_table.sql", "/setup_driver_rate_table.sql"},
+        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+public class RatingControllerIntegrationTest {
 
     @Container
     public static PostgreSQLContainer postgreSQLContainer =
@@ -72,38 +67,17 @@ public class RatingControllerIT {
     }
 
     @Autowired
-    private PassengerRateRepository passengerRateRepository;
-
-    @Autowired
-    private DriverRateRepository driverRateRepository;
-
-    @Autowired
     private WebApplicationContext webApplicationContext;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    private PassengerRate defaultPassengerRate;
-    private DriverRate defaultDriverRate;
 
     @BeforeAll
     static void setUp() {
         kafkaContainer.start();
-        wireMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig()
-                .port(8083));
-        wireMockServer.start();
+        RideWireMock.wireMockServer.start();
     }
 
     @BeforeEach
     void init() {
         RestAssuredMockMvc.mockMvc(MockMvcBuilders.webAppContextSetup(webApplicationContext).build());
-        passengerRateRepository.deleteAll();
-        jdbcTemplate.execute("ALTER SEQUENCE passenger_rates_id_seq RESTART WITH 1");
-        jdbcTemplate.execute("ALTER SEQUENCE rating_id_seq RESTART WITH 1");
-        defaultDriverRate = getDriverRateBuilder().build();
-        defaultPassengerRate = getPassengerRateBuilder().build();
-        passengerRateRepository.save(defaultPassengerRate);
-        driverRateRepository.save(defaultDriverRate);
     }
 
     @Test
@@ -115,7 +89,7 @@ public class RatingControllerIT {
                 .when()
                 .get(DRIVER_URL)
                 .then()
-                .statusCode(200)
+                .statusCode(HttpStatus.OK.value())
                 .body("content.size()", equalTo(1));
     }
 
@@ -125,7 +99,7 @@ public class RatingControllerIT {
                 .when()
                 .get(PASSENGER_URL)
                 .then()
-                .statusCode(200)
+                .statusCode(HttpStatus.OK.value())
                 .body("content.size()", equalTo(1));
     }
 
@@ -135,11 +109,11 @@ public class RatingControllerIT {
                 .when()
                 .get(DRIVER_URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
-                .statusCode(200)
-                .body("id", equalTo(1))
-                .body("rideId", equalTo(1))
-                .body("comment", equalTo("Good"))
-                .body("rating", equalTo(4));
+                .statusCode(HttpStatus.OK.value())
+                .body("id", equalTo(DEFAULT_ID.intValue()))
+                .body("rideId", equalTo(DEFAULT_ID.intValue()))
+                .body("comment", equalTo(DEFAULT_COMMENT))
+                .body("rating", equalTo(DEFAULT_RATE));
     }
 
     @Test
@@ -148,7 +122,7 @@ public class RatingControllerIT {
                 .when()
                 .get(DRIVER_URL_WITH_ID, "2")
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Rate was not found"));
     }
 
@@ -158,11 +132,11 @@ public class RatingControllerIT {
                 .when()
                 .get(PASSENGER_URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
-                .statusCode(200)
-                .body("id", equalTo(1))
-                .body("rideId", equalTo(1))
-                .body("comment", equalTo("Good"))
-                .body("rating", equalTo(4));
+                .statusCode(HttpStatus.OK.value())
+                .body("id", equalTo(DEFAULT_ID.intValue()))
+                .body("rideId", equalTo(DEFAULT_ID.intValue()))
+                .body("comment", equalTo(DEFAULT_COMMENT))
+                .body("rating", equalTo(DEFAULT_RATE));
     }
 
     @Test
@@ -171,7 +145,7 @@ public class RatingControllerIT {
                 .when()
                 .get(PASSENGER_URL_WITH_ID, "2")
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Rate was not found"));
     }
 
@@ -179,7 +153,7 @@ public class RatingControllerIT {
     void create_whenRideIsFound_thenReturn200AndRateReadDto() {
         RateCreateEditDto createRate = getPassengerRateCreateEditDtoBuilder().build();
 
-        getRide();
+        RideWireMock.getRide();
 
         RestAssuredMockMvc
                 .given()
@@ -188,7 +162,7 @@ public class RatingControllerIT {
                 .when()
                 .post(URL)
                 .then()
-                .statusCode(201)
+                .statusCode(HttpStatus.CREATED.value())
                 .body("id", notNullValue());
     }
 
@@ -196,7 +170,7 @@ public class RatingControllerIT {
     void create_whenRideIsNotFound_thenReturn404() {
         RateCreateEditDto createRate = getPassengerRateCreateEditDtoBuilder().build();
 
-        getNonexistentRide();
+        RideWireMock.getNonexistentRide();
 
         RestAssuredMockMvc
                 .given()
@@ -205,7 +179,7 @@ public class RatingControllerIT {
                 .when()
                 .post(URL)
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Ride was not found"));
     }
 
@@ -215,7 +189,7 @@ public class RatingControllerIT {
                                         .rating(5)
                                         .build();
 
-        getRide();
+        RideWireMock.getRide();
 
         RestAssuredMockMvc
                 .given()
@@ -224,10 +198,10 @@ public class RatingControllerIT {
                 .when()
                 .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
-                .statusCode(200)
-                .body("id", equalTo(1))
-                .body("rideId", equalTo(1))
-                .body("comment", equalTo("Good"))
+                .statusCode(HttpStatus.OK.value())
+                .body("id", equalTo(DEFAULT_ID.intValue()))
+                .body("rideId", equalTo(DEFAULT_ID.intValue()))
+                .body("comment", equalTo(DEFAULT_COMMENT))
                 .body("rating", equalTo(5));
     }
 
@@ -235,7 +209,7 @@ public class RatingControllerIT {
     void update_whenRideIsNotFound_thenReturn404() {
         RateCreateEditDto updateRate = getPassengerRateCreateEditDtoBuilder().build();
 
-        getNonexistentRide();
+        RideWireMock.getNonexistentRide();
 
         RestAssuredMockMvc
                 .given()
@@ -244,7 +218,7 @@ public class RatingControllerIT {
                 .when()
                 .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Ride was not found"));
     }
 
@@ -259,37 +233,9 @@ public class RatingControllerIT {
                 .when()
                 .put(URL_WITH_ID, "2")
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Rate was not found"));
     }
 
-    private void getRide() {
-        wireMockServer.stubFor(
-                get(urlEqualTo("/api/v1/rides/1"))
-                        .willReturn(aResponse()
-                                .withHeader("Content-Type", "application/json")
-                                .withStatus(200)
-                                .withBody("""
-                                        {
-                                            "id": 1,
-                                            "driverId": 1,
-                                            "passengerId": 1,
-                                            "addressFrom": "From",
-                                            "addressTo": "To",
-                                            "driverRideStatus": "ACCEPTED",
-                                            "passengerRideStatus": "WAITING",
-                                            "cost": 29.99
-                                        }
-                                        """)));
-    }
 
-    private void getNonexistentRide() {
-        wireMockServer.stubFor(
-                get(urlEqualTo("/api/v1/rides/1"))
-                        .willReturn(aResponse()
-                                .withHeader("Content-Type", "application/json")
-                                .withStatus(404)
-                                .withBody("{\"message\": \"Ride was not found\"}")));
-
-    }
 }

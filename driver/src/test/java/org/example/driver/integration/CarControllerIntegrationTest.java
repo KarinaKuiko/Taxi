@@ -10,10 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.containers.KafkaContainer;
@@ -23,14 +24,18 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import static org.example.driver.util.DataUtil.CAR_ENTITY;
+import static org.example.driver.util.DataUtil.DEFAULT_BRAND;
+import static org.example.driver.util.DataUtil.DEFAULT_COLOR;
 import static org.example.driver.util.DataUtil.DEFAULT_ID;
+import static org.example.driver.util.DataUtil.DEFAULT_NUMBER;
+import static org.example.driver.util.DataUtil.DEFAULT_YEAR;
 import static org.example.driver.util.DataUtil.LIMIT;
 import static org.example.driver.util.DataUtil.LIMIT_VALUE;
 import static org.example.driver.util.DataUtil.PAGE;
 import static org.example.driver.util.DataUtil.PAGE_VALUE;
 import static org.example.driver.util.DataUtil.URL;
 import static org.example.driver.util.DataUtil.URL_WITH_ID;
-import static org.example.driver.util.DataUtil.getCar;
+import static org.example.driver.util.DataUtil.getCarBuilder;
 import static org.example.driver.util.DataUtil.getCarCreateEditDtoBuilder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -38,7 +43,8 @@ import static org.hamcrest.Matchers.notNullValue;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CarControllerIT {
+@Sql(scripts = "/setup_car_table.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+public class CarControllerIntegrationTest {
 
     @Container
     public static PostgreSQLContainer postgreSQLContainer =
@@ -66,11 +72,6 @@ public class CarControllerIT {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    private Car defaultCar;
-
     @BeforeAll
     static void setUp() {
         kafkaContainer.start();
@@ -79,10 +80,6 @@ public class CarControllerIT {
     @BeforeEach
     void init() {
         RestAssuredMockMvc.mockMvc(MockMvcBuilders.webAppContextSetup(webApplicationContext).build());
-        carRepository.deleteAll();
-        jdbcTemplate.execute("ALTER SEQUENCE cars_id_seq RESTART WITH 1");
-        defaultCar = getCar().build();
-        carRepository.save(defaultCar);
     }
 
     @Test
@@ -94,7 +91,7 @@ public class CarControllerIT {
                 .when()
                 .get(URL, CAR_ENTITY)
                 .then()
-                .statusCode(200)
+                .statusCode(HttpStatus.OK.value())
                 .body("content.size()", equalTo(1));
     }
 
@@ -104,12 +101,12 @@ public class CarControllerIT {
                 .when()
                 .get(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID.toString())
                 .then()
-                .statusCode(200)
-                .body("id", equalTo(1))
-                .body("color", equalTo("red"))
-                .body("brand", equalTo("BMW"))
-                .body("number", equalTo("AB123CD"))
-                .body("year", equalTo(2023));
+                .statusCode(HttpStatus.OK.value())
+                .body("id", equalTo(DEFAULT_ID.intValue()))
+                .body("color", equalTo(DEFAULT_COLOR))
+                .body("brand", equalTo(DEFAULT_BRAND))
+                .body("number", equalTo(DEFAULT_NUMBER))
+                .body("year", equalTo(DEFAULT_YEAR));
     }
 
     @Test
@@ -118,7 +115,7 @@ public class CarControllerIT {
                 .when()
                 .get(URL_WITH_ID, CAR_ENTITY, "10")
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Car was not found"));
     }
 
@@ -135,7 +132,7 @@ public class CarControllerIT {
                 .when()
                 .post(URL, CAR_ENTITY)
                 .then()
-                .statusCode(201)
+                .statusCode(HttpStatus.CREATED.value())
                 .body("id", notNullValue());
     }
 
@@ -150,7 +147,7 @@ public class CarControllerIT {
                 .when()
                 .post(URL, CAR_ENTITY)
                 .then()
-                .statusCode(409)
+                .statusCode(HttpStatus.CONFLICT.value())
                 .body("message", equalTo("Car with this number already exists"));
     }
 
@@ -168,17 +165,17 @@ public class CarControllerIT {
                 .when()
                 .put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID.toString())
                 .then()
-                .statusCode(200)
-                .body("id", equalTo(1))
+                .statusCode(HttpStatus.OK.value())
+                .body("id", equalTo(DEFAULT_ID.intValue()))
                 .body("color", equalTo("yellow"))
-                .body("brand", equalTo("BMW"))
-                .body("number", equalTo("AB123CD"))
+                .body("brand", equalTo(DEFAULT_BRAND))
+                .body("number", equalTo(DEFAULT_NUMBER))
                 .body("year", equalTo(2020));
     }
 
     @Test
     void update_whenCarNumberIsDuplicatedAndDifferentIds_thenThrowDuplicatedCarNumberException() {
-        Car createCar = getCar()
+        Car createCar = getCarBuilder()
                         .id(2L)
                         .number("LK124AS")
                         .build();
@@ -197,7 +194,7 @@ public class CarControllerIT {
                 .when()
                 .put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID.toString())
                 .then()
-                .statusCode(409)
+                .statusCode(HttpStatus.CONFLICT.value())
                 .body("message", equalTo("Car with this number already exists"));
     }
 
@@ -212,7 +209,7 @@ public class CarControllerIT {
                 .when()
                 .put(URL_WITH_ID, CAR_ENTITY, "2")
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Car was not found"));
     }
 
@@ -222,7 +219,7 @@ public class CarControllerIT {
                 .when()
                 .delete(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID.toString())
                 .then()
-                .statusCode(204);
+                .statusCode(HttpStatus.NO_CONTENT.value());
 
         assertThat(0, equalTo(carRepository.findByIsDeletedFalse(
                 PageRequest.of(PAGE_VALUE, LIMIT_VALUE)).getNumberOfElements()));
@@ -234,7 +231,7 @@ public class CarControllerIT {
                 .when()
                 .delete(URL_WITH_ID, CAR_ENTITY, "2")
                 .then()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Car was not found"));
     }
 }

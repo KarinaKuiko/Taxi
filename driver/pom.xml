@@ -38,7 +38,7 @@
         <default.liquibase.username>postgres</default.liquibase.username>
         <default.liquibase.password>postgres</default.liquibase.password>
         <antrun.version>1.8</antrun.version>
-
+        <failsafe.plugin.version>3.5.2</failsafe.plugin.version>
     </properties>
     <dependencies>
         <dependency>
@@ -186,11 +186,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.5.2</version>
+                <version>${failsafe.plugin.version}</version>
                 <configuration>
                     <includes>
-                        <include>**/*IT.java</include>
-                        <include>**/integration/**/*IT.java</include>
+                        <include>**/*IntegrationTest.java</include>
+                        <include>**/integration/**/*IntegrationTest.java</include>
                     </includes>
                 </configuration>
                 <executions>

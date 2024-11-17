@@ -1,5 +1,7 @@
 package org.example.driver.util;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.example.driver.dto.create.CarCreateEditDto;
 import org.example.driver.dto.create.DriverCreateEditDto;
 import org.example.driver.dto.read.CarReadDto;
@@ -10,6 +12,7 @@ import org.example.driver.entity.enumeration.Gender;
 
 import java.util.List;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DataUtil {
     public static final String PAGE = "page";
     public static final String LIMIT = "limit";
@@ -21,50 +24,63 @@ public class DataUtil {
     public static final String CAR_ENTITY = "cars";
     public static final String DRIVER_ENTITY = "drivers";
 
-    public static Car.CarBuilder getCar() {
+    //Car
+    public static final String DEFAULT_COLOR = "red";
+    public static final String DEFAULT_BRAND = "BMW";
+    public static final String DEFAULT_NUMBER = "AB123CD";
+    public static final int DEFAULT_YEAR = 2023;
+
+    //Driver
+    public static final String DEFAUlT_NAME = "test";
+    public static final String DEFAULT_EMAIL = "test@gmail.com";
+    public static final String DEFAULT_PHONE = "+375297654321";
+    public static final double DEFAULT_RATING = 5.0;
+
+
+    public static Car.CarBuilder getCarBuilder() {
         return Car.builder()
                 .id(DEFAULT_ID)
-                .color("red")
-                .brand("BMW")
-                .number("AB123CD")
-                .year(2023)
+                .color(DEFAULT_COLOR)
+                .brand(DEFAULT_BRAND)
+                .number(DEFAULT_NUMBER)
+                .year(DEFAULT_YEAR)
                 .drivers(List.of());
     }
 
     public static CarReadDto.CarReadDtoBuilder getCarReadDtoBuilder() {
         return CarReadDto.builder()
                 .id(DEFAULT_ID)
-                .color("red")
-                .brand("BMW")
-                .number("AB123CD")
-                .year(2023)
+                .color(DEFAULT_COLOR)
+                .brand(DEFAULT_BRAND)
+                .number(DEFAULT_NUMBER)
+                .year(DEFAULT_YEAR)
                 .drivers(List.of());
     }
 
     public static CarCreateEditDto.CarCreateEditDtoBuilder getCarCreateEditDtoBuilder() {
         return CarCreateEditDto.builder()
-                .color("red")
-                .brand("BMW")
-                .number("AB123CD")
-                .year(2023);
+                .color(DEFAULT_COLOR)
+                .brand(DEFAULT_BRAND)
+                .number(DEFAULT_NUMBER)
+                .year(DEFAULT_YEAR);
     }
 
     public static DriverReadDto.DriverReadDtoBuilder getDriverReadDtoBuilder() {
         return DriverReadDto.builder()
                 .id(DEFAULT_ID)
-                .name("test")
-                .email("test@gmail.com")
-                .phone("+375297654321")
+                .name(DEFAUlT_NAME)
+                .email(DEFAULT_EMAIL)
+                .phone(DEFAULT_PHONE)
                 .gender(Gender.MALE)
                 .carId(DEFAULT_ID)
-                .rating(5.0);
+                .rating(DEFAULT_RATING);
     }
 
     public static DriverCreateEditDto.DriverCreateEditDtoBuilder getDriverCreateEditDtoBuilder() {
         return DriverCreateEditDto.builder()
-                .name("test")
-                .email("test@gmail.com")
-                .phone("+375297654321")
+                .name(DEFAUlT_NAME)
+                .email(DEFAULT_EMAIL)
+                .phone(DEFAULT_PHONE)
                 .gender(Gender.MALE)
                 .carId(DEFAULT_ID);
     }
@@ -72,11 +88,11 @@ public class DataUtil {
     public static Driver.DriverBuilder getDriverBuilder() {
         return Driver.builder()
                 .id(DEFAULT_ID)
-                .name("test")
-                .email("test@gmail.com")
-                .phone("+375297654321")
+                .name(DEFAUlT_NAME)
+                .email(DEFAULT_EMAIL)
+                .phone(DEFAULT_PHONE)
                 .gender(Gender.MALE)
-                .car(getCar().build())
-                .rating(5.0);
+                .car(getCarBuilder().build())
+                .rating(DEFAULT_RATING);
     }
 }
