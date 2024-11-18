@@ -4,6 +4,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.rating.client.RideClient;
+import org.example.rating.dto.read.RideReadDto;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -13,11 +14,11 @@ public class RideClientService {
     private final RideClient rideClient;
 
     @CircuitBreaker(name = "ride-client", fallbackMethod = "fallbackMethod")
-    public void checkExistingRide(Long rideId) {
-        rideClient.findById(rideId);
+    public RideReadDto checkExistingRide(Long rideId) {
+        return rideClient.findById(rideId);
     }
 
-    private void fallbackMethod(RuntimeException e) throws RuntimeException {
+    private RideReadDto fallbackMethod(RuntimeException e) throws RuntimeException {
         log.info(e.getMessage());
         throw e;
     }

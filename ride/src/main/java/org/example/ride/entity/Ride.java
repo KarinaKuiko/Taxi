@@ -11,6 +11,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.example.ride.entity.enumeration.DriverRideStatus;
+import org.example.ride.entity.enumeration.PassengerRideStatus;
 
 import java.math.BigDecimal;
 
@@ -33,6 +34,9 @@ public class Ride extends AuditingEntity {
 
     @Enumerated(EnumType.STRING)
     private DriverRideStatus driverRideStatus;
+
+    @Enumerated(EnumType.STRING)
+    private PassengerRideStatus passengerRideStatus;
 
     @Column(precision = 6, scale = 2)
     private BigDecimal cost;

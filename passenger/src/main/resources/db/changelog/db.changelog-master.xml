@@ -19,4 +19,10 @@
         <tagDatabase tag="v001"/>
     </changeSet>
 
+    <include file="v2/db.changelog-v.2.0.xml" relativeToChangelogFile="true"/>
+
+    <changeSet id="40" author="KarinaIhorevna@gmail.com">
+        <tagDatabase tag="v002"/>
+    </changeSet>
+
 </databaseChangeLog>

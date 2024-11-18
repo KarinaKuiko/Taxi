@@ -1,9 +1,13 @@
 package org.example.driver.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.driver.constants.AppConstants;
+import lombok.extern.slf4j.Slf4j;
+import org.example.driver.constants.CommonConstants;
+import org.example.driver.constants.ExceptionConstants;
 import org.example.driver.dto.create.DriverCreateEditDto;
 import org.example.driver.dto.read.DriverReadDto;
+import org.example.driver.dto.read.RideReadDto;
+import org.example.driver.dto.read.UserRateDto;
 import org.example.driver.entity.Car;
 import org.example.driver.entity.Driver;
 import org.example.driver.exception.car.CarNotFoundException;
@@ -16,14 +20,12 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DriverService {
     private final DriverRepository driverRepository;
     private final DriverMapper driverMapper;
@@ -35,7 +37,7 @@ public class DriverService {
         driverRepository.findByEmailAndIsDeletedFalse(driverDto.email())
                 .ifPresent(driver -> {
                     throw new DuplicatedDriverEmailException(messageSource.getMessage(
-                            AppConstants.DRIVER_DUPLICATED_EMAIL,
+                            ExceptionConstants.DRIVER_DUPLICATED_EMAIL,
                             new Object[]{driverDto.email()},
                             LocaleContextHolder.getLocale()));
                 });
@@ -44,11 +46,12 @@ public class DriverService {
 
         Car car = carRepository.findByIdAndIsDeletedFalse(driverDto.carId())
                 .orElseThrow(() -> new CarNotFoundException(messageSource.getMessage(
-                        AppConstants.CAR_NOT_FOUND,
+                        ExceptionConstants.CAR_NOT_FOUND,
                         new Object[]{driverDto.carId()},
                         LocaleContextHolder.getLocale())));
 
         driver.setCar(car);
+        driver.setRating(CommonConstants.DEFAULT_RATING);
 
         return driverMapper.toReadDto(driverRepository.save(driver));
 
@@ -62,7 +65,7 @@ public class DriverService {
                             .ifPresent(driverCheck -> {
                                 if (!driverCheck.getId().equals(id)) {
                                     throw new DuplicatedDriverEmailException(messageSource.getMessage(
-                                            AppConstants.DRIVER_DUPLICATED_EMAIL,
+                                            ExceptionConstants.DRIVER_DUPLICATED_EMAIL,
                                             new Object[]{driverDto.email()},
                                             LocaleContextHolder.getLocale()));
                                 }
@@ -70,7 +73,7 @@ public class DriverService {
                     driverMapper.map(driver, driverDto);
                     Car car = carRepository.findByIdAndIsDeletedFalse(driverDto.carId())
                             .orElseThrow(() -> new CarNotFoundException(messageSource.getMessage(
-                                    AppConstants.CAR_NOT_FOUND,
+                                    ExceptionConstants.CAR_NOT_FOUND,
                                     new Object[]{driverDto.carId()},
                                     LocaleContextHolder.getLocale())));
                     driver.setCar(car);
@@ -79,7 +82,7 @@ public class DriverService {
                 .map(driverRepository::save)
                 .map(driverMapper::toReadDto)
                 .orElseThrow(() -> new DriverNotFoundException(messageSource.getMessage(
-                        AppConstants.DRIVER_NOT_FOUND,
+                        ExceptionConstants.DRIVER_NOT_FOUND,
                         new Object[]{id},
                         LocaleContextHolder.getLocale())));
     }
@@ -94,7 +97,7 @@ public class DriverService {
                     return driver;
                 })
                 .orElseThrow(() -> new DriverNotFoundException(messageSource.getMessage(
-                        AppConstants.DRIVER_NOT_FOUND,
+                        ExceptionConstants.DRIVER_NOT_FOUND,
                         new Object[]{id},
                         LocaleContextHolder.getLocale())));
     }
@@ -115,8 +118,20 @@ public class DriverService {
         return driverRepository.findByIdAndIsDeletedFalse(id)
                 .map(driverMapper::toReadDto)
                 .orElseThrow(() -> new DriverNotFoundException(messageSource.getMessage(
-                        AppConstants.DRIVER_NOT_FOUND,
+                        ExceptionConstants.DRIVER_NOT_FOUND,
                         new Object[]{id},
                         LocaleContextHolder.getLocale())));
+    }
+
+    public void notifyDriver(RideReadDto rideReadDto) {
+        log.info(rideReadDto.toString());
+    }
+
+    @Transactional
+    public void updateRating(UserRateDto userRateDto) {
+        Driver driver = driverRepository.findById(userRateDto.userId()).get();
+        driver.setRating(userRateDto.averageRate());
+        log.info("Update rating to {}, driver's id {}", userRateDto.averageRate(), userRateDto.userId());
+        driverRepository.save(driver);
     }
 }

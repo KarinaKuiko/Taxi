@@ -1,0 +1,2 @@
+ALTER TABLE passengers
+ADD COLUMN rating NUMERIC(2, 1) NOT NULL;

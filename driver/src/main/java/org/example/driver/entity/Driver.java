@@ -33,4 +33,5 @@ public class Driver extends AuditingEntity {
     @ManyToOne
     private Car car;
 
+    private Double rating;
 }
