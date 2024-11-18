@@ -1,14 +1,16 @@
 package org.example.ride.dto.read;
 
+import lombok.Builder;
 import org.example.ride.entity.enumeration.DriverRideStatus;
 import org.example.ride.entity.enumeration.PassengerRideStatus;
 
 import java.math.BigDecimal;
 
+@Builder
 public record RideReadDto(
-        Long id,
+        long id,
         Long driverId,
-        Long passengerId,
+        long passengerId,
         String addressFrom,
         String addressTo,
         DriverRideStatus driverRideStatus,

@@ -1,13 +1,16 @@
 package org.example.driver.dto.read;
 
+import lombok.Builder;
+
 import java.util.List;
 
+@Builder
 public record CarReadDto(
-        Long id,
+        long id,
         String color,
         String brand,
         String number,
-        Integer year,
+        int year,
         List<DriverReadDto> drivers
 ) {
 }

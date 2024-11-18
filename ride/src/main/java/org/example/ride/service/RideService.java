@@ -81,8 +81,8 @@ public class RideService {
 
     @Transactional
     public RideReadDto create(RideCreateEditDto rideDto) {
-        driverClient.checkExistingDriver(rideDto.driverId());
-        passengerClient.checkExistingPassenger(rideDto.passengerId());
+        driverClient.getDriver(rideDto.driverId());
+        passengerClient.getPassenger(rideDto.passengerId());
 
         Ride ride = rideMapper.toRide(rideDto);
         ride.setDriverRideStatus(DriverRideStatus.CREATED);
@@ -96,8 +96,8 @@ public class RideService {
     public RideReadDto update(Long id, RideCreateEditDto rideDto) {
         return rideRepository.findById(id)
                 .map(ride -> {
-                    driverClient.checkExistingDriver(rideDto.driverId());
-                    passengerClient.checkExistingPassenger(rideDto.passengerId());
+                    driverClient.getDriver(rideDto.driverId());
+                    passengerClient.getPassenger(rideDto.passengerId());
                     rideMapper.map(ride, rideDto);
                     return ride;
                 })
@@ -120,10 +120,12 @@ public class RideService {
         DriverRideStatus driverRideStatus = driverRideStatusDto.rideStatus();
 
         rideStatusValidation.validateUpdatingDriverStatus(ride, driverRideStatus);
-        if(driverRideStatus == DriverRideStatus.ON_WAY_TO_DESTINATION) {
+        rideMapper.mapDriverStatus(ride, driverRideStatus);
+
+        if (driverRideStatus == DriverRideStatus.ON_WAY_TO_DESTINATION) {
             updatePassengerStatus(id, new PassengerRideStatusDto(PassengerRideStatus.IN_CAR));
         }
-        rideMapper.mapDriverStatus(ride, driverRideStatus);
+
         RideReadDto rideRead = rideMapper.toReadDto(rideRepository.save(ride));
         kafkaProducer.notifyPassenger(rideRead);
 
