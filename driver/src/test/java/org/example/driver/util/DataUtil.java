@@ -23,6 +23,7 @@ public class DataUtil {
     public static final Long DEFAULT_ID = 1L;
     public static final String CAR_ENTITY = "cars";
     public static final String DRIVER_ENTITY = "drivers";
+    public static final String MESSAGE = "message";
 
     //Car
     public static final String DEFAULT_COLOR = "red";

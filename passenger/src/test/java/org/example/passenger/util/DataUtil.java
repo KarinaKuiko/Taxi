@@ -15,6 +15,7 @@ public class DataUtil {
     public static final String LIMIT = "limit";
     public static final Integer PAGE_VALUE = 0;
     public static final Integer LIMIT_VALUE = 10;
+    public static final String MESSAGE = "message";
 
     //Passenger
     public static final String DEFAULT_NAME = "passenger";

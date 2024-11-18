@@ -1,9 +1,9 @@
 package org.example.rating.integration;
 
-import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.example.rating.dto.create.RateCreateEditDto;
 import org.example.rating.wireMock.RideWireMock;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +29,7 @@ import static org.example.rating.util.DataUtil.DRIVER_URL;
 import static org.example.rating.util.DataUtil.DRIVER_URL_WITH_ID;
 import static org.example.rating.util.DataUtil.LIMIT;
 import static org.example.rating.util.DataUtil.LIMIT_VALUE;
+import static org.example.rating.util.DataUtil.MESSAGE;
 import static org.example.rating.util.DataUtil.PAGE;
 import static org.example.rating.util.DataUtil.PAGE_VALUE;
 import static org.example.rating.util.DataUtil.PASSENGER_URL;
@@ -41,7 +42,6 @@ import static org.hamcrest.Matchers.notNullValue;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@WireMockTest
 @Sql(scripts = {"/setup_passenger_rate_table.sql", "/setup_driver_rate_table.sql"},
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class RatingControllerIntegrationTest {
@@ -73,6 +73,12 @@ public class RatingControllerIntegrationTest {
     static void setUp() {
         kafkaContainer.start();
         RideWireMock.wireMockServer.start();
+    }
+
+    @AfterAll
+    static void tearDown() {
+        kafkaContainer.stop();
+        RideWireMock.wireMockServer.stop();
     }
 
     @BeforeEach
@@ -123,7 +129,7 @@ public class RatingControllerIntegrationTest {
                 .get(DRIVER_URL_WITH_ID, "2")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Rate was not found"));
+                .body(MESSAGE, equalTo("Rate was not found"));
     }
 
     @Test
@@ -146,7 +152,7 @@ public class RatingControllerIntegrationTest {
                 .get(PASSENGER_URL_WITH_ID, "2")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Rate was not found"));
+                .body(MESSAGE, equalTo("Rate was not found"));
     }
 
     @Test
@@ -180,7 +186,7 @@ public class RatingControllerIntegrationTest {
                 .post(URL)
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Ride was not found"));
+                .body(MESSAGE, equalTo("Ride was not found"));
     }
 
     @Test
@@ -219,7 +225,7 @@ public class RatingControllerIntegrationTest {
                 .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Ride was not found"));
+                .body(MESSAGE, equalTo("Ride was not found"));
     }
 
     @Test
@@ -234,8 +240,6 @@ public class RatingControllerIntegrationTest {
                 .put(URL_WITH_ID, "2")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Rate was not found"));
+                .body(MESSAGE, equalTo("Rate was not found"));
     }
-
-
 }

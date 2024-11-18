@@ -4,6 +4,7 @@ import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.example.passenger.dto.create.PassengerCreateEditDto;
 import org.example.passenger.entity.Passenger;
 import org.example.passenger.repository.PassengerRepository;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,7 @@ import static org.example.passenger.util.DataUtil.DEFAULT_NAME;
 import static org.example.passenger.util.DataUtil.DEFAULT_PHONE;
 import static org.example.passenger.util.DataUtil.LIMIT;
 import static org.example.passenger.util.DataUtil.LIMIT_VALUE;
+import static org.example.passenger.util.DataUtil.MESSAGE;
 import static org.example.passenger.util.DataUtil.PAGE;
 import static org.example.passenger.util.DataUtil.PAGE_VALUE;
 import static org.example.passenger.util.DataUtil.URL;
@@ -75,6 +77,11 @@ public class PassengerControllerIntegrationTest {
         kafkaContainer.start();
     }
 
+    @AfterAll
+    static void tearDown() {
+        kafkaContainer.stop();
+    }
+
     @BeforeEach
     void init() {
         RestAssuredMockMvc.mockMvc(MockMvcBuilders.webAppContextSetup(webApplicationContext).build());
@@ -113,7 +120,7 @@ public class PassengerControllerIntegrationTest {
                 .get(URL_WITH_ID, "2")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Passenger was not found"));
+                .body(MESSAGE, equalTo("Passenger was not found"));
     }
 
     @Test
@@ -145,7 +152,7 @@ public class PassengerControllerIntegrationTest {
                 .post(URL)
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .body("message", equalTo("Passenger with this email already exists"));
+                .body(MESSAGE, equalTo("Passenger with this email already exists"));
     }
 
     @Test
@@ -189,7 +196,7 @@ public class PassengerControllerIntegrationTest {
                 .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .body("message", equalTo("Passenger with this email already exists"));
+                .body(MESSAGE, equalTo("Passenger with this email already exists"));
     }
 
     @Test
@@ -204,7 +211,7 @@ public class PassengerControllerIntegrationTest {
                 .put(URL_WITH_ID, "2")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Passenger was not found"));
+                .body(MESSAGE, equalTo("Passenger was not found"));
     }
 
     @Test
@@ -226,6 +233,6 @@ public class PassengerControllerIntegrationTest {
                 .delete(URL_WITH_ID,"2")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Passenger was not found"));
+                .body(MESSAGE, equalTo("Passenger was not found"));
     }
 }

@@ -4,24 +4,23 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.example.ride.util.DataUtil.CONTENT_TYPE;
 import static org.example.ride.util.DataUtil.DRIVER_URL;
 
-@Component
 public class DriverWireMock {
-
+    private static final int DRIVER_PORT = 8081;
     public static WireMockServer driverWireMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig()
-            .port(8081));
+            .port(DRIVER_PORT));
 
     public static void getDriver(){
         driverWireMockServer.stubFor(
                 get(urlEqualTo(DRIVER_URL + "/1"))
                         .willReturn(aResponse()
-                                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                                .withHeader(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                                 .withStatus(HttpStatus.OK.value())
                                 .withBody("""
                                         {
@@ -41,7 +40,7 @@ public class DriverWireMock {
         driverWireMockServer.stubFor(
                 get(urlEqualTo(DRIVER_URL + "/1"))
                         .willReturn(aResponse()
-                                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                                .withHeader(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                                 .withStatus(HttpStatus.NOT_FOUND.value())
                                 .withBody("{\"message\": \"Driver was not found\"}")));
     }

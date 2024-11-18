@@ -1,16 +1,14 @@
 package org.example.ride.integration;
 
-import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.example.ride.dto.create.DriverRideStatusDto;
 import org.example.ride.dto.create.PassengerRideStatusDto;
 import org.example.ride.dto.create.RideCreateEditDto;
-import org.example.ride.entity.Ride;
 import org.example.ride.entity.enumeration.DriverRideStatus;
 import org.example.ride.entity.enumeration.PassengerRideStatus;
-import org.example.ride.repository.RideRepository;
 import org.example.ride.wireMock.DriverWireMock;
 import org.example.ride.wireMock.PassengerWireMock;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,17 +31,16 @@ import static org.example.ride.util.DataUtil.DEFAULT_ADDRESS_FROM;
 import static org.example.ride.util.DataUtil.DEFAULT_ADDRESS_TO;
 import static org.example.ride.util.DataUtil.DEFAULT_ID;
 import static org.example.ride.util.DataUtil.DRIVER_STATUS;
+import static org.example.ride.util.DataUtil.MESSAGE;
 import static org.example.ride.util.DataUtil.PASSENGER_STATUS;
 import static org.example.ride.util.DataUtil.URL;
 import static org.example.ride.util.DataUtil.URL_WITH_ID;
-import static org.example.ride.util.DataUtil.getRideBuilder;
 import static org.example.ride.util.DataUtil.getRideCreateEditDtoBuilder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@WireMockTest
 @Sql(scripts = "/setup_ride_table.sql",
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class RideControllerIntegrationTest {
@@ -69,9 +66,6 @@ public class RideControllerIntegrationTest {
     }
 
     @Autowired
-    private RideRepository rideRepository;
-
-    @Autowired
     private WebApplicationContext webApplicationContext;
 
     @BeforeAll
@@ -79,6 +73,13 @@ public class RideControllerIntegrationTest {
         kafkaContainer.start();
         DriverWireMock.driverWireMockServer.start();
         PassengerWireMock.passengerWireMockServer.start();
+    }
+
+    @AfterAll
+    static void tearDown() {
+        kafkaContainer.stop();
+        DriverWireMock.driverWireMockServer.stop();
+        PassengerWireMock.passengerWireMockServer.stop();
     }
 
     @BeforeEach
@@ -93,7 +94,7 @@ public class RideControllerIntegrationTest {
                 .get(URL)
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .body("content.size()", equalTo(1));
+                .body("content.size()", equalTo(2));
     }
 
     @Test
@@ -114,10 +115,10 @@ public class RideControllerIntegrationTest {
     void findById_whenRideIsNotFound_thenReturn404() {
         RestAssuredMockMvc
                 .when()
-                .get(URL_WITH_ID, "2")
+                .get(URL_WITH_ID, "10")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Ride was not found"));
+                .body(MESSAGE, equalTo("Ride was not found"));
     }
 
     @Test
@@ -147,7 +148,7 @@ public class RideControllerIntegrationTest {
                 .put(URL_WITH_ID + DRIVER_STATUS, DEFAULT_ID.toString())
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .body("message", equalTo("Cannot be updated to the proposed status"));
+                .body(MESSAGE, equalTo("Cannot be updated to the proposed status"));
     }
 
     @Test
@@ -159,18 +160,14 @@ public class RideControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
-                .put(URL_WITH_ID + DRIVER_STATUS, "2")
+                .put(URL_WITH_ID + DRIVER_STATUS, "10")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Ride was not found"));
+                .body(MESSAGE, equalTo("Ride was not found"));
     }
 
     @Test
     void updatePassengerStatus_whenValidInput_thenReturn200AndRideReadDto() {
-        Ride defaultRide = getRideBuilder().build();
-        defaultRide.setDriverRideStatus(DriverRideStatus.WAITING);
-        rideRepository.save(defaultRide);
-
         PassengerRideStatusDto rideStatusDto = new PassengerRideStatusDto(PassengerRideStatus.GETTING_OUT);
 
         RestAssuredMockMvc
@@ -178,7 +175,7 @@ public class RideControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
-                .put(URL_WITH_ID + PASSENGER_STATUS, DEFAULT_ID.toString())
+                .put(URL_WITH_ID + PASSENGER_STATUS, "2")
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("passengerRideStatus", equalTo(PassengerRideStatus.GETTING_OUT.name()));
@@ -196,7 +193,7 @@ public class RideControllerIntegrationTest {
                 .put(URL_WITH_ID + PASSENGER_STATUS, DEFAULT_ID.toString())
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .body("message", equalTo("Status cannot be changed now"));
+                .body(MESSAGE, equalTo("Status cannot be changed now"));
     }
 
     @Test
@@ -208,10 +205,10 @@ public class RideControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
-                .put(URL_WITH_ID + PASSENGER_STATUS, "2")
+                .put(URL_WITH_ID + PASSENGER_STATUS, "10")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Ride was not found"));
+                .body(MESSAGE, equalTo("Ride was not found"));
     }
 
     @Test
@@ -248,7 +245,7 @@ public class RideControllerIntegrationTest {
                 .post(URL)
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Driver was not found"));
+                .body(MESSAGE, equalTo("Driver was not found"));
     }
 
     @Test
@@ -266,7 +263,7 @@ public class RideControllerIntegrationTest {
                 .post(URL)
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Passenger was not found"));
+                .body(MESSAGE, equalTo("Passenger was not found"));
     }
 
     @Test
@@ -312,7 +309,7 @@ public class RideControllerIntegrationTest {
                 .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Driver was not found"));
+                .body(MESSAGE, equalTo("Driver was not found"));
     }
 
     @Test
@@ -333,7 +330,7 @@ public class RideControllerIntegrationTest {
                 .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Passenger was not found"));
+                .body(MESSAGE, equalTo("Passenger was not found"));
     }
 
     @Test
@@ -345,9 +342,9 @@ public class RideControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateRide)
                 .when()
-                .put(URL_WITH_ID, "2")
+                .put(URL_WITH_ID, "10")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Ride was not found"));
+                .body(MESSAGE, equalTo("Ride was not found"));
     }
 }

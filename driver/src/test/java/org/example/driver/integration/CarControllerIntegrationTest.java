@@ -2,8 +2,8 @@ package org.example.driver.integration;
 
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.example.driver.dto.create.CarCreateEditDto;
-import org.example.driver.entity.Car;
 import org.example.driver.repository.CarRepository;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,11 +31,11 @@ import static org.example.driver.util.DataUtil.DEFAULT_NUMBER;
 import static org.example.driver.util.DataUtil.DEFAULT_YEAR;
 import static org.example.driver.util.DataUtil.LIMIT;
 import static org.example.driver.util.DataUtil.LIMIT_VALUE;
+import static org.example.driver.util.DataUtil.MESSAGE;
 import static org.example.driver.util.DataUtil.PAGE;
 import static org.example.driver.util.DataUtil.PAGE_VALUE;
 import static org.example.driver.util.DataUtil.URL;
 import static org.example.driver.util.DataUtil.URL_WITH_ID;
-import static org.example.driver.util.DataUtil.getCarBuilder;
 import static org.example.driver.util.DataUtil.getCarCreateEditDtoBuilder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -77,6 +77,11 @@ public class CarControllerIntegrationTest {
         kafkaContainer.start();
     }
 
+    @AfterAll
+    static void tearDown() {
+        kafkaContainer.stop();
+    }
+
     @BeforeEach
     void init() {
         RestAssuredMockMvc.mockMvc(MockMvcBuilders.webAppContextSetup(webApplicationContext).build());
@@ -92,7 +97,7 @@ public class CarControllerIntegrationTest {
                 .get(URL, CAR_ENTITY)
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .body("content.size()", equalTo(1));
+                .body("content.size()", equalTo(2));
     }
 
     @Test
@@ -116,13 +121,13 @@ public class CarControllerIntegrationTest {
                 .get(URL_WITH_ID, CAR_ENTITY, "10")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Car was not found"));
+                .body(MESSAGE, equalTo("Car was not found"));
     }
 
     @Test
     void create_whenValidInput_thenReturn200AndCarReadDto() {
         CarCreateEditDto createCar = getCarCreateEditDtoBuilder()
-                                        .number("LK124AS")
+                                        .number("LK124AD")
                                         .build();
 
         RestAssuredMockMvc
@@ -148,7 +153,7 @@ public class CarControllerIntegrationTest {
                 .post(URL, CAR_ENTITY)
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .body("message", equalTo("Car with this number already exists"));
+                .body(MESSAGE, equalTo("Car with this number already exists"));
     }
 
     @Test
@@ -175,12 +180,6 @@ public class CarControllerIntegrationTest {
 
     @Test
     void update_whenCarNumberIsDuplicatedAndDifferentIds_thenThrowDuplicatedCarNumberException() {
-        Car createCar = getCarBuilder()
-                        .id(2L)
-                        .number("LK124AS")
-                        .build();
-        carRepository.save(createCar);
-
         CarCreateEditDto updateCar = getCarCreateEditDtoBuilder()
                                     .color("yellow")
                                     .number("LK124AS")
@@ -195,7 +194,7 @@ public class CarControllerIntegrationTest {
                 .put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID.toString())
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .body("message", equalTo("Car with this number already exists"));
+                .body(MESSAGE, equalTo("Car with this number already exists"));
     }
 
     @Test
@@ -207,7 +206,7 @@ public class CarControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateCar)
                 .when()
-                .put(URL_WITH_ID, CAR_ENTITY, "2")
+                .put(URL_WITH_ID, CAR_ENTITY, "10")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .body("message", equalTo("Car was not found"));
@@ -221,7 +220,7 @@ public class CarControllerIntegrationTest {
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
-        assertThat(0, equalTo(carRepository.findByIsDeletedFalse(
+        assertThat(1, equalTo(carRepository.findByIsDeletedFalse(
                 PageRequest.of(PAGE_VALUE, LIMIT_VALUE)).getNumberOfElements()));
     }
 
@@ -229,9 +228,9 @@ public class CarControllerIntegrationTest {
     void safeDelete_whenCarIsNotFound_thenReturn404() {
         RestAssuredMockMvc
                 .when()
-                .delete(URL_WITH_ID, CAR_ENTITY, "2")
+                .delete(URL_WITH_ID, CAR_ENTITY, "10")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Car was not found"));
+                .body(MESSAGE, equalTo("Car was not found"));
     }
 }

@@ -25,6 +25,8 @@ public class DataUtil {
     public static final Integer LIMIT_VALUE = 10;
     public static final String DRIVER_URL = "/api/v1/drivers";
     public static final String PASSENGER_URL = "/api/v1/passengers";
+    public static final String CONTENT_TYPE = "Content-Type";
+    public static final String MESSAGE = "message";
 
     //Ride
     public static final String DEFAULT_ADDRESS_FROM = "from";

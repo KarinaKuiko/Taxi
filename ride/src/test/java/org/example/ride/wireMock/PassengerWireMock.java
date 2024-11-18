@@ -9,19 +9,19 @@ import org.springframework.stereotype.Component;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.example.ride.util.DataUtil.CONTENT_TYPE;
 import static org.example.ride.util.DataUtil.PASSENGER_URL;
 
-@Component
 public class PassengerWireMock {
-
+    private static final int PASSENGER_PORT = 8082;
     public static WireMockServer passengerWireMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig()
-            .port(8082));
+            .port(PASSENGER_PORT));
 
     public static void getPassenger() {
         passengerWireMockServer.stubFor(
                 get(urlEqualTo(PASSENGER_URL + "/1"))
                         .willReturn(aResponse()
-                                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                                .withHeader(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                                 .withStatus(HttpStatus.OK.value())
                                 .withBody("""
                                         {
@@ -40,7 +40,7 @@ public class PassengerWireMock {
         passengerWireMockServer.stubFor(
                 get(urlEqualTo(PASSENGER_URL + "/1"))
                         .willReturn(aResponse()
-                                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                                .withHeader(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                                 .withStatus(HttpStatus.NOT_FOUND.value())
                                 .withBody("{\"message\": \"Passenger was not found\"}")));
     }

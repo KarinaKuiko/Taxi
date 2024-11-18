@@ -25,6 +25,8 @@ public class DataUtil {
     public static final Integer PAGE_VALUE = 0;
     public static final Integer LIMIT_VALUE = 10;
     public static final String RIDE_URL = "/api/v1/rides";
+    public static final String CONTENT_TYPE = "Content-Type";
+    public static final String MESSAGE = "message";
 
     //Rate
     public static final int DEFAULT_RATE = 4;

@@ -8,18 +8,19 @@ import org.springframework.http.MediaType;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.example.rating.util.DataUtil.CONTENT_TYPE;
 import static org.example.rating.util.DataUtil.RIDE_URL;
 
 public class RideWireMock {
-
+    private static final int RIDE_PORT = 8083;
     public static WireMockServer wireMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig()
-                .port(8083));
+                .port(RIDE_PORT));
 
     public static void getRide() {
         wireMockServer.stubFor(
                 get(urlEqualTo(RIDE_URL + "/1"))
                         .willReturn(aResponse()
-                                .withHeader("Content-Type", "application/json")
+                                .withHeader(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                                 .withStatus(HttpStatus.OK.value())
                                 .withBody("""
                                         {
@@ -39,7 +40,7 @@ public class RideWireMock {
         wireMockServer.stubFor(
                 get(urlEqualTo(RIDE_URL + "/1"))
                         .willReturn(aResponse()
-                                .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                                .withHeader(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                                 .withStatus(HttpStatus.NOT_FOUND.value())
                                 .withBody("{\"message\": \"Ride was not found\"}")));
 

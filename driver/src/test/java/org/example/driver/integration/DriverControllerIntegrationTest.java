@@ -2,9 +2,9 @@ package org.example.driver.integration;
 
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.example.driver.dto.create.DriverCreateEditDto;
-import org.example.driver.entity.Driver;
 import org.example.driver.entity.enumeration.Gender;
 import org.example.driver.repository.DriverRepository;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,11 +31,11 @@ import static org.example.driver.util.DataUtil.DEFAUlT_NAME;
 import static org.example.driver.util.DataUtil.DRIVER_ENTITY;
 import static org.example.driver.util.DataUtil.LIMIT;
 import static org.example.driver.util.DataUtil.LIMIT_VALUE;
+import static org.example.driver.util.DataUtil.MESSAGE;
 import static org.example.driver.util.DataUtil.PAGE;
 import static org.example.driver.util.DataUtil.PAGE_VALUE;
 import static org.example.driver.util.DataUtil.URL;
 import static org.example.driver.util.DataUtil.URL_WITH_ID;
-import static org.example.driver.util.DataUtil.getDriverBuilder;
 import static org.example.driver.util.DataUtil.getDriverCreateEditDtoBuilder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -77,6 +77,11 @@ public class DriverControllerIntegrationTest {
         kafkaContainer.start();
     }
 
+    @AfterAll
+    static void tearDown() {
+        kafkaContainer.stop();
+    }
+
     @BeforeEach
     void init() {
         RestAssuredMockMvc.mockMvc(MockMvcBuilders.webAppContextSetup(webApplicationContext).build());
@@ -92,7 +97,7 @@ public class DriverControllerIntegrationTest {
                 .get(URL, DRIVER_ENTITY)
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .body("content.size()", equalTo(1));
+                .body("content.size()", equalTo(2));
     }
 
     @Test
@@ -114,17 +119,17 @@ public class DriverControllerIntegrationTest {
     void findById_whenDriverIsNotFound_thenReturn404() {
         RestAssuredMockMvc
                 .when()
-                .get(URL_WITH_ID, DRIVER_ENTITY, "2")
+                .get(URL_WITH_ID, DRIVER_ENTITY, "10")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Driver was not found"));
+                .body(MESSAGE, equalTo("Driver was not found"));
     }
 
     @Test
     void create_whenValidInput_thenReturn201AndDriverReadDto() {
         DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
                 .name("name")
-                .email("name@gmail.com")
+                .email("driver@gmail.com")
                 .phone("+375291122334")
                 .gender(Gender.MALE)
                 .carId(DEFAULT_ID)
@@ -153,14 +158,14 @@ public class DriverControllerIntegrationTest {
                 .post(URL, DRIVER_ENTITY)
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .body("message", equalTo("Driver with this email already exists"));
+                .body(MESSAGE, equalTo("Driver with this email already exists"));
     }
 
     @Test
     void create_whenCarIdNotFound_thenReturn404() {
         DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
-                .email("name@gmail.com")
-                .carId(2L)
+                .email("driver@gmail.com")
+                .carId(10L)
                 .build();
 
         RestAssuredMockMvc
@@ -171,7 +176,7 @@ public class DriverControllerIntegrationTest {
                 .post(URL, DRIVER_ENTITY)
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Car was not found"));
+                .body(MESSAGE, equalTo("Car was not found"));
     }
 
     @Test
@@ -206,20 +211,14 @@ public class DriverControllerIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateDriver)
                 .when()
-                .put(URL_WITH_ID, DRIVER_ENTITY, "2")
+                .put(URL_WITH_ID, DRIVER_ENTITY, "10")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Driver was not found"));
+                .body(MESSAGE, equalTo("Driver was not found"));
     }
 
     @Test
     void update_whenEmailIsDuplicated_thenReturn409() {
-        Driver createDriver = getDriverBuilder()
-                .id(2L)
-                .email("name@gmail.com")
-                .build();
-        driverRepository.save(createDriver);
-
         DriverCreateEditDto updateDriver = getDriverCreateEditDtoBuilder()
                 .name("testing")
                 .email("name@gmail.com")
@@ -233,13 +232,13 @@ public class DriverControllerIntegrationTest {
                 .put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID.toString())
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .body("message", equalTo("Driver with this email already exists"));
+                .body(MESSAGE, equalTo("Driver with this email already exists"));
     }
 
     @Test
     void update_whenCarIsNotFound_thenReturn404() {
         DriverCreateEditDto updateDriver = getDriverCreateEditDtoBuilder()
-                .carId(2L)
+                .carId(10L)
                 .build();
 
         RestAssuredMockMvc
@@ -250,7 +249,7 @@ public class DriverControllerIntegrationTest {
                 .put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID.toString())
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Car was not found"));
+                .body(MESSAGE, equalTo("Car was not found"));
     }
 
     @Test
@@ -261,7 +260,7 @@ public class DriverControllerIntegrationTest {
                 .then()
                 .statusCode(HttpStatus.NO_CONTENT.value());
 
-        assertThat(0, equalTo(driverRepository.findByIsDeletedFalse(
+        assertThat(1, equalTo(driverRepository.findByIsDeletedFalse(
                 PageRequest.of(PAGE_VALUE, LIMIT_VALUE)).getNumberOfElements()));
     }
 
@@ -269,9 +268,9 @@ public class DriverControllerIntegrationTest {
     void safeDelete_whenDriverIsNotFound_thenReturn404() {
         RestAssuredMockMvc
                 .when()
-                .delete(URL_WITH_ID, DRIVER_ENTITY, "2")
+                .delete(URL_WITH_ID, DRIVER_ENTITY, "10")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Driver was not found"));
+                .body(MESSAGE, equalTo("Driver was not found"));
     }
 }
