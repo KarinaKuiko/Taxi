@@ -1,7 +1,7 @@
 package org.example.rating.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.example.rating.constants.AppConstants;
+import org.example.rating.constants.ExceptionConstants;
 import org.example.rating.dto.create.RateCreateEditDto;
 import org.example.rating.dto.read.RateReadDto;
 import org.example.rating.dto.read.RideReadDto;
@@ -46,7 +46,7 @@ public class PassengerRateService implements RateService {
         return passengerRateRepository.findById(id)
                 .map(rateMapper::toReadDto)
                 .orElseThrow(() -> new RateNotFoundException(messageSource.getMessage(
-                        AppConstants.RATE_NOT_FOUND,
+                        ExceptionConstants.RATE_NOT_FOUND,
                         new Object[]{id},
                         LocaleContextHolder.getLocale()
                 )));
@@ -56,7 +56,7 @@ public class PassengerRateService implements RateService {
     @Transactional
     public RateReadDto create(RateCreateEditDto rateDto) {
         PassengerRate rate = rateMapper.toPassengerRate(rateDto);
-        RideReadDto rideReadDto = rideClient.checkExistingRide(rate.getRideId());
+        RideReadDto rideReadDto = rideClient.getRide(rate.getRideId());
         rate = passengerRateRepository.save(rate);
         updateAverageRating(rideReadDto.passengerId());
         return rateMapper.toReadDto(rate);
@@ -67,7 +67,7 @@ public class PassengerRateService implements RateService {
     public RateReadDto update(Long id, RateCreateEditDto rateDto) {
         return passengerRateRepository.findById(id)
                 .map(rate -> {
-                    RideReadDto rideReadDto = rideClient.checkExistingRide(rateDto.rideId());
+                    RideReadDto rideReadDto = rideClient.getRide(rateDto.rideId());
                     rateMapper.map(rate, rateDto);
                     passengerRateRepository.save(rate);
                     updateAverageRating(rideReadDto.passengerId());
@@ -75,7 +75,7 @@ public class PassengerRateService implements RateService {
                 })
                 .map(rateMapper::toReadDto)
                 .orElseThrow(() -> new RateNotFoundException(messageSource.getMessage(
-                        AppConstants.RATE_NOT_FOUND,
+                        ExceptionConstants.RATE_NOT_FOUND,
                         new Object[]{id},
                         LocaleContextHolder.getLocale())));
     }

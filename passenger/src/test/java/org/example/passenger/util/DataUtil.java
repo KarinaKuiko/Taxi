@@ -17,6 +17,7 @@ public class DataUtil {
     public static final Integer LIMIT_VALUE = 10;
     public static final String MESSAGE = "message";
 
+
     //Passenger
     public static final String DEFAULT_NAME = "passenger";
     public static final String DEFAULT_EMAIL = "passenger@gmail.com";

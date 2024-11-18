@@ -11,6 +11,7 @@ import org.example.rating.entity.enumeration.UserType;
 import org.example.rating.service.impl.DriverRateService;
 import org.example.rating.service.impl.PassengerRateService;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/rates")
 @RequiredArgsConstructor
+@Validated
 public class RateController {
     public final DriverRateService driverRateService;
     public final PassengerRateService passengerRateService;

@@ -97,3 +97,4 @@ public class DataUtil {
                 .rating(DEFAULT_RATING);
     }
 }
+

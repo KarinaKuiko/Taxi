@@ -93,7 +93,6 @@ public class CarService {
         Pageable request = PageRequest.of(page, limit);
         return carRepository.findByIsDeletedFalse(request)
                 .map(carMapper::toReadDto);
-
     }
 
     public Page<CarReadDto> findAllWithDeleted(Integer page, Integer limit) {

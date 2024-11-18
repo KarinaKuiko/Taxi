@@ -102,3 +102,4 @@ public class DataUtil {
                 .userType(UserType.DRIVER);
     }
 }
+
