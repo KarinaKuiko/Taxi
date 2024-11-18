@@ -13,13 +13,8 @@ import org.springframework.stereotype.Service;
 public class RideClientService {
     private final RideClient rideClient;
 
-    @CircuitBreaker(name = "ride-client", fallbackMethod = "fallbackMethod")
-    public RideReadDto checkExistingRide(Long rideId) {
+    @CircuitBreaker(name = "ride-client")
+    public RideReadDto getRide(Long rideId) {
         return rideClient.findById(rideId);
-    }
-
-    private RideReadDto fallbackMethod(RuntimeException e) throws RuntimeException {
-        log.info(e.getMessage());
-        throw e;
     }
 }

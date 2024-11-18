@@ -5,8 +5,10 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.Builder;
 import org.example.driver.constants.ExceptionConstants;
 
+@Builder
 public record CarCreateEditDto(
         @NotBlank(message = "{color.blank}")
         String color,

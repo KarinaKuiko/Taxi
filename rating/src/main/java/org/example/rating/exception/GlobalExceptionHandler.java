@@ -1,7 +1,7 @@
 package org.example.rating.exception;
 
 import jakarta.validation.ConstraintViolationException;
-import org.example.rating.constants.AppConstants;
+import org.example.rating.constants.ExceptionConstants;
 import org.example.rating.dto.read.ExceptionDto;
 import org.example.rating.dto.read.ValidationResponse;
 import org.example.rating.exception.rate.RateNotFoundException;
@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionDto handleRuntimeException(RuntimeException exception) {
-        return new ExceptionDto(HttpStatus.INTERNAL_SERVER_ERROR, AppConstants.INTERNAL_SERVER_ERROR, LocalDateTime.now());
+        return new ExceptionDto(HttpStatus.INTERNAL_SERVER_ERROR, ExceptionConstants.INTERNAL_SERVER_ERROR, LocalDateTime.now());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

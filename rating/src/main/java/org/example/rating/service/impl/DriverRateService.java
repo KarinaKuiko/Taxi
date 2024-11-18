@@ -1,7 +1,7 @@
 package org.example.rating.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.example.rating.constants.AppConstants;
+import org.example.rating.constants.ExceptionConstants;
 import org.example.rating.dto.create.RateCreateEditDto;
 import org.example.rating.dto.read.RateReadDto;
 import org.example.rating.dto.read.RideReadDto;
@@ -27,10 +27,10 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class DriverRateService implements RateService {
-    public final DriverRateRepository driverRateRepository;
-    public final RateMapper rateMapper;
-    public final MessageSource messageSource;
-    public final RideClientService rideClient;
+    private final DriverRateRepository driverRateRepository;
+    private final RateMapper rateMapper;
+    private final MessageSource messageSource;
+    private final RideClientService rideClient;
     private final RateCounterService rateCounterService;
     private final KafkaProducer kafkaProducer;
 
@@ -46,7 +46,7 @@ public class DriverRateService implements RateService {
         return driverRateRepository.findById(id)
                 .map(rateMapper::toReadDto)
                 .orElseThrow(() -> new RateNotFoundException(messageSource.getMessage(
-                        AppConstants.RATE_NOT_FOUND,
+                        ExceptionConstants.RATE_NOT_FOUND,
                         new Object[]{id},
                         LocaleContextHolder.getLocale()
                 )));
@@ -55,8 +55,8 @@ public class DriverRateService implements RateService {
     @Override
     @Transactional
     public RateReadDto create(RateCreateEditDto rateDto) {
-        DriverRate rate = rateMapper.toDriverRate(rateDto); //TODO: fill field userId
-        RideReadDto rideReadDto = rideClient.checkExistingRide(rate.getRideId());
+        DriverRate rate = rateMapper.toDriverRate(rateDto);
+        RideReadDto rideReadDto = rideClient.getRide(rate.getRideId());
         rate = driverRateRepository.save(rate);
         updateAverageRating(rideReadDto.driverId());
         return rateMapper.toReadDto(rate);
@@ -67,7 +67,7 @@ public class DriverRateService implements RateService {
     public RateReadDto update(Long id, RateCreateEditDto rateDto) {
         return driverRateRepository.findById(id)
                 .map(rate -> {
-                    RideReadDto rideReadDto = rideClient.checkExistingRide(rateDto.rideId());
+                    RideReadDto rideReadDto = rideClient.getRide(rateDto.rideId());
                     rateMapper.map(rate, rateDto);
                     driverRateRepository.save(rate);
                     updateAverageRating(rideReadDto.driverId());
@@ -75,7 +75,7 @@ public class DriverRateService implements RateService {
                 })
                 .map(rateMapper::toReadDto)
                 .orElseThrow(() -> new RateNotFoundException(messageSource.getMessage(
-                        AppConstants.RATE_NOT_FOUND,
+                        ExceptionConstants.RATE_NOT_FOUND,
                         new Object[]{id},
                         LocaleContextHolder.getLocale())));
     }

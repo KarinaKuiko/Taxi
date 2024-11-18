@@ -3,7 +3,9 @@ package org.example.ride.dto.create;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
+@Builder
 public record RideCreateEditDto(
 
         @Min(value = 1, message = "{id.min}")
@@ -16,7 +18,7 @@ public record RideCreateEditDto(
         @NotBlank(message = "{address.from.blank}")
         String addressFrom,
 
-        @NotBlank(message = "{address.from.blank}")
+        @NotBlank(message = "{address.to.blank}")
         String addressTo
 ) {
 }
