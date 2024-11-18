@@ -5,9 +5,9 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "ride", url = "http://localhost:8083/api/v1/rides")
+@FeignClient(name = "ride")
 public interface RideClient {
 
-    @GetMapping("/{id}")
+    @GetMapping("/api/v1/rides/{id}")
     RideReadDto findById(@PathVariable("id") Long id);
 }
