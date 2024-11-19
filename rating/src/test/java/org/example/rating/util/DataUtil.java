@@ -24,6 +24,14 @@ public class DataUtil {
     public static final String LIMIT = "limit";
     public static final Integer PAGE_VALUE = 0;
     public static final Integer LIMIT_VALUE = 10;
+    public static final String RIDE_URL = "/api/v1/rides";
+    public static final String CONTENT_TYPE = "Content-Type";
+    public static final String MESSAGE = "message";
+
+    //Exception
+    public static final String RATE_NOT_FOUND_EXCEPTION_MESSAGE = "Rate was not found";
+    public static final String RIDE_NOT_FOUND_EXCEPTION_MESSAGE = "Ride was not found";
+
 
     //Rate
     public static final int DEFAULT_RATE = 4;
@@ -99,3 +107,4 @@ public class DataUtil {
                 .userType(UserType.DRIVER);
     }
 }
+

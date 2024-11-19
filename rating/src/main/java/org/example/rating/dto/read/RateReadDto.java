@@ -8,8 +8,8 @@ public record RateReadDto(
         long id,
         long rideId,
         String comment,
-        Integer rating,
-        long userId,
+        int rating,
+        Long userId,
         UserType userType
 ) {
 }

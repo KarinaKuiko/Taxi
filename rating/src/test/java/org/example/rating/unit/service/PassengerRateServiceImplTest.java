@@ -174,7 +174,7 @@ class PassengerRateServiceImplTest {
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.RATE_NOT_FOUND);
         verify(passengerRateRepository).findById(DEFAULT_ID);
         verify(rideClient, never()).getRide(any());
-        verify(rateMapper, never()).map(any(), any());
+        verify(rateMapper, never()).map(any(PassengerRate.class), any());
         verify(passengerRateRepository, never()).save(any());
         verify(rateMapper, never()).toReadDto(any(DriverRate.class));
         verify(messageSource).getMessage(
