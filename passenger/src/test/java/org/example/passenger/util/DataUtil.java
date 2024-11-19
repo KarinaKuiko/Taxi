@@ -17,6 +17,10 @@ public class DataUtil {
     public static final Integer LIMIT_VALUE = 10;
     public static final String MESSAGE = "message";
 
+    //Exception
+    public static final String PASSENGER_NOT_FOUND_EXCEPTION_MESSAGE = "Passenger was not found";
+    public static final String PASSENGER_DUPlICATED_EMAIL_MESSAGE = "Passenger with this email already exists";
+
 
     //Passenger
     public static final String DEFAULT_NAME = "passenger";

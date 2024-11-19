@@ -1,4 +1,4 @@
-package org.example.ride.wireMock;
+package org.example.ride.wiremock;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;

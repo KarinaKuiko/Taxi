@@ -28,6 +28,15 @@ public class DataUtil {
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String MESSAGE = "message";
 
+    //Exception
+    public static final String RIDE_NOT_FOUND_EXCEPTION_MESSAGE = "Ride was not found";
+    public static final String DRIVER_NOT_FOUND_EXCEPTION_MESSAGE = "Driver was not found";
+    public static final String PASSENGER_NOT_FOUND_EXCEPTION_MESSAGE = "Passenger was not found";
+    public static final String INVALID_PROPOSED_STATUS_MESSAGE = "Cannot be updated to the proposed status";
+    public static final String IRRELEVANT_DRIVER_STATUS = "Status cannot be changed now";
+
+
+
     //Ride
     public static final String DEFAULT_ADDRESS_FROM = "from";
     public static final String DEFAULT_ADDRESS_TO = "to";

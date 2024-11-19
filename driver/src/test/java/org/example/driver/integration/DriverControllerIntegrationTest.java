@@ -24,11 +24,14 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import static org.example.driver.util.DataUtil.CAR_NOT_FOUND;
 import static org.example.driver.util.DataUtil.DEFAULT_EMAIL;
 import static org.example.driver.util.DataUtil.DEFAULT_ID;
 import static org.example.driver.util.DataUtil.DEFAULT_PHONE;
 import static org.example.driver.util.DataUtil.DEFAUlT_NAME;
+import static org.example.driver.util.DataUtil.DRIVER_DUPLICATED_EMAIL;
 import static org.example.driver.util.DataUtil.DRIVER_ENTITY;
+import static org.example.driver.util.DataUtil.DRIVER_NOT_FOUND;
 import static org.example.driver.util.DataUtil.LIMIT;
 import static org.example.driver.util.DataUtil.LIMIT_VALUE;
 import static org.example.driver.util.DataUtil.MESSAGE;
@@ -43,7 +46,7 @@ import static org.hamcrest.Matchers.notNullValue;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(scripts = {"/setup_car_table.sql", "/setup_driver_table.sql"},
+@Sql(scripts = {"/sql/setup_car_table.sql", "/sql/setup_driver_table.sql"},
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class DriverControllerIntegrationTest {
     @Container
@@ -122,7 +125,7 @@ public class DriverControllerIntegrationTest {
                 .get(URL_WITH_ID, DRIVER_ENTITY, "10")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body(MESSAGE, equalTo("Driver was not found"));
+                .body(MESSAGE, equalTo(DRIVER_NOT_FOUND));
     }
 
     @Test
@@ -158,7 +161,7 @@ public class DriverControllerIntegrationTest {
                 .post(URL, DRIVER_ENTITY)
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .body(MESSAGE, equalTo("Driver with this email already exists"));
+                .body(MESSAGE, equalTo(DRIVER_DUPLICATED_EMAIL));
     }
 
     @Test
@@ -176,7 +179,7 @@ public class DriverControllerIntegrationTest {
                 .post(URL, DRIVER_ENTITY)
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body(MESSAGE, equalTo("Car was not found"));
+                .body(MESSAGE, equalTo(CAR_NOT_FOUND));
     }
 
     @Test
@@ -214,7 +217,7 @@ public class DriverControllerIntegrationTest {
                 .put(URL_WITH_ID, DRIVER_ENTITY, "10")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body(MESSAGE, equalTo("Driver was not found"));
+                .body(MESSAGE, equalTo(DRIVER_NOT_FOUND));
     }
 
     @Test
@@ -232,7 +235,7 @@ public class DriverControllerIntegrationTest {
                 .put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID.toString())
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .body(MESSAGE, equalTo("Driver with this email already exists"));
+                .body(MESSAGE, equalTo(DRIVER_DUPLICATED_EMAIL));
     }
 
     @Test
@@ -249,7 +252,7 @@ public class DriverControllerIntegrationTest {
                 .put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID.toString())
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body(MESSAGE, equalTo("Car was not found"));
+                .body(MESSAGE, equalTo(CAR_NOT_FOUND));
     }
 
     @Test
@@ -271,6 +274,6 @@ public class DriverControllerIntegrationTest {
                 .delete(URL_WITH_ID, DRIVER_ENTITY, "10")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body(MESSAGE, equalTo("Driver was not found"));
+                .body(MESSAGE, equalTo(DRIVER_NOT_FOUND));
     }
 }

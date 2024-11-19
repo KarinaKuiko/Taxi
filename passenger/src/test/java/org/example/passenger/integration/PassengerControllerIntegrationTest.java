@@ -33,6 +33,8 @@ import static org.example.passenger.util.DataUtil.LIMIT_VALUE;
 import static org.example.passenger.util.DataUtil.MESSAGE;
 import static org.example.passenger.util.DataUtil.PAGE;
 import static org.example.passenger.util.DataUtil.PAGE_VALUE;
+import static org.example.passenger.util.DataUtil.PASSENGER_DUPlICATED_EMAIL_MESSAGE;
+import static org.example.passenger.util.DataUtil.PASSENGER_NOT_FOUND_EXCEPTION_MESSAGE;
 import static org.example.passenger.util.DataUtil.URL;
 import static org.example.passenger.util.DataUtil.URL_WITH_ID;
 import static org.example.passenger.util.DataUtil.getPassengerBuilder;
@@ -43,7 +45,7 @@ import static org.hamcrest.Matchers.notNullValue;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(scripts = "/setup_passenger_table.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = "/sql/setup_passenger_table.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class PassengerControllerIntegrationTest {
 
     @Container
@@ -120,7 +122,7 @@ public class PassengerControllerIntegrationTest {
                 .get(URL_WITH_ID, "2")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body(MESSAGE, equalTo("Passenger was not found"));
+                .body(MESSAGE, equalTo(PASSENGER_NOT_FOUND_EXCEPTION_MESSAGE));
     }
 
     @Test
@@ -152,7 +154,7 @@ public class PassengerControllerIntegrationTest {
                 .post(URL)
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .body(MESSAGE, equalTo("Passenger with this email already exists"));
+                .body(MESSAGE, equalTo(PASSENGER_DUPlICATED_EMAIL_MESSAGE));
     }
 
     @Test
@@ -196,7 +198,7 @@ public class PassengerControllerIntegrationTest {
                 .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .body(MESSAGE, equalTo("Passenger with this email already exists"));
+                .body(MESSAGE, equalTo(PASSENGER_DUPlICATED_EMAIL_MESSAGE));
     }
 
     @Test
@@ -211,7 +213,7 @@ public class PassengerControllerIntegrationTest {
                 .put(URL_WITH_ID, "2")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body(MESSAGE, equalTo("Passenger was not found"));
+                .body(MESSAGE, equalTo(PASSENGER_NOT_FOUND_EXCEPTION_MESSAGE));
     }
 
     @Test
@@ -233,6 +235,6 @@ public class PassengerControllerIntegrationTest {
                 .delete(URL_WITH_ID,"2")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body(MESSAGE, equalTo("Passenger was not found"));
+                .body(MESSAGE, equalTo(PASSENGER_NOT_FOUND_EXCEPTION_MESSAGE));
     }
 }

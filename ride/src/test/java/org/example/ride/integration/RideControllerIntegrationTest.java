@@ -6,8 +6,8 @@ import org.example.ride.dto.create.PassengerRideStatusDto;
 import org.example.ride.dto.create.RideCreateEditDto;
 import org.example.ride.entity.enumeration.DriverRideStatus;
 import org.example.ride.entity.enumeration.PassengerRideStatus;
-import org.example.ride.wireMock.DriverWireMock;
-import org.example.ride.wireMock.PassengerWireMock;
+import org.example.ride.wiremock.DriverWireMock;
+import org.example.ride.wiremock.PassengerWireMock;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,9 +30,14 @@ import org.testcontainers.utility.DockerImageName;
 import static org.example.ride.util.DataUtil.DEFAULT_ADDRESS_FROM;
 import static org.example.ride.util.DataUtil.DEFAULT_ADDRESS_TO;
 import static org.example.ride.util.DataUtil.DEFAULT_ID;
+import static org.example.ride.util.DataUtil.DRIVER_NOT_FOUND_EXCEPTION_MESSAGE;
 import static org.example.ride.util.DataUtil.DRIVER_STATUS;
+import static org.example.ride.util.DataUtil.INVALID_PROPOSED_STATUS_MESSAGE;
+import static org.example.ride.util.DataUtil.IRRELEVANT_DRIVER_STATUS;
 import static org.example.ride.util.DataUtil.MESSAGE;
+import static org.example.ride.util.DataUtil.PASSENGER_NOT_FOUND_EXCEPTION_MESSAGE;
 import static org.example.ride.util.DataUtil.PASSENGER_STATUS;
+import static org.example.ride.util.DataUtil.RIDE_NOT_FOUND_EXCEPTION_MESSAGE;
 import static org.example.ride.util.DataUtil.URL;
 import static org.example.ride.util.DataUtil.URL_WITH_ID;
 import static org.example.ride.util.DataUtil.getRideCreateEditDtoBuilder;
@@ -41,7 +46,7 @@ import static org.hamcrest.Matchers.notNullValue;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(scripts = "/setup_ride_table.sql",
+@Sql(scripts = "/sql/setup_ride_table.sql",
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class RideControllerIntegrationTest {
 
@@ -118,7 +123,7 @@ public class RideControllerIntegrationTest {
                 .get(URL_WITH_ID, "10")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body(MESSAGE, equalTo("Ride was not found"));
+                .body(MESSAGE, equalTo(RIDE_NOT_FOUND_EXCEPTION_MESSAGE));
     }
 
     @Test
@@ -148,7 +153,7 @@ public class RideControllerIntegrationTest {
                 .put(URL_WITH_ID + DRIVER_STATUS, DEFAULT_ID.toString())
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .body(MESSAGE, equalTo("Cannot be updated to the proposed status"));
+                .body(MESSAGE, equalTo(INVALID_PROPOSED_STATUS_MESSAGE));
     }
 
     @Test
@@ -163,7 +168,7 @@ public class RideControllerIntegrationTest {
                 .put(URL_WITH_ID + DRIVER_STATUS, "10")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body(MESSAGE, equalTo("Ride was not found"));
+                .body(MESSAGE, equalTo(RIDE_NOT_FOUND_EXCEPTION_MESSAGE));
     }
 
     @Test
@@ -193,7 +198,7 @@ public class RideControllerIntegrationTest {
                 .put(URL_WITH_ID + PASSENGER_STATUS, DEFAULT_ID.toString())
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .body(MESSAGE, equalTo("Status cannot be changed now"));
+                .body(MESSAGE, equalTo(IRRELEVANT_DRIVER_STATUS));
     }
 
     @Test
@@ -208,7 +213,7 @@ public class RideControllerIntegrationTest {
                 .put(URL_WITH_ID + PASSENGER_STATUS, "10")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body(MESSAGE, equalTo("Ride was not found"));
+                .body(MESSAGE, equalTo(RIDE_NOT_FOUND_EXCEPTION_MESSAGE));
     }
 
     @Test
@@ -245,7 +250,7 @@ public class RideControllerIntegrationTest {
                 .post(URL)
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body(MESSAGE, equalTo("Driver was not found"));
+                .body(MESSAGE, equalTo(DRIVER_NOT_FOUND_EXCEPTION_MESSAGE));
     }
 
     @Test
@@ -263,7 +268,7 @@ public class RideControllerIntegrationTest {
                 .post(URL)
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body(MESSAGE, equalTo("Passenger was not found"));
+                .body(MESSAGE, equalTo(PASSENGER_NOT_FOUND_EXCEPTION_MESSAGE));
     }
 
     @Test
@@ -287,8 +292,7 @@ public class RideControllerIntegrationTest {
                 .body("driverId", equalTo(DEFAULT_ID.intValue()))
                 .body("passengerId", equalTo(DEFAULT_ID.intValue()))
                 .body("addressFrom", equalTo("Minsk"))
-                .body("addressTo", equalTo("To"))
-                .log().all();
+                .body("addressTo", equalTo("To"));
     }
 
     @Test
@@ -309,7 +313,7 @@ public class RideControllerIntegrationTest {
                 .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body(MESSAGE, equalTo("Driver was not found"));
+                .body(MESSAGE, equalTo(DRIVER_NOT_FOUND_EXCEPTION_MESSAGE));
     }
 
     @Test
@@ -330,7 +334,7 @@ public class RideControllerIntegrationTest {
                 .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body(MESSAGE, equalTo("Passenger was not found"));
+                .body(MESSAGE, equalTo(PASSENGER_NOT_FOUND_EXCEPTION_MESSAGE));
     }
 
     @Test
@@ -345,6 +349,6 @@ public class RideControllerIntegrationTest {
                 .put(URL_WITH_ID, "10")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body(MESSAGE, equalTo("Ride was not found"));
+                .body(MESSAGE, equalTo(RIDE_NOT_FOUND_EXCEPTION_MESSAGE));
     }
 }

@@ -23,7 +23,9 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import static org.example.driver.util.DataUtil.CAR_DUPLICATED_NUMBER;
 import static org.example.driver.util.DataUtil.CAR_ENTITY;
+import static org.example.driver.util.DataUtil.CAR_NOT_FOUND;
 import static org.example.driver.util.DataUtil.DEFAULT_BRAND;
 import static org.example.driver.util.DataUtil.DEFAULT_COLOR;
 import static org.example.driver.util.DataUtil.DEFAULT_ID;
@@ -43,7 +45,7 @@ import static org.hamcrest.Matchers.notNullValue;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(scripts = "/setup_car_table.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = "/sql/setup_car_table.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class CarControllerIntegrationTest {
 
     @Container
@@ -121,7 +123,7 @@ public class CarControllerIntegrationTest {
                 .get(URL_WITH_ID, CAR_ENTITY, "10")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body(MESSAGE, equalTo("Car was not found"));
+                .body(MESSAGE, equalTo(CAR_NOT_FOUND));
     }
 
     @Test
@@ -153,7 +155,7 @@ public class CarControllerIntegrationTest {
                 .post(URL, CAR_ENTITY)
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .body(MESSAGE, equalTo("Car with this number already exists"));
+                .body(MESSAGE, equalTo(CAR_DUPLICATED_NUMBER));
     }
 
     @Test
@@ -194,7 +196,7 @@ public class CarControllerIntegrationTest {
                 .put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID.toString())
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .body(MESSAGE, equalTo("Car with this number already exists"));
+                .body(MESSAGE, equalTo(CAR_DUPLICATED_NUMBER));
     }
 
     @Test
@@ -209,7 +211,7 @@ public class CarControllerIntegrationTest {
                 .put(URL_WITH_ID, CAR_ENTITY, "10")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body("message", equalTo("Car was not found"));
+                .body("message", equalTo(CAR_NOT_FOUND));
     }
 
     @Test
@@ -231,6 +233,6 @@ public class CarControllerIntegrationTest {
                 .delete(URL_WITH_ID, CAR_ENTITY, "10")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
-                .body(MESSAGE, equalTo("Car was not found"));
+                .body(MESSAGE, equalTo(CAR_NOT_FOUND));
     }
 }
