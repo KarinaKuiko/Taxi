@@ -39,6 +39,7 @@
         <default.liquibase.password>postgres</default.liquibase.password>
         <antrun.version>1.8</antrun.version>
         <failsafe.plugin.version>3.5.2</failsafe.plugin.version>
+        <cucumber.version>7.19.0</cucumber.version>
     </properties>
     <dependencies>
         <dependency>
@@ -125,7 +126,28 @@
             <artifactId>spring-mock-mvc</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit</artifactId>
+        </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.cucumber</groupId>
+                <artifactId>cucumber-bom</artifactId>
+                <version>${cucumber.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
