@@ -16,6 +16,9 @@ public class DataUtil {
     public static final Integer PAGE_VALUE = 0;
     public static final Integer LIMIT_VALUE = 10;
     public static final String MESSAGE = "message";
+    public static final String HOST_PORT = "http://localhost:8082";
+    public static final String BASE_URL = HOST_PORT + URL;
+    public static final String BASE_URL_WITH_ID = HOST_PORT + URL_WITH_ID;
 
     //Exception
     public static final String PASSENGER_NOT_FOUND_EXCEPTION_MESSAGE = "Passenger was not found";

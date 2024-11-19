@@ -6,7 +6,7 @@ Feature: Driver API
         {
           "color": "red",
           "brand": "BMW",
-          "number": "AB123CD",
+          "number": "AB321CD",
           "year": 2023
         }
       """
@@ -15,25 +15,25 @@ Feature: Driver API
     And response body contain car data
       """
         {
-          "id": 1,
+          "id": 3,
           "color": "red",
           "brand": "BMW",
-          "number": "AB123CD",
+          "number": "AB321CD",
           "year": 2023,
           "drivers": []
         }
       """
 
   Scenario: Get car by id
-    When get car with id 1
+    When get car with id 3
     Then response status is 200
     And response body contain car data
       """
         {
-          "id": 1,
+          "id": 3,
           "color": "red",
           "brand": "BMW",
-          "number": "AB123CD",
+          "number": "AB321CD",
           "year": 2023,
           "drivers": []
         }
@@ -45,19 +45,19 @@ Feature: Driver API
         {
           "color": "yellow",
           "brand": "BMW",
-          "number": "AB123CD",
+          "number": "AB321CD",
           "year": 2014
         }
       """
-    When update car with id 1
+    When update car with id 3
     Then response status is 200
     And response body contain car data
       """
         {
-          "id": 1,
+          "id": 3,
           "color": "yellow",
           "brand": "BMW",
-          "number": "AB123CD",
+          "number": "AB321CD",
           "year": 2014,
           "drivers": []
         }
@@ -67,8 +67,8 @@ Feature: Driver API
     Given request body to create or update driver
       """
         {
-          "name": "Test",
-          "email": "test@gmail.com",
+          "name": "Driver",
+          "email": "driver@gmail.com",
           "phone": "+375331234567",
           "gender": "MALE",
           "carId": 1
@@ -79,9 +79,9 @@ Feature: Driver API
     And response body contain driver data
       """
         {
-          "id": 1,
-          "name": "Test",
-          "email": "test@gmail.com",
+          "id": 3,
+          "name": "Driver",
+          "email": "driver@gmail.com",
           "phone": "+375331234567",
           "gender": "MALE",
           "carId": 1,
@@ -90,14 +90,14 @@ Feature: Driver API
       """
 
   Scenario: Get driver by id
-    When get driver with id 1
+    When get driver with id 3
     Then response status is 200
     And response body contain driver data
       """
         {
-          "id": 1,
-          "name": "Test",
-          "email": "test@gmail.com",
+          "id": 3,
+          "name": "Driver",
+          "email": "driver@gmail.com",
           "phone": "+375331234567",
           "gender": "MALE",
           "carId": 1,
@@ -110,20 +110,20 @@ Feature: Driver API
       """
         {
           "name": "Driver",
-          "email": "test@gmail.com",
+          "email": "driver@gmail.com",
           "phone": "+375331234567",
           "gender": "FEMALE",
           "carId": 1
         }
       """
-    When update driver with id 1
+    When update driver with id 3
     Then response status is 200
     And response body contain driver data
       """
         {
-          "id": 1,
+          "id": 3,
           "name": "Driver",
-          "email": "test@gmail.com",
+          "email": "driver@gmail.com",
           "phone": "+375331234567",
           "gender": "FEMALE",
           "carId": 1,
@@ -132,9 +132,9 @@ Feature: Driver API
       """
 
   Scenario: Delete driver
-    When delete driver with id 1
+    When delete driver with id 3
     Then response status is 204
 
   Scenario: Delete car
-    When delete car with id 1
+    When delete car with id 3
     Then response status is 204
