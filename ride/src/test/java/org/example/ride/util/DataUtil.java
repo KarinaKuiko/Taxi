@@ -27,6 +27,9 @@ public class DataUtil {
     public static final String PASSENGER_URL = "/api/v1/passengers";
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String MESSAGE = "message";
+    public static final String HOST_PORT = "http://localhost:8083";
+    public static final String BASE_URL = HOST_PORT + URL;
+    public static final String BASE_URL_WITH_ID = HOST_PORT + URL_WITH_ID;
 
     //Exception
     public static final String RIDE_NOT_FOUND_EXCEPTION_MESSAGE = "Ride was not found";
@@ -35,12 +38,11 @@ public class DataUtil {
     public static final String INVALID_PROPOSED_STATUS_MESSAGE = "Cannot be updated to the proposed status";
     public static final String IRRELEVANT_DRIVER_STATUS = "Status cannot be changed now";
 
-
-
     //Ride
     public static final String DEFAULT_ADDRESS_FROM = "from";
     public static final String DEFAULT_ADDRESS_TO = "to";
     public static final String DEFAULT_COST = "123.45";
+    public static final String COST_FIELD = "cost";
 
     public static DriverReadDto.DriverReadDtoBuilder getDriverReadDtoBuilder() {
         return DriverReadDto.builder()
