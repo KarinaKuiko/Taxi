@@ -1,0 +1,7 @@
+client:
+  driver:
+    name: test-driver
+    url: http://localhost:8081
+  passenger:
+    name: test-passenger
+    url: http://localhost:8082

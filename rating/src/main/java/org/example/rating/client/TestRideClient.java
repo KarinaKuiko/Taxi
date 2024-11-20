@@ -4,6 +4,6 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.context.annotation.Profile;
 
 @Profile("test")
-@FeignClient(name = "test-ride", url = "http://localhost:8083")
+@FeignClient(name = "${client.name}", url = "${client.url}")
 public interface TestRideClient extends CommonFeignClient {
 }
