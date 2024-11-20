@@ -1,4 +1,4 @@
-package org.example.rating.e2e;
+package org.example.rating.e2e.step;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.And;

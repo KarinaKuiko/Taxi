@@ -1,4 +1,4 @@
-package org.example.passenger.e2e;
+package org.example.passenger.e2e.step;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.And;
