@@ -1,0 +1,72 @@
+services:
+  rating-db-e2e:
+    image: postgres:15-alpine
+    container_name: rating_e2e_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: rating
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.utf8"
+    ports:
+      - "5433:5432"
+    volumes:
+      - rating_e2e_data:/var/lib/postgresql/data
+
+  rides-db-e2e:
+    image: postgres:15-alpine
+    container_name: rides_e2e_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: rides
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.utf8"
+    ports:
+      - "5434:5432"
+    volumes:
+      - rides_e2e_data:/var/lib/postgresql/data
+
+  passengers-db-e2e:
+    image: postgres:15-alpine
+    container_name: passenger_e2e_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: passengers
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.utf8"
+    ports:
+      - "5435:5432"
+    volumes:
+      - passengers_e2e_data:/var/lib/postgresql/data
+
+  drivers-db-e2e:
+    image: postgres:15-alpine
+    container_name: driver_e2e_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: drivers
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.utf8"
+    ports:
+      - "5436:5432"
+    volumes:
+      - drivers_e2e_data:/var/lib/postgresql/data
+
+  zookeeper-e2e:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper_e2e
+    ports:
+      - "2181:2181"
+  kafka-e2e:
+    image: wurstmeister/kafka
+    container_name: kafka_e2e
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper_e2e:2181
+
+volumes:
+  rating_e2e_data:
+  rides_e2e_data:
+  passengers_e2e_data:
+  drivers_e2e_data:

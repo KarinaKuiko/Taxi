@@ -18,12 +18,15 @@ public class DataUtil {
     public static final String LIMIT = "limit";
     public static final Integer PAGE_VALUE = 0;
     public static final Integer LIMIT_VALUE = 10;
+    public static final String HOST_PORT = "http://localhost:8081";
     public static final String URL = "/api/v1/{entity}";
     public static final String URL_WITH_ID = URL + "/{id}";
     public static final Long DEFAULT_ID = 1L;
     public static final String CAR_ENTITY = "cars";
     public static final String DRIVER_ENTITY = "drivers";
     public static final String MESSAGE = "message";
+    public static final String BASE_URL = HOST_PORT + URL;
+    public static final String BASE_URL_WITH_ID = HOST_PORT + URL_WITH_ID;
 
     //Exception
     public static final String CAR_NOT_FOUND = "Car was not found";

@@ -27,6 +27,9 @@ public class DataUtil {
     public static final String RIDE_URL = "/api/v1/rides";
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String MESSAGE = "message";
+    public static final String HOST_PORT = "http://localhost:8084";
+    public static final String BASE_URL = HOST_PORT + URL;
+    public static final String BASE_URL_WITH_ID = HOST_PORT + URL_WITH_ID;
 
     //Exception
     public static final String RATE_NOT_FOUND_EXCEPTION_MESSAGE = "Rate was not found";
