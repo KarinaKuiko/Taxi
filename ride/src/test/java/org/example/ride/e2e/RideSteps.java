@@ -50,7 +50,7 @@ public class RideSteps {
     }
 
     @And("response body contain ride data")
-    public void responseBodyContainPassengerData(String expected) throws Exception {
+    public void responseBodyContainRideData(String expected) throws Exception {
         assertThat(response.as(RideReadDto.class))
                 .usingRecursiveComparison()
                 .ignoringFields(COST_FIELD)
@@ -71,13 +71,6 @@ public class RideSteps {
                 .body(rideRequestDto)
                 .when()
                 .put(BASE_URL_WITH_ID, id);
-    }
-
-    @When("delete passenger with id {int}")
-    public void deletePassengerWithId(int id) {
-        response = given()
-                .when()
-                .delete(BASE_URL_WITH_ID, id);
     }
 
     @Given("request body to create or update driver ride status")
