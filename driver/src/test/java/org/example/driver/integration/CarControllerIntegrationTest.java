@@ -48,6 +48,9 @@ import static org.hamcrest.Matchers.notNullValue;
 @Sql(scripts = "/sql/setup_car_table.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class CarControllerIntegrationTest {
 
+    @DynamicPropertySource
+    static void disableEureka(DynamicPropertyRegistry registry) {
+        registry.add("eureka.client.enabled", () -> "false");}
     @Container
     public static PostgreSQLContainer postgreSQLContainer =
             new PostgreSQLContainer<>("postgres:15-alpine");

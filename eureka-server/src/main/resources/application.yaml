@@ -9,5 +9,5 @@ eureka:
     fetch-registry: false
 logging:
   level:
-    com.netflix.eureka: OFF
-    com.netflix.discovery: OFF
+    com.netflix.eureka: INFO
+    com.netflix.discovery: INFO

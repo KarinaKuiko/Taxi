@@ -38,7 +38,6 @@
         <default.liquibase.username>postgres</default.liquibase.username>
         <default.liquibase.password>postgres</default.liquibase.password>
         <antrun.version>1.8</antrun.version>
-        <eureka.version>4.1.3</eureka.version>
         <spring-cloud.version>2023.0.3</spring-cloud.version>
         <failsafe.plugin.version>3.5.2</failsafe.plugin.version>
     </properties>
