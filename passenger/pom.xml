@@ -40,6 +40,7 @@
         <antrun.version>1.8</antrun.version>
         <failsafe.plugin.version>3.5.2</failsafe.plugin.version>
         <cucumber.version>7.19.0</cucumber.version>
+        <extentsreport.version>1.14.0</extentsreport.version>
     </properties>
     <dependencies>
         <dependency>
@@ -135,6 +136,11 @@
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-spring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>tech.grasshopper</groupId>
+            <artifactId>extentreports-cucumber7-adapter</artifactId>
+            <version>${extentsreport.version}</version>
         </dependency>
     </dependencies>
 
