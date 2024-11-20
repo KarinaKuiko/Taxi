@@ -5,7 +5,6 @@ import org.example.rating.dto.create.RateCreateEditDto;
 import org.example.rating.dto.read.RateReadDto;
 import org.example.rating.entity.DriverRate;
 import org.example.rating.entity.PassengerRate;
-import org.example.rating.entity.Rate;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -21,5 +20,7 @@ public interface RateMapper {
     RateReadDto toReadDto(PassengerRate rate);
     RateReadDto toReadDto(DriverRate rate);
 
-    void map(@MappingTarget Rate to, RateCreateEditDto from);
+    void map(@MappingTarget PassengerRate to, RateCreateEditDto from);
+    void map(@MappingTarget DriverRate to, RateCreateEditDto from);
+
 }

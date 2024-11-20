@@ -23,6 +23,13 @@ public class DataUtil {
     public static final Long DEFAULT_ID = 1L;
     public static final String CAR_ENTITY = "cars";
     public static final String DRIVER_ENTITY = "drivers";
+    public static final String MESSAGE = "message";
+
+    //Exception
+    public static final String CAR_NOT_FOUND = "Car was not found";
+    public static final String CAR_DUPLICATED_NUMBER = "Car with this number already exists";
+    public static final String DRIVER_NOT_FOUND = "Driver was not found";
+    public static final String DRIVER_DUPLICATED_EMAIL = "Driver with this email already exists";
 
     //Car
     public static final String DEFAULT_COLOR = "red";
@@ -96,3 +103,4 @@ public class DataUtil {
                 .rating(DEFAULT_RATING);
     }
 }
+

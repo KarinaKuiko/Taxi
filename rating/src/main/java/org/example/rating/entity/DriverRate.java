@@ -18,8 +18,8 @@ import org.example.rating.entity.enumeration.UserType;
 @Table(name = "driver_rates")
 @Data
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class DriverRate extends Rate {
     @Id
