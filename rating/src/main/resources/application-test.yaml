@@ -1,0 +1,3 @@
+client:
+  name: test-ride
+  url: http://localhost:8083
