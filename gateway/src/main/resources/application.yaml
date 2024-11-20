@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      routes:
+        - id: driver
+          uri: http://localhost:8081
+          predicates:
+            - Path=${commonApiPath}/cars/**, ${commonApiPath}/drivers/**
+
+        - id: passenger
+          uri: http://localhost:8082
+          predicates:
+            - Path=${commonApiPath}/passengers/**
+
+        - id: rating
+          uri: http://localhost:8084
+          predicates:
+            - Path=${commonApiPath}/rates/**
+
+        - id: ride
+          uri: http://localhost:8083
+          predicates:
+            - Path=${commonApiPath}/rides/**
+
+commonApiPath: /api/v1
+server:
+  port: 8080
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
