@@ -1,6 +1,14 @@
 name: API CI
 
 on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'driver/**'
+      - 'passenger/**'
+      - 'rating/**'
+      - 'ride/**'
   pull_request:
     branches:
       - master
@@ -38,7 +46,7 @@ jobs:
         if: steps.changes.outputs.driver == 'true'
         run:  mvn -B clean install --file driver/pom.xml
       - name: Run unit and integration tests PASSENGER
-        if: steps.changes.outputs.passenger = 'true'
+        if: steps.changes.outputs.passenger == 'true'
         run:  mvn -B clean install --file passenger/pom.xml
       - name: Run unit and integration tests RATING
         if: steps.changes.outputs.rating == 'true'
