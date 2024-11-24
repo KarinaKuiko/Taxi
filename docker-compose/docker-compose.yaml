@@ -1,9 +1,55 @@
 version: '3.8'
 
 services:
+  eureka-server:
+    build:
+      context: ../eureka-server
+      dockerfile: ../docker-compose/Dockerfile
+      args:
+        SERVICE_NAME: eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - taxi-network
+
+  driver:
+    build:
+      context: ../driver
+      dockerfile: ../docker-compose/Dockerfile
+      args:
+        SERVICE_NAME: driver
+    container_name: driver
+    environment:
+      DB_URL: jdbc:postgresql://drivers-db:5432/drivers
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8081:8081"
+#    depends_on:
+#      drivers-db:
+#        condition: service_healthy
+#      eureka-server:
+#        condition: service_healthy
+#      zookeeper:
+#        condition: service_healthy
+#      kafka:
+#        condition: service_healthy
+    networks:
+      - taxi-network
+    healthcheck:
+      test: curl -f http://driver:8081/actuator/health
+      interval: 1s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
+
+
   rating-db:
     image: postgres:15-alpine
-    container_name: rating
+    container_name: rating_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -16,7 +62,7 @@ services:
 
   rides-db:
     image: postgres:15-alpine
-    container_name: rides
+    container_name: rides_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -29,7 +75,7 @@ services:
 
   passengers-db:
     image: postgres:15-alpine
-    container_name: passenger
+    container_name: passenger_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -42,7 +88,7 @@ services:
 
   drivers-db:
     image: postgres:15-alpine
-    container_name: driver
+    container_name: driver_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -50,6 +96,8 @@ services:
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.utf8"
     ports:
       - "5436:5432"
+    networks:
+      - taxi-network
     volumes:
       - drivers_data:/var/lib/postgresql/data
 
@@ -58,17 +106,32 @@ services:
     container_name: zookeeper
     ports:
       - "2181:2181"
+    networks:
+      - taxi-network
   kafka:
     image: wurstmeister/kafka
     container_name: kafka
+    expose:
+      - 9092
     ports:
-      - "9092:9092"
+      - "9093:9093"
     environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9092,OUTSIDE://localhost:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://kafka:9092,OUTSIDE://localhost:9093
       KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    networks:
+      - taxi-network
 
 volumes:
   rating_data:
   rides_data:
   passengers_data:
   drivers_data:
+
+networks:
+  taxi-network:
+    name: taxi-network
+    driver: bridge
