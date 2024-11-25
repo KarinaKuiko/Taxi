@@ -5,22 +5,22 @@ spring:
     gateway:
       routes:
         - id: driver
-          uri: http://localhost:8081
+          uri: lb://driver
           predicates:
             - Path=${commonApiPath}/cars/**, ${commonApiPath}/drivers/**
 
         - id: passenger
-          uri: http://localhost:8082
+          uri: lb://passenger
           predicates:
             - Path=${commonApiPath}/passengers/**
 
         - id: rating
-          uri: http://localhost:8084
+          uri: lb://rating
           predicates:
             - Path=${commonApiPath}/rates/**
 
         - id: ride
-          uri: http://localhost:8083
+          uri: lb://ride
           predicates:
             - Path=${commonApiPath}/rides/**
 
