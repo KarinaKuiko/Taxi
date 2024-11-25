@@ -10,6 +10,7 @@ COPY --from=build /app/target/${SERVICE_NAME}-0.0.1-SNAPSHOT.jar ./${SERVICE_NAM
 RUN java -Djarmode=layertools -jar ${SERVICE_NAME}.jar extract
 
 FROM openjdk:21-slim
+RUN apt-get update && apt-get install -y curl
 WORKDIR /app
 COPY --from=extract app/dependencies/ ./
 COPY --from=extract app/spring-boot-loader/ ./

@@ -12,6 +12,8 @@ services:
       - "8761:8761"
     networks:
       - taxi-network
+    healthcheck:
+      test: curl -f http://eureka-server:8761/actuator/health
 
   driver:
     build:
@@ -28,15 +30,15 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     ports:
       - "8081:8081"
-#    depends_on:
-#      drivers-db:
-#        condition: service_healthy
-#      eureka-server:
-#        condition: service_healthy
-#      zookeeper:
-#        condition: service_healthy
-#      kafka:
-#        condition: service_healthy
+    depends_on:
+      drivers-db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      zookeeper:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     networks:
       - taxi-network
     healthcheck:
@@ -46,6 +48,110 @@ services:
       retries: 30
       start_period: 60s
 
+  passenger:
+    build:
+      context: ../passenger
+      dockerfile: ../docker-compose/Dockerfile
+      args:
+        SERVICE_NAME: passenger
+    container_name: passenger
+    environment:
+      DB_URL: jdbc:postgresql://passengers-db:5432/passengers
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8082:8082"
+    depends_on:
+      passengers-db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      zookeeper:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - taxi-network
+    healthcheck:
+      test: curl -f http://passenger:8082/actuator/health
+      interval: 1s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
+
+  ride:
+    build:
+      context: ../ride
+      dockerfile: ../docker-compose/Dockerfile
+      args:
+        SERVICE_NAME: ride
+    container_name: ride
+    environment:
+      DB_URL: jdbc:postgresql://rides-db:5432/rides
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8083:8083"
+    depends_on:
+      rides-db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      zookeeper:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      driver:
+        condition: service_healthy
+      passenger:
+        condition: service_healthy
+    networks:
+      - taxi-network
+    healthcheck:
+      test: curl -f http://ride:8083/actuator/health
+      interval: 1s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
+
+  rating:
+    build:
+      context: ../rating
+      dockerfile: ../docker-compose/Dockerfile
+      args:
+        SERVICE_NAME: rating
+    container_name: rating
+    environment:
+      DB_URL: jdbc:postgresql://rating-db:5432/rating
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8084:8084"
+    depends_on:
+      rating-db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      zookeeper:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      ride:
+        condition: service_healthy
+    networks:
+      - taxi-network
+    healthcheck:
+      test: curl -f http://rating:8084/actuator/health
+      interval: 1s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
 
   rating-db:
     image: postgres:15-alpine
@@ -57,8 +163,16 @@ services:
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.utf8"
     ports:
       - "5433:5432"
+    networks:
+      - taxi-network
     volumes:
       - rating_data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
 
   rides-db:
     image: postgres:15-alpine
@@ -70,8 +184,16 @@ services:
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.utf8"
     ports:
       - "5434:5432"
+    networks:
+      - taxi-network
     volumes:
       - rides_data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
 
   passengers-db:
     image: postgres:15-alpine
@@ -83,8 +205,16 @@ services:
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.utf8"
     ports:
       - "5435:5432"
+    networks:
+      - taxi-network
     volumes:
       - passengers_data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
 
   drivers-db:
     image: postgres:15-alpine
@@ -100,6 +230,12 @@ services:
       - taxi-network
     volumes:
       - drivers_data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
 
   zookeeper:
     image: wurstmeister/zookeeper
@@ -108,22 +244,37 @@ services:
       - "2181:2181"
     networks:
       - taxi-network
+    healthcheck:
+      test: nc -z localhost 2181 || exit -1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
   kafka:
     image: wurstmeister/kafka
     container_name: kafka
     expose:
       - 9092
     ports:
-      - "9093:9093"
+      - "29092:29092"
     environment:
-      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9092,OUTSIDE://localhost:9093
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9092,OUTSIDE://localhost:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
-      KAFKA_LISTENERS: INSIDE://kafka:9092,OUTSIDE://localhost:9093
+      KAFKA_LISTENERS: INSIDE://kafka:9092,OUTSIDE://localhost:29092
       KAFKA_ADVERTISED_HOST_NAME: localhost
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     networks:
       - taxi-network
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "kafka-topics.sh", "--list", "--bootstrap-server", "kafka:9092" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
 volumes:
   rating_data:
