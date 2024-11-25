@@ -1,9 +1,9 @@
-FROM maven:3.9.5-eclipse-temurin-21-alpine as build
+FROM maven:3.9.5-eclipse-temurin-21-alpine AS build
 WORKDIR /app
 COPY . /app/.
 RUN mvn -f /app/pom.xml clean package -Dmaven.test.skip=true
 
-FROM openjdk:21-slim as extract
+FROM openjdk:21-slim AS extract
 ARG SERVICE_NAME
 WORKDIR /app
 COPY --from=build /app/target/${SERVICE_NAME}-0.0.1-SNAPSHOT.jar ./${SERVICE_NAME}.jar
