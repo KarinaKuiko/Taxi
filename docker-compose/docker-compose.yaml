@@ -1,5 +1,9 @@
 version: '3.8'
 
+x-defaults: &defaults
+    EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+    KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
 services:
   eureka-server:
     build:
@@ -13,7 +17,7 @@ services:
     networks:
       - taxi-network
     healthcheck:
-      test: curl -f http://eureka-server:8761/actuator/health
+      test: curl --fail --location http://eureka-server:8761/actuator/health
 
   driver:
     build:
@@ -24,10 +28,9 @@ services:
     container_name: driver
     environment:
       DB_URL: jdbc:postgresql://drivers-db:5432/drivers
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
-      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      <<: *defaults
     ports:
       - "8081:8081"
     depends_on:
@@ -42,7 +45,7 @@ services:
     networks:
       - taxi-network
     healthcheck:
-      test: curl -f http://driver:8081/actuator/health
+      test: curl --fail --location http://driver:8081/actuator/health
       interval: 1s
       timeout: 10s
       retries: 30
@@ -57,10 +60,9 @@ services:
     container_name: passenger
     environment:
       DB_URL: jdbc:postgresql://passengers-db:5432/passengers
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
-      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      <<: *defaults
     ports:
       - "8082:8082"
     depends_on:
@@ -75,7 +77,7 @@ services:
     networks:
       - taxi-network
     healthcheck:
-      test: curl -f http://passenger:8082/actuator/health
+      test: curl --fail --location http://passenger:8082/actuator/health
       interval: 1s
       timeout: 10s
       retries: 30
@@ -90,10 +92,9 @@ services:
     container_name: ride
     environment:
       DB_URL: jdbc:postgresql://rides-db:5432/rides
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
-      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      <<: *defaults
     ports:
       - "8083:8083"
     depends_on:
@@ -112,7 +113,7 @@ services:
     networks:
       - taxi-network
     healthcheck:
-      test: curl -f http://ride:8083/actuator/health
+      test: curl --fail --location http://ride:8083/actuator/health
       interval: 1s
       timeout: 10s
       retries: 30
@@ -127,10 +128,9 @@ services:
     container_name: rating
     environment:
       DB_URL: jdbc:postgresql://rating-db:5432/rating
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
-      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      <<: *defaults
     ports:
       - "8084:8084"
     depends_on:
@@ -147,7 +147,7 @@ services:
     networks:
       - taxi-network
     healthcheck:
-      test: curl -f http://rating:8084/actuator/health
+      test: curl --fail --location http://rating:8084/actuator/health
       interval: 1s
       timeout: 10s
       retries: 30
@@ -157,8 +157,8 @@ services:
     image: postgres:15-alpine
     container_name: rating_db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: rating
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.utf8"
     ports:
@@ -178,8 +178,8 @@ services:
     image: postgres:15-alpine
     container_name: rides_db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: rides
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.utf8"
     ports:
@@ -199,8 +199,8 @@ services:
     image: postgres:15-alpine
     container_name: passenger_db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: passengers
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.utf8"
     ports:
@@ -220,8 +220,8 @@ services:
     image: postgres:15-alpine
     container_name: driver_db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: drivers
       POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.utf8"
     ports:
@@ -245,7 +245,7 @@ services:
     networks:
       - taxi-network
     healthcheck:
-      test: nc -z localhost 2181 || exit -1
+      test: ["CMD", "echo", "ruok", "|", "nc", "localhost", "2181"]
       interval: 10s
       timeout: 5s
       retries: 5
