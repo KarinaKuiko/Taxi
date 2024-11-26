@@ -18,6 +18,33 @@ services:
       - taxi-network
     healthcheck:
       test: curl --fail --location http://eureka-server:8761/actuator/health
+      interval: 1s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
+
+  gateway:
+    build:
+      context: ../gateway
+      dockerfile: ../docker-compose/Dockerfile
+      args:
+        SERVICE_NAME: gateway
+    container_name: gateway
+    environment:
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+    ports:
+      - "8080:8080"
+    networks:
+      - taxi-network
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    healthcheck:
+      test: curl --fail --location http://gateway:8080/actuator/health
+      interval: 1s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
 
   driver:
     build:
@@ -37,6 +64,8 @@ services:
       drivers-db:
         condition: service_healthy
       eureka-server:
+        condition: service_healthy
+      gateway:
         condition: service_healthy
       zookeeper:
         condition: service_healthy
@@ -70,6 +99,8 @@ services:
         condition: service_healthy
       eureka-server:
         condition: service_healthy
+      gateway:
+        condition: service_healthy
       zookeeper:
         condition: service_healthy
       kafka:
@@ -101,6 +132,8 @@ services:
       rides-db:
         condition: service_healthy
       eureka-server:
+        condition: service_healthy
+      gateway:
         condition: service_healthy
       zookeeper:
         condition: service_healthy
@@ -137,6 +170,8 @@ services:
       rating-db:
         condition: service_healthy
       eureka-server:
+        condition: service_healthy
+      gateway:
         condition: service_healthy
       zookeeper:
         condition: service_healthy
