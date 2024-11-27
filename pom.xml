@@ -20,6 +20,7 @@
         <module>passenger</module>
         <module>ride</module>
         <module>rating</module>
+        <module>eureka-server</module>
     </modules>
 
 </project>
