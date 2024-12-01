@@ -331,6 +331,11 @@ services:
       - bootstrap.memory_lock=true
     networks:
       - taxi-network
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "http://localhost:9200/_cluster/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   logstash:
     image: logstash:7.14.0
@@ -345,7 +350,8 @@ services:
     networks:
       - taxi-network
     depends_on:
-      - elasticsearch
+      elasticsearch:
+        condition: service_healthy
 
   kibana:
     image: kibana:7.14.0
@@ -358,7 +364,13 @@ services:
     networks:
       - taxi-network
     depends_on:
-      - elasticsearch
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "http://localhost:5601/api/status" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   filebeat:
     image: elastic/filebeat:7.14.0
@@ -374,9 +386,10 @@ services:
     networks:
       - taxi-network
     depends_on:
-      - elasticsearch
-      - kibana
-
+      elasticsearch:
+        condition: service_healthy
+      kibana:
+        condition: service_healthy
 
 volumes:
   rating_data:
