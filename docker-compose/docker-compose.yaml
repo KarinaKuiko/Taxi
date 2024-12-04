@@ -391,6 +391,35 @@ services:
       kibana:
         condition: service_healthy
 
+  grafana:
+    build: './grafana'
+    user: "0"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      taxi-network:
+        aliases:
+          - grafana
+
+  prometheus:
+    image: prom/prometheus
+    user: "0"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus:/prometheus
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      taxi-network:
+        aliases:
+          - prometheus
 volumes:
   rating_data:
   rides_data:
