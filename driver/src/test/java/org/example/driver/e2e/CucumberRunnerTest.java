@@ -20,3 +20,4 @@ import org.springframework.test.context.ContextConfiguration;
 @SpringBootTest
 public class CucumberRunnerTest {
 }
+
