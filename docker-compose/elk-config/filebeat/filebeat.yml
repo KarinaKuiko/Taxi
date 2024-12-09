@@ -1,11 +1,9 @@
-
-
 filebeat.inputs:
   - type: log
     enabled: true
     paths:
       - /var/log/*.log
-      - /var/lib/docker/containers/*.log
+      - /var/lib/docker/containers/*/*.log
 
 filebeat.modules:
   - module: system
