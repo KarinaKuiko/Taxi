@@ -177,6 +177,11 @@
             <artifactId>extentreports-cucumber7-adapter</artifactId>
             <version>${extentsreport.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
