@@ -3,7 +3,6 @@ version: '3.8'
 x-defaults: &defaults
   EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
   KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-  SPRING_ZIPKIN_BASE_URL: http://zipkin:9411/
 
 services:
   eureka-server:
