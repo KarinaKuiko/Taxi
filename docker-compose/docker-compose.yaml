@@ -464,6 +464,14 @@ services:
     networks:
       - taxi-network
 
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - taxi-network
+
 volumes:
   rating_data:
   rides_data:
