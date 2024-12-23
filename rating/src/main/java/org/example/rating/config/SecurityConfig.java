@@ -1,4 +1,4 @@
-package org.example.driver.config;
+package org.example.rating.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -7,7 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static org.example.driver.constants.SecurityConstants.ROLE_ADMIN;
+import static org.example.rating.constants.SecurityConstants.ROLE_ADMIN;
 
 @Configuration
 @RequiredArgsConstructor
@@ -20,8 +20,8 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/actuator/health").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/drivers").hasRole(ROLE_ADMIN)
-                        .requestMatchers(HttpMethod.GET, "/api/v1/cars").hasRole(ROLE_ADMIN)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/rates/driver").hasRole(ROLE_ADMIN)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/rates/passenger").hasRole(ROLE_ADMIN)
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
