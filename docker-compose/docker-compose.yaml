@@ -456,7 +456,7 @@ services:
       KC_BOOTSTRAP_ADMIN_PASSWORD : ${KEYCLOAK_PASSWORD}
     volumes:
       - ./keycloak/realms:/opt/keycloak/data/import
-    command: ["start-dev", "--http-port=8484", "--import-realm"]
+    command: ["start-dev", "--http-port=8484"]
     ports:
       - "8484:8484"
     depends_on:
@@ -488,7 +488,13 @@ services:
     networks:
       - taxi-network
 
-
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - taxi-network
 volumes:
   rating_data:
   rides_data:

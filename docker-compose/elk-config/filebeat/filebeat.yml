@@ -1,11 +1,11 @@
-
-
 filebeat.inputs:
   - type: log
     enabled: true
     paths:
       - /var/log/*.log
-      - /var/lib/docker/containers/*.log
+      - /var/lib/docker/containers/*/*.log
+    processors:
+      - add_docker_metadata: { }
 
 filebeat.modules:
   - module: system
