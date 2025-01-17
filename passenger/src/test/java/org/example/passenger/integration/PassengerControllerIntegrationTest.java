@@ -164,7 +164,7 @@ public class PassengerControllerIntegrationTest {
     @Test
     void update_whenValidInput_thenReturn200AndPassengerReadDto() {
         PassengerCreateEditDto updatePassenger = getPassengerCreateEditDtoBuilder()
-                                                    .name("naming")
+                                                    .firstName("naming")
                                                     .build();
 
         RestAssuredMockMvc
@@ -176,7 +176,7 @@ public class PassengerControllerIntegrationTest {
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("id", equalTo(DEFAULT_ID.intValue()))
-                .body("name", equalTo("naming"))
+                .body("firstName", equalTo("naming"))
                 .body("email", equalTo(DEFAULT_EMAIL))
                 .body("phone", equalTo(DEFAULT_PHONE));
     }
@@ -190,7 +190,7 @@ public class PassengerControllerIntegrationTest {
         passengerRepository.save(createPassenger);
 
         PassengerCreateEditDto updatePassenger = getPassengerCreateEditDtoBuilder()
-                                                    .name("naming")
+                                                    .firstName("naming")
                                                     .email("test@gmail.com")
                                                     .build();
 

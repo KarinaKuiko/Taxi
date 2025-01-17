@@ -6,7 +6,8 @@ import org.example.driver.entity.enumeration.Gender;
 @Builder
 public record DriverReadDto(
         long id,
-        String name,
+        String firstName,
+        String lastName,
         String email,
         String phone,
         Gender gender,

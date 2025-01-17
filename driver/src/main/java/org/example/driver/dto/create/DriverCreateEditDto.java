@@ -11,7 +11,10 @@ import org.example.driver.entity.enumeration.Gender;
 public record DriverCreateEditDto(
 
         @NotBlank(message = "{name.blank}")
-        String name,
+        String firstName,
+
+        @NotBlank(message = "{name.blank}")
+        String lastName,
 
         @Email(message = "{email.invalid}")
         @NotBlank(message = "{email.blank}")

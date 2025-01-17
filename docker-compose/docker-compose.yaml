@@ -454,7 +454,9 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_USERNAME}
       KC_BOOTSTRAP_ADMIN_PASSWORD : ${KEYCLOAK_PASSWORD}
-    command: ["start-dev", "--http-port=8484"]
+    volumes:
+      - ./keycloak/realms:/opt/keycloak/data/import
+    command: ["start-dev", "--http-port=8484", "--import-realm"]
     ports:
       - "8484:8484"
     depends_on:
@@ -463,6 +465,29 @@ services:
       - "keycloak_db:keycloak_db"
     networks:
       - taxi-network
+
+  registration-service:
+    build:
+      context: ../registration-service
+      dockerfile: ../docker-compose/Dockerfile
+      args:
+        SERVICE_NAME: registration-service
+    container_name: registration-service
+    environment:
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      KEYCLOAK_SERVER_URL: http://keycloak:8484
+    ports:
+      - "8085:8085"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      gateway:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    networks:
+      - taxi-network
+
 
 volumes:
   rating_data:

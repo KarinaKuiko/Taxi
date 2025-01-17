@@ -136,7 +136,7 @@ public class DriverControllerIntegrationTest {
     @Test
     void create_whenValidInput_thenReturn201AndDriverReadDto() {
         DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
-                .name("name")
+                .firstName("name")
                 .email("driver@gmail.com")
                 .phone("+375291122334")
                 .gender(Gender.MALE)
@@ -190,7 +190,7 @@ public class DriverControllerIntegrationTest {
     @Test
     void update_whenValidInput_thenReturn200AndDriverReadDto() {
         DriverCreateEditDto updateDriver = getDriverCreateEditDtoBuilder()
-                .name("testing")
+                .firstName("testing")
                 .gender(Gender.FEMALE)
                 .build();
 
@@ -203,7 +203,7 @@ public class DriverControllerIntegrationTest {
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("id", equalTo(DEFAULT_ID.intValue()))
-                .body("name", equalTo("testing"))
+                .body("firstName", equalTo("testing"))
                 .body("email", equalTo(DEFAULT_EMAIL))
                 .body("phone", equalTo(DEFAULT_PHONE))
                 .body("gender", equalTo(Gender.FEMALE.name()))
@@ -228,7 +228,7 @@ public class DriverControllerIntegrationTest {
     @Test
     void update_whenEmailIsDuplicated_thenReturn409() {
         DriverCreateEditDto updateDriver = getDriverCreateEditDtoBuilder()
-                .name("testing")
+                .firstName("testing")
                 .email("name@gmail.com")
                 .build();
 

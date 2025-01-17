@@ -44,7 +44,7 @@ public class DriverService {
 
         Driver driver = driverMapper.toDriver(driverDto);
 
-        Car car = carRepository.findByIdAndIsDeletedFalse(driverDto.carId())
+        Car car = carRepository.findByIdAndIsDeletedFalse(1L)
                 .orElseThrow(() -> new CarNotFoundException(messageSource.getMessage(
                         ExceptionConstants.CAR_NOT_FOUND,
                         new Object[]{driverDto.carId()},

@@ -1,0 +1,2 @@
+ALTER TABLE passengers
+DROP COLUMN gender VARCHAR(64);

@@ -78,7 +78,8 @@ public class DataUtil {
     public static DriverReadDto.DriverReadDtoBuilder getDriverReadDtoBuilder() {
         return DriverReadDto.builder()
                 .id(DEFAULT_ID)
-                .name(DEFAUlT_NAME)
+                .firstName(DEFAUlT_NAME)
+                .lastName(DEFAUlT_NAME)
                 .email(DEFAULT_EMAIL)
                 .phone(DEFAULT_PHONE)
                 .gender(Gender.MALE)
@@ -88,7 +89,8 @@ public class DataUtil {
 
     public static DriverCreateEditDto.DriverCreateEditDtoBuilder getDriverCreateEditDtoBuilder() {
         return DriverCreateEditDto.builder()
-                .name(DEFAUlT_NAME)
+                .firstName(DEFAUlT_NAME)
+                .lastName(DEFAUlT_NAME)
                 .email(DEFAULT_EMAIL)
                 .phone(DEFAULT_PHONE)
                 .gender(Gender.MALE)
@@ -98,7 +100,8 @@ public class DataUtil {
     public static Driver.DriverBuilder getDriverBuilder() {
         return Driver.builder()
                 .id(DEFAULT_ID)
-                .name(DEFAUlT_NAME)
+                .firstName(DEFAUlT_NAME)
+                .lastName(DEFAUlT_NAME)
                 .email(DEFAULT_EMAIL)
                 .phone(DEFAULT_PHONE)
                 .gender(Gender.MALE)

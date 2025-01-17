@@ -35,7 +35,8 @@ public class DataUtil {
     public static PassengerReadDto.PassengerReadDtoBuilder getPassengerReadDtoBuilder() {
         return PassengerReadDto.builder()
                 .id(DEFAULT_ID)
-                .name(DEFAULT_NAME)
+                .firstName(DEFAULT_NAME)
+                .lastName(DEFAULT_NAME)
                 .email(DEFAULT_EMAIL)
                 .phone(DEFAULT_PHONE)
                 .rating(DEFAULT_RATING);
@@ -43,7 +44,8 @@ public class DataUtil {
 
     public static PassengerCreateEditDto.PassengerCreateEditDtoBuilder getPassengerCreateEditDtoBuilder() {
         return PassengerCreateEditDto.builder()
-                .name(DEFAULT_NAME)
+                .firstName(DEFAULT_NAME)
+                .lastName(DEFAULT_NAME)
                 .email(DEFAULT_EMAIL)
                 .phone(DEFAULT_PHONE);
     }
@@ -51,7 +53,8 @@ public class DataUtil {
     public static Passenger.PassengerBuilder getPassengerBuilder () {
         return Passenger.builder()
                 .id(DEFAULT_ID)
-                .name(DEFAULT_NAME)
+                .firstName(DEFAULT_NAME)
+                .lastName(DEFAULT_NAME)
                 .email(DEFAULT_EMAIL)
                 .phone(DEFAULT_PHONE)
                 .rating(DEFAULT_RATING);

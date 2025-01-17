@@ -173,7 +173,8 @@ class PassengerControllerTest {
             ArgumentCaptor<PassengerCreateEditDto> carCaptor = ArgumentCaptor.forClass(PassengerCreateEditDto.class);
 
             verify(passengerService, times(1)).create(carCaptor.capture());
-            assertThat(carCaptor.getValue().name()).isEqualTo(DEFAULT_NAME);
+            assertThat(carCaptor.getValue().firstName()).isEqualTo(DEFAULT_NAME);
+            assertThat(carCaptor.getValue().lastName()).isEqualTo(DEFAULT_NAME);
             assertThat(carCaptor.getValue().email()).isEqualTo(DEFAULT_EMAIL);
             assertThat(carCaptor.getValue().phone()).isEqualTo(DEFAULT_PHONE);
         }
@@ -199,7 +200,7 @@ class PassengerControllerTest {
         @Test
         void create_whenInvalidInput_thenReturn400AndValidationResponse() throws Exception {
             PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder()
-                                .name(null)
+                                .firstName(null)
                                 .email(null)
                                 .phone(null)
                                 .build();
@@ -297,7 +298,8 @@ class PassengerControllerTest {
             verify(passengerService, times(1)).update(
                     idCaptor.capture(), passengerCaptor.capture());
             assertThat(idCaptor.getValue()).isEqualTo(DEFAULT_ID);
-            assertThat(passengerCaptor.getValue().name()).isEqualTo(DEFAULT_NAME);
+            assertThat(passengerCaptor.getValue().firstName()).isEqualTo(DEFAULT_NAME);
+            assertThat(passengerCaptor.getValue().lastName()).isEqualTo(DEFAULT_NAME);
             assertThat(passengerCaptor.getValue().email()).isEqualTo(DEFAULT_EMAIL);
             assertThat(passengerCaptor.getValue().phone()).isEqualTo(DEFAULT_PHONE);
         }
@@ -323,7 +325,7 @@ class PassengerControllerTest {
         @Test
         void update_whenInvalidInput_thenReturn400AndValidationResponse() throws Exception {
             PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder()
-                                .name(null)
+                                .firstName(null)
                                 .email(null)
                                 .phone(null)
                                 .build();
