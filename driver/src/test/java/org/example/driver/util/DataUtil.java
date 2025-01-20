@@ -41,7 +41,7 @@ public class DataUtil {
     public static final int DEFAULT_YEAR = 2023;
 
     //Driver
-    public static final String DEFAUlT_NAME = "test";
+    public static final String DEFAULT_NAME = "test";
     public static final String DEFAULT_EMAIL = "test@gmail.com";
     public static final String DEFAULT_PHONE = "+375297654321";
     public static final double DEFAULT_RATING = 5.0;
@@ -78,8 +78,8 @@ public class DataUtil {
     public static DriverReadDto.DriverReadDtoBuilder getDriverReadDtoBuilder() {
         return DriverReadDto.builder()
                 .id(DEFAULT_ID)
-                .firstName(DEFAUlT_NAME)
-                .lastName(DEFAUlT_NAME)
+                .firstName(DEFAULT_NAME)
+                .lastName(DEFAULT_NAME)
                 .email(DEFAULT_EMAIL)
                 .phone(DEFAULT_PHONE)
                 .gender(Gender.MALE)
@@ -89,19 +89,19 @@ public class DataUtil {
 
     public static DriverCreateEditDto.DriverCreateEditDtoBuilder getDriverCreateEditDtoBuilder() {
         return DriverCreateEditDto.builder()
-                .firstName(DEFAUlT_NAME)
-                .lastName(DEFAUlT_NAME)
+                .firstName(DEFAULT_NAME)
+                .lastName(DEFAULT_NAME)
                 .email(DEFAULT_EMAIL)
                 .phone(DEFAULT_PHONE)
-                .gender(Gender.MALE)
-                .carId(DEFAULT_ID);
+                .gender(Gender.MALE);
+                //.carId(DEFAULT_ID);
     }
 
     public static Driver.DriverBuilder getDriverBuilder() {
         return Driver.builder()
                 .id(DEFAULT_ID)
-                .firstName(DEFAUlT_NAME)
-                .lastName(DEFAUlT_NAME)
+                .firstName(DEFAULT_NAME)
+                .lastName(DEFAULT_NAME)
                 .email(DEFAULT_EMAIL)
                 .phone(DEFAULT_PHONE)
                 .gender(Gender.MALE)

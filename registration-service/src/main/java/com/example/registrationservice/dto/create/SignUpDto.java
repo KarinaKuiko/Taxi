@@ -28,6 +28,7 @@ public record SignUpDto (
         @NotBlank(message = "{phone.blank}")
         String phone,
         Gender gender,
-        Role role
+        Role role,
+        CarCreateEditDto carCreateEditDto
 ) {
 }

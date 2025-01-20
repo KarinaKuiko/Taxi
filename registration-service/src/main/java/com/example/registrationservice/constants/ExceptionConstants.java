@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ExceptionConstants {
+public final class ExceptionConstants {
     public static final String KEYCLOAK_CREATE_USER_EXCEPTION_MESSAGE = "create.user.exception";
     public static final String SERVICE_UNAVAILABLE_MESSAGE = "service.unavailable";
     public static final String UNAUTHORIZED_MESSAGE = "unauthorized";

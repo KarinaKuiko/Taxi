@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ServiceConstants {
+public final class ServiceConstants {
     public static final String GRANT_TYPE_FIELD = "grant_type";
     public static final String CLIENT_ID_FIELD = "client_id";
     public static final String CLIENT_SECRET_FIELD = "client_secret";

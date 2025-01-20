@@ -1,5 +1,6 @@
 package com.example.registrationservice.client;
 
+import com.example.registrationservice.constants.AppConstants;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import org.springframework.security.core.Authentication;
@@ -17,7 +18,7 @@ public class FeignRequestInterceptor implements RequestInterceptor {
         if (authentication instanceof JwtAuthenticationToken) {
             Jwt jwt = (Jwt) authentication.getPrincipal();
             String token = jwt.getTokenValue();
-            template.header("Authorization", "Bearer " + token);
+            template.header("Authorization", AppConstants.BEARER_PREFIX + token);
         }
     }
 }

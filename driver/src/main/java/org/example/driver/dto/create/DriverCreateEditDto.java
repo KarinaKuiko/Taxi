@@ -26,6 +26,6 @@ public record DriverCreateEditDto(
         String phone,
 
         Gender gender,
-        Long carId
+        CarCreateEditDto carCreateEditDto
 ) {
 }

@@ -456,7 +456,7 @@ services:
       KC_BOOTSTRAP_ADMIN_PASSWORD : ${KEYCLOAK_PASSWORD}
     volumes:
       - ./keycloak/realms:/opt/keycloak/data/import
-    command: ["start-dev", "--http-port=8484"]
+    command: ["start-dev", "--http-port=8484", "--import-realm"]
     ports:
       - "8484:8484"
     depends_on:
@@ -476,14 +476,15 @@ services:
     environment:
       EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
       KEYCLOAK_SERVER_URL: http://keycloak:8484
+      KEYCLOAK_ADMIN_CLIENT_ID: ${ADMIN_CLIENT_ID}
+      KEYCLOAK_ADMIN_CLIENT_SECRET: ${ADMIN_CLIENT_SECRET}
+      KEYCLOAK_REALM: ${REALM}
     ports:
       - "8085:8085"
     depends_on:
       eureka-server:
         condition: service_healthy
       gateway:
-        condition: service_healthy
-      keycloak:
         condition: service_healthy
     networks:
       - taxi-network

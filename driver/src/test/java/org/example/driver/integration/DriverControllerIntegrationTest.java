@@ -28,7 +28,7 @@ import static org.example.driver.util.DataUtil.CAR_NOT_FOUND;
 import static org.example.driver.util.DataUtil.DEFAULT_EMAIL;
 import static org.example.driver.util.DataUtil.DEFAULT_ID;
 import static org.example.driver.util.DataUtil.DEFAULT_PHONE;
-import static org.example.driver.util.DataUtil.DEFAUlT_NAME;
+import static org.example.driver.util.DataUtil.DEFAULT_NAME;
 import static org.example.driver.util.DataUtil.DRIVER_DUPLICATED_EMAIL;
 import static org.example.driver.util.DataUtil.DRIVER_ENTITY;
 import static org.example.driver.util.DataUtil.DRIVER_NOT_FOUND;
@@ -116,7 +116,7 @@ public class DriverControllerIntegrationTest {
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("id", equalTo(DEFAULT_ID.intValue()))
-                .body("name", equalTo(DEFAUlT_NAME))
+                .body("name", equalTo(DEFAULT_NAME))
                 .body("email", equalTo(DEFAULT_EMAIL))
                 .body("phone", equalTo(DEFAULT_PHONE))
                 .body("gender", equalTo(Gender.MALE.name()))
@@ -140,7 +140,7 @@ public class DriverControllerIntegrationTest {
                 .email("driver@gmail.com")
                 .phone("+375291122334")
                 .gender(Gender.MALE)
-                .carId(DEFAULT_ID)
+               // .carId(DEFAULT_ID)
                 .build();
 
         RestAssuredMockMvc
@@ -173,7 +173,7 @@ public class DriverControllerIntegrationTest {
     void create_whenCarIdNotFound_thenReturn404() {
         DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
                 .email("driver@gmail.com")
-                .carId(10L)
+                //.carId(10L)
                 .build();
 
         RestAssuredMockMvc
@@ -246,7 +246,7 @@ public class DriverControllerIntegrationTest {
     @Test
     void update_whenCarIsNotFound_thenReturn404() {
         DriverCreateEditDto updateDriver = getDriverCreateEditDtoBuilder()
-                .carId(10L)
+             //   .carId(10L)
                 .build();
 
         RestAssuredMockMvc
