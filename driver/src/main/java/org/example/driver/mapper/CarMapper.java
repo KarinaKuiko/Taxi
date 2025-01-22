@@ -12,6 +12,7 @@ import org.mapstruct.MappingTarget;
 public interface CarMapper {
     @Mapping(target = "id", ignore = true)
     Car toCar(CarCreateEditDto dto);
+    Car toCar(CarReadDto dto);
 
     CarReadDto toReadDto(Car car);
 

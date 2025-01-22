@@ -5,14 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.driver.constants.CommonConstants;
 import org.example.driver.constants.ExceptionConstants;
 import org.example.driver.dto.create.DriverCreateEditDto;
+import org.example.driver.dto.read.CarReadDto;
 import org.example.driver.dto.read.DriverReadDto;
 import org.example.driver.dto.read.RideReadDto;
 import org.example.driver.dto.read.UserRateDto;
 import org.example.driver.entity.Car;
 import org.example.driver.entity.Driver;
-import org.example.driver.exception.car.CarNotFoundException;
 import org.example.driver.exception.driver.DriverNotFoundException;
 import org.example.driver.exception.driver.DuplicatedDriverEmailException;
+import org.example.driver.mapper.CarMapper;
 import org.example.driver.mapper.DriverMapper;
 import org.example.driver.repository.CarRepository;
 import org.example.driver.repository.DriverRepository;
@@ -31,6 +32,8 @@ public class DriverService {
     private final DriverMapper driverMapper;
     private final CarRepository carRepository;
     private final MessageSource messageSource;
+    private final CarService carService;
+    private final CarMapper carMapper;
 
     @Transactional
     public DriverReadDto create(DriverCreateEditDto driverDto) {
@@ -43,16 +46,13 @@ public class DriverService {
                 });
 
         Driver driver = driverMapper.toDriver(driverDto);
-
-        Car car = carRepository.findByIdAndIsDeletedFalse(driverDto.carId())
-                .orElseThrow(() -> new CarNotFoundException(messageSource.getMessage(
-                        ExceptionConstants.CAR_NOT_FOUND,
-                        new Object[]{driverDto.carId()},
-                        LocaleContextHolder.getLocale())));
-
+        Car car = carRepository.findByNumberAndIsDeletedFalse(driverDto.carCreateEditDto().number())
+                .orElseGet(() -> {
+                    CarReadDto carReadDto = carService.create(driverDto.carCreateEditDto());
+                    return carMapper.toCar(carReadDto);
+                });
         driver.setCar(car);
         driver.setRating(CommonConstants.DEFAULT_RATING);
-
         return driverMapper.toReadDto(driverRepository.save(driver));
 
     }
@@ -71,11 +71,11 @@ public class DriverService {
                                 }
                             });
                     driverMapper.map(driver, driverDto);
-                    Car car = carRepository.findByIdAndIsDeletedFalse(driverDto.carId())
-                            .orElseThrow(() -> new CarNotFoundException(messageSource.getMessage(
-                                    ExceptionConstants.CAR_NOT_FOUND,
-                                    new Object[]{driverDto.carId()},
-                                    LocaleContextHolder.getLocale())));
+                    Car car = carRepository.findByNumberAndIsDeletedFalse(driverDto.carCreateEditDto().number())
+                            .orElseGet(() -> {
+                                CarReadDto carReadDto = carService.create(driverDto.carCreateEditDto());
+                                return carMapper.toCar(carReadDto);
+                            });
                     driver.setCar(car);
                     return driver;
                 })

@@ -1,0 +1,2 @@
+ALTER TABLE passengers
+ADD COLUMN gender VARCHAR(64);

@@ -5,12 +5,16 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import org.example.passenger.constants.ExceptionConstants;
+import org.example.passenger.entity.enumeration.Gender;
 
 @Builder
 public record PassengerCreateEditDto (
 
         @NotBlank(message = "{name.blank}")
-        String name,
+        String firstName,
+
+        @NotBlank(message = "{name.blank}")
+        String lastName,
 
         @NotBlank(message = "{email.blank}")
         @Email(message = "{email.invalid}")
@@ -19,6 +23,7 @@ public record PassengerCreateEditDto (
         @Pattern(message = "{phone.invalid}",
                 regexp = ExceptionConstants.PHONE_PATTERN)
         @NotBlank(message = "{phone.blank}")
-        String phone
+        String phone,
+        Gender gender
 ) {
 }

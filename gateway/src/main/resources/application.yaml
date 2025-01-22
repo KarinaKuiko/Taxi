@@ -24,6 +24,11 @@ spring:
           predicates:
             - Path=${commonApiPath}/rides/**
 
+        - id: registration-service
+          uri: lb://registration-service
+          predicates:
+            - Path=${commonApiPath}/taxi/**
+
 commonApiPath: /api/v1
 server:
   port: 8080

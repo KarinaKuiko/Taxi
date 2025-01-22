@@ -3,6 +3,7 @@ version: '3.8'
 x-defaults: &defaults
   EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
   KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  KEYCLOAK_ISSUER_URI: http://keycloak:8484/realms/taxi_realm
 
 services:
   eureka-server:
@@ -421,6 +422,73 @@ services:
         aliases:
           - prometheus
 
+  keycloak_db:
+    container_name: keycloak_db
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: keycloak_db
+    ports:
+      - "5437:5432"
+    restart: unless-stopped
+    networks:
+      - taxi-network
+    volumes:
+      - keycloak_data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  keycloak:
+    image: keycloak/keycloak
+    container_name: keycloak
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: keycloak_db
+      DB_DATABASE: keycloak_db
+      DB_USER: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_USERNAME}
+      KC_BOOTSTRAP_ADMIN_PASSWORD : ${KEYCLOAK_PASSWORD}
+    volumes:
+      - ./keycloak/realms:/opt/keycloak/data/import
+    command: ["start-dev", "--http-port=8484", "--import-realm"]
+    ports:
+      - "8484:8484"
+    depends_on:
+      - keycloak_db
+    links:
+      - "keycloak_db:keycloak_db"
+    networks:
+      - taxi-network
+
+  registration-service:
+    build:
+      context: ../registration-service
+      dockerfile: ../docker-compose/Dockerfile
+      args:
+        SERVICE_NAME: registration-service
+    container_name: registration-service
+    environment:
+      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      KEYCLOAK_SERVER_URL: http://keycloak:8484
+      KEYCLOAK_ADMIN_CLIENT_ID: ${ADMIN_CLIENT_ID}
+      KEYCLOAK_ADMIN_CLIENT_SECRET: ${ADMIN_CLIENT_SECRET}
+      KEYCLOAK_REALM: ${REALM}
+    ports:
+      - "8085:8085"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      gateway:
+        condition: service_healthy
+    networks:
+      - taxi-network
+
   zipkin:
     image: openzipkin/zipkin
     container_name: zipkin
@@ -428,7 +496,6 @@ services:
       - "9411:9411"
     networks:
       - taxi-network
-
 volumes:
   rating_data:
   rides_data:
@@ -437,6 +504,7 @@ volumes:
   elk_data:
   ls_data:
   kb_data:
+  keycloak_data:
 
 networks:
   taxi-network:

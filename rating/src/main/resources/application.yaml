@@ -29,6 +29,20 @@ spring:
           enabled: true
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: taxi_client
+            scope:
+              - openid
+        provider:
+          keycloak:
+            issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8484/realms/taxi_realm}
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8484/realms/taxi_realm}
 
 management:
   endpoint:

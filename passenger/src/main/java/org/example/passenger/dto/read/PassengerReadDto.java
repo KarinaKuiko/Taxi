@@ -5,11 +5,11 @@ import lombok.Builder;
 @Builder
 public record PassengerReadDto(
         long id,
-        String name,
-
+        String firstName,
+        String lastName,
         String email,
-
         String phone,
-        double rating
+        double rating,
+        String gender
 ) {
 }

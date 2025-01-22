@@ -28,7 +28,7 @@ import static org.example.driver.util.DataUtil.CAR_NOT_FOUND;
 import static org.example.driver.util.DataUtil.DEFAULT_EMAIL;
 import static org.example.driver.util.DataUtil.DEFAULT_ID;
 import static org.example.driver.util.DataUtil.DEFAULT_PHONE;
-import static org.example.driver.util.DataUtil.DEFAUlT_NAME;
+import static org.example.driver.util.DataUtil.DEFAULT_NAME;
 import static org.example.driver.util.DataUtil.DRIVER_DUPLICATED_EMAIL;
 import static org.example.driver.util.DataUtil.DRIVER_ENTITY;
 import static org.example.driver.util.DataUtil.DRIVER_NOT_FOUND;
@@ -116,7 +116,7 @@ public class DriverControllerIntegrationTest {
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("id", equalTo(DEFAULT_ID.intValue()))
-                .body("name", equalTo(DEFAUlT_NAME))
+                .body("name", equalTo(DEFAULT_NAME))
                 .body("email", equalTo(DEFAULT_EMAIL))
                 .body("phone", equalTo(DEFAULT_PHONE))
                 .body("gender", equalTo(Gender.MALE.name()))
@@ -136,11 +136,11 @@ public class DriverControllerIntegrationTest {
     @Test
     void create_whenValidInput_thenReturn201AndDriverReadDto() {
         DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
-                .name("name")
+                .firstName("name")
                 .email("driver@gmail.com")
                 .phone("+375291122334")
                 .gender(Gender.MALE)
-                .carId(DEFAULT_ID)
+               // .carId(DEFAULT_ID)
                 .build();
 
         RestAssuredMockMvc
@@ -173,7 +173,7 @@ public class DriverControllerIntegrationTest {
     void create_whenCarIdNotFound_thenReturn404() {
         DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
                 .email("driver@gmail.com")
-                .carId(10L)
+                //.carId(10L)
                 .build();
 
         RestAssuredMockMvc
@@ -190,7 +190,7 @@ public class DriverControllerIntegrationTest {
     @Test
     void update_whenValidInput_thenReturn200AndDriverReadDto() {
         DriverCreateEditDto updateDriver = getDriverCreateEditDtoBuilder()
-                .name("testing")
+                .firstName("testing")
                 .gender(Gender.FEMALE)
                 .build();
 
@@ -203,7 +203,7 @@ public class DriverControllerIntegrationTest {
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("id", equalTo(DEFAULT_ID.intValue()))
-                .body("name", equalTo("testing"))
+                .body("firstName", equalTo("testing"))
                 .body("email", equalTo(DEFAULT_EMAIL))
                 .body("phone", equalTo(DEFAULT_PHONE))
                 .body("gender", equalTo(Gender.FEMALE.name()))
@@ -228,7 +228,7 @@ public class DriverControllerIntegrationTest {
     @Test
     void update_whenEmailIsDuplicated_thenReturn409() {
         DriverCreateEditDto updateDriver = getDriverCreateEditDtoBuilder()
-                .name("testing")
+                .firstName("testing")
                 .email("name@gmail.com")
                 .build();
 
@@ -246,7 +246,7 @@ public class DriverControllerIntegrationTest {
     @Test
     void update_whenCarIsNotFound_thenReturn404() {
         DriverCreateEditDto updateDriver = getDriverCreateEditDtoBuilder()
-                .carId(10L)
+             //   .carId(10L)
                 .build();
 
         RestAssuredMockMvc
