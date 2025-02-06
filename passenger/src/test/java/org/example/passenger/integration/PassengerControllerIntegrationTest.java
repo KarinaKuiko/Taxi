@@ -33,7 +33,7 @@ import static org.example.passenger.util.DataUtil.LIMIT_VALUE;
 import static org.example.passenger.util.DataUtil.MESSAGE;
 import static org.example.passenger.util.DataUtil.PAGE;
 import static org.example.passenger.util.DataUtil.PAGE_VALUE;
-import static org.example.passenger.util.DataUtil.PASSENGER_DUPlICATED_EMAIL_MESSAGE;
+import static org.example.passenger.util.DataUtil.PASSENGER_DUPLICATED_EMAIL_MESSAGE;
 import static org.example.passenger.util.DataUtil.PASSENGER_NOT_FOUND_EXCEPTION_MESSAGE;
 import static org.example.passenger.util.DataUtil.URL;
 import static org.example.passenger.util.DataUtil.URL_WITH_ID;
@@ -158,7 +158,7 @@ public class PassengerControllerIntegrationTest {
                 .post(URL)
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .body(MESSAGE, equalTo(PASSENGER_DUPlICATED_EMAIL_MESSAGE));
+                .body(MESSAGE, equalTo(PASSENGER_DUPLICATED_EMAIL_MESSAGE));
     }
 
     @Test
@@ -202,7 +202,7 @@ public class PassengerControllerIntegrationTest {
                 .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .body(MESSAGE, equalTo(PASSENGER_DUPlICATED_EMAIL_MESSAGE));
+                .body(MESSAGE, equalTo(PASSENGER_DUPLICATED_EMAIL_MESSAGE));
     }
 
     @Test

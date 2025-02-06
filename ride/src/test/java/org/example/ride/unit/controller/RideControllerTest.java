@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -46,6 +47,7 @@ import static org.example.ride.util.DataUtil.getRideReadDtoBuilder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -53,6 +55,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = RideController.class)
 @Import(MessageSourceConfig.class)
+@WithMockUser
 class RideControllerTest {
 
     @Autowired
@@ -186,7 +189,8 @@ class RideControllerTest {
 
             mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createRide)))
+                            .content(objectMapper.writeValueAsString(createRide))
+                            .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
 
@@ -199,7 +203,8 @@ class RideControllerTest {
 
             mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createRide)))
+                            .content(objectMapper.writeValueAsString(createRide))
+                            .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
 
@@ -221,7 +226,8 @@ class RideControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createRide)))
+                            .content(objectMapper.writeValueAsString(createRide))
+                            .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
 
@@ -241,7 +247,8 @@ class RideControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createRide)))
+                            .content(objectMapper.writeValueAsString(createRide))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -265,7 +272,8 @@ class RideControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createRide)))
+                            .content(objectMapper.writeValueAsString(createRide))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -288,7 +296,8 @@ class RideControllerTest {
 
             mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createRide)))
+                            .content(objectMapper.writeValueAsString(createRide))
+                            .with(csrf()))
                     .andExpect(status().isOk());
 
             verify(rideService, times(1)).update(DEFAULT_ID, createRide);
@@ -300,7 +309,8 @@ class RideControllerTest {
 
             mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createRide)))
+                            .content(objectMapper.writeValueAsString(createRide))
+                            .with(csrf()))
                     .andExpect(status().isOk());
 
             ArgumentCaptor<RideCreateEditDto> rideCaptor = ArgumentCaptor.forClass(RideCreateEditDto.class);
@@ -323,7 +333,8 @@ class RideControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createRide)))
+                            .content(objectMapper.writeValueAsString(createRide))
+                            .with(csrf()))
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -343,7 +354,8 @@ class RideControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createRide)))
+                            .content(objectMapper.writeValueAsString(createRide))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -368,7 +380,8 @@ class RideControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createRide)))
+                            .content(objectMapper.writeValueAsString(createRide))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -387,7 +400,8 @@ class RideControllerTest {
 
             mockMvc.perform(put(URL_WITH_ID + DRIVER_STATUS, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(driverRideStatusDto)))
+                            .content(objectMapper.writeValueAsString(driverRideStatusDto))
+                            .with(csrf()))
                     .andExpect(status().isOk());
 
             verify(rideService, times(1)).updateDriverStatus(DEFAULT_ID, driverRideStatusDto);
@@ -399,7 +413,8 @@ class RideControllerTest {
 
             mockMvc.perform(put(URL_WITH_ID + DRIVER_STATUS, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(driverRideStatusDto)))
+                            .content(objectMapper.writeValueAsString(driverRideStatusDto))
+                            .with(csrf()))
                     .andExpect(status().isOk());
 
             ArgumentCaptor<DriverRideStatusDto> driverStatusCaptor = ArgumentCaptor.forClass(DriverRideStatusDto.class);
@@ -421,7 +436,8 @@ class RideControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID + DRIVER_STATUS, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(driverRideStatusDto)))
+                            .content(objectMapper.writeValueAsString(driverRideStatusDto))
+                            .with(csrf()))
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -436,7 +452,8 @@ class RideControllerTest {
 
             mockMvc.perform(put(URL_WITH_ID + PASSENGER_STATUS, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(passengerRideStatusDto)))
+                            .content(objectMapper.writeValueAsString(passengerRideStatusDto))
+                            .with(csrf()))
                     .andExpect(status().isOk());
 
             verify(rideService, times(1)).updatePassengerStatus(
@@ -449,7 +466,8 @@ class RideControllerTest {
 
             mockMvc.perform(put(URL_WITH_ID + PASSENGER_STATUS, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(passengerRideStatusDto)))
+                            .content(objectMapper.writeValueAsString(passengerRideStatusDto))
+                            .with(csrf()))
                     .andExpect(status().isOk());
 
             ArgumentCaptor<PassengerRideStatusDto> passengerStatusCaptor =
@@ -472,7 +490,8 @@ class RideControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID + PASSENGER_STATUS, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(passengerRideStatusDto)))
+                            .content(objectMapper.writeValueAsString(passengerRideStatusDto))
+                            .with(csrf()))
                     .andExpect(status().isOk())
                     .andReturn();
 

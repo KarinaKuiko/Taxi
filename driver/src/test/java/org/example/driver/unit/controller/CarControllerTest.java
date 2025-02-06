@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -43,6 +44,7 @@ import static org.example.driver.util.DataUtil.getCarReadDtoBuilder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -51,6 +53,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = CarController.class)
 @Import(MessageSourceConfig.class)
+@WithMockUser
 class CarControllerTest {
 
     @Autowired
@@ -151,7 +154,8 @@ class CarControllerTest {
 
             mockMvc.perform(post(URL, CAR_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createCar)))
+                            .content(objectMapper.writeValueAsString(createCar))
+                            .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
 
@@ -164,7 +168,8 @@ class CarControllerTest {
 
             mockMvc.perform(post(URL, CAR_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createCar)))
+                            .content(objectMapper.writeValueAsString(createCar))
+                            .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
 
@@ -186,7 +191,8 @@ class CarControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(post(URL, CAR_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createCar)))
+                            .content(objectMapper.writeValueAsString(createCar))
+                            .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
 
@@ -206,7 +212,8 @@ class CarControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(post(URL, CAR_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createCar)))
+                            .content(objectMapper.writeValueAsString(createCar))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -230,7 +237,8 @@ class CarControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(post(URL, CAR_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createCar)))
+                            .content(objectMapper.writeValueAsString(createCar))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -251,7 +259,8 @@ class CarControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(post(URL, CAR_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createCar)))
+                            .content(objectMapper.writeValueAsString(createCar))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -272,7 +281,8 @@ class CarControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(post(URL, CAR_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createCar)))
+                            .content(objectMapper.writeValueAsString(createCar))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -293,7 +303,8 @@ class CarControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(post(URL, CAR_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createCar)))
+                            .content(objectMapper.writeValueAsString(createCar))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -314,7 +325,8 @@ class CarControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(post(URL, CAR_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createCar)))
+                            .content(objectMapper.writeValueAsString(createCar))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -335,7 +347,8 @@ class CarControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(post(URL, CAR_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createCar)))
+                            .content(objectMapper.writeValueAsString(createCar))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -358,7 +371,8 @@ class CarControllerTest {
 
             mockMvc.perform(put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createCar)))
+                            .content(objectMapper.writeValueAsString(createCar))
+                            .with(csrf()))
                     .andExpect(status().isOk());
 
             verify(carService, times(1)).update(DEFAULT_ID, createCar);
@@ -372,7 +386,8 @@ class CarControllerTest {
 
             mockMvc.perform(put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createCar)))
+                            .content(objectMapper.writeValueAsString(createCar))
+                            .with(csrf()))
                     .andExpect(status().isOk());
 
             ArgumentCaptor<CarCreateEditDto> carCaptor = ArgumentCaptor.forClass(CarCreateEditDto.class);
@@ -395,7 +410,8 @@ class CarControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createCar)))
+                            .content(objectMapper.writeValueAsString(createCar))
+                            .with(csrf()))
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -415,7 +431,8 @@ class CarControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createCar)))
+                            .content(objectMapper.writeValueAsString(createCar))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -439,7 +456,8 @@ class CarControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createCar)))
+                            .content(objectMapper.writeValueAsString(createCar))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -460,7 +478,8 @@ class CarControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createCar)))
+                            .content(objectMapper.writeValueAsString(createCar))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -481,7 +500,8 @@ class CarControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createCar)))
+                            .content(objectMapper.writeValueAsString(createCar))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -502,7 +522,8 @@ class CarControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createCar)))
+                            .content(objectMapper.writeValueAsString(createCar))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -523,7 +544,8 @@ class CarControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createCar)))
+                            .content(objectMapper.writeValueAsString(createCar))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -544,7 +566,8 @@ class CarControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createCar)))
+                            .content(objectMapper.writeValueAsString(createCar))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -563,7 +586,8 @@ class CarControllerTest {
     public class deleteTests {
         @Test
         void delete_whenVerifyingRequestMatching_thenReturn204() throws Exception {
-            mockMvc.perform(delete(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID))
+            mockMvc.perform(delete(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID)
+                            .with(csrf()))
                     .andExpect(status().isNoContent());
 
             verify(carService, times(1)).safeDelete(DEFAULT_ID);

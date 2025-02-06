@@ -2,6 +2,7 @@ package org.example.driver.unit.sevice;
 
 import org.example.driver.constants.ExceptionConstants;
 import org.example.driver.dto.create.DriverCreateEditDto;
+import org.example.driver.dto.read.CarReadDto;
 import org.example.driver.dto.read.DriverReadDto;
 import org.example.driver.dto.read.UserRateDto;
 import org.example.driver.entity.Car;
@@ -9,9 +10,11 @@ import org.example.driver.entity.Driver;
 import org.example.driver.exception.car.CarNotFoundException;
 import org.example.driver.exception.driver.DriverNotFoundException;
 import org.example.driver.exception.driver.DuplicatedDriverEmailException;
+import org.example.driver.mapper.CarMapper;
 import org.example.driver.mapper.DriverMapper;
 import org.example.driver.repository.CarRepository;
 import org.example.driver.repository.DriverRepository;
+import org.example.driver.service.CarService;
 import org.example.driver.service.DriverService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,13 +32,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.example.driver.util.DataUtil.DEFAULT_ID;
-import static org.example.driver.util.DataUtil.LIMIT_VALUE;
-import static org.example.driver.util.DataUtil.PAGE_VALUE;
-import static org.example.driver.util.DataUtil.getCarBuilder;
-import static org.example.driver.util.DataUtil.getDriverBuilder;
-import static org.example.driver.util.DataUtil.getDriverCreateEditDtoBuilder;
-import static org.example.driver.util.DataUtil.getDriverReadDtoBuilder;
+import static org.example.driver.util.DataUtil.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -56,6 +53,12 @@ class DriverServiceTest {
 
     @Mock
     private CarRepository carRepository;
+
+    @Mock
+    private CarService carService;
+
+    @Mock
+    private CarMapper carMapper;
 
     @Mock
     private MessageSource messageSource;
@@ -83,33 +86,30 @@ class DriverServiceTest {
     }
 
     @Test
-    void create_whenCarIsNotFound_thenThrowCarNotFoundException() {
+    void create_whenCarIsNotFound_thenReturnDriverReadDto() {
         Driver defaultDriver = getDriverBuilder().build();
         DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
+        DriverReadDto readDriver = getDriverReadDtoBuilder().build();
+        Car car = getCarBuilder().build();
+        CarReadDto carReadDto = getCarReadDtoBuilder().build();
 
         when(driverRepository.findByEmailAndIsDeletedFalse(createDriver.email()))
                 .thenReturn(Optional.empty());
         when(driverMapper.toDriver(createDriver)).thenReturn(defaultDriver);
-        //when(carRepository.findByIdAndIsDeletedFalse(createDriver.carId())).thenReturn(Optional.empty());
-//        when(messageSource.getMessage(
-//                ExceptionConstants.CAR_NOT_FOUND,
-//                new Object[]{createDriver.carId()},
-//                LocaleContextHolder.getLocale()))
-//                .thenReturn(ExceptionConstants.CAR_NOT_FOUND);
+        when(carRepository.findByNumberAndIsDeletedFalse(createDriver.carCreateEditDto().number())).thenReturn(Optional.empty());
+        when(carService.create(createDriver.carCreateEditDto())).thenReturn(carReadDto);
+        when(carMapper.toCar(carReadDto)).thenReturn(car);
+        when(driverRepository.save(defaultDriver)).thenReturn(defaultDriver);
+        when(driverMapper.toReadDto(defaultDriver)).thenReturn(readDriver);
 
-        CarNotFoundException exception = assertThrows(CarNotFoundException.class,
-                () -> driverService.create(createDriver));
-
-        assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.CAR_NOT_FOUND);
+        assertThat(driverService.create(createDriver)).isNotNull();
         verify(driverRepository).findByEmailAndIsDeletedFalse(createDriver.email());
         verify(driverMapper).toDriver(createDriver);
-//        verify(carRepository).findByIdAndIsDeletedFalse(createDriver.carId());
-//        verify(messageSource).getMessage(
-//                ExceptionConstants.CAR_NOT_FOUND,
-//                new Object[]{createDriver.carId()},
-//                LocaleContextHolder.getLocale());
-        verify(driverRepository, never()).save(any());
-        verify(driverMapper, never()).toReadDto(any());
+        verify(carRepository).findByNumberAndIsDeletedFalse(createDriver.carCreateEditDto().number());
+        verify(carService).create(createDriver.carCreateEditDto());
+        verify(carMapper).toCar(carReadDto);
+        verify(driverRepository).save(defaultDriver);
+        verify(driverMapper).toReadDto(defaultDriver);
     }
 
     @Test
@@ -150,7 +150,7 @@ class DriverServiceTest {
         when(driverRepository.findByIdAndIsDeletedFalse(DEFAULT_ID)).thenReturn(Optional.of(defaultDriver));
         when(driverRepository.findByEmailAndIsDeletedFalse(createDriver.email()))
                 .thenReturn(Optional.of(defaultDriver));
-        //when(carRepository.findByIdAndIsDeletedFalse(createDriver.carId())).thenReturn(Optional.of(car));
+        when(carRepository.findByNumberAndIsDeletedFalse(createDriver.carCreateEditDto().number())).thenReturn(Optional.of(car));
         when(driverRepository.save(defaultDriver)).thenReturn(defaultDriver);
         when(driverMapper.toReadDto(defaultDriver)).thenReturn(readDriver);
 
@@ -158,7 +158,7 @@ class DriverServiceTest {
         verify(driverRepository).findByIdAndIsDeletedFalse(DEFAULT_ID);
         verify(driverRepository).findByEmailAndIsDeletedFalse(createDriver.email());
         verify(driverMapper).map(defaultDriver, createDriver);
-       // verify(carRepository).findByIdAndIsDeletedFalse(createDriver.carId());
+        verify(carRepository).findByNumberAndIsDeletedFalse(createDriver.carCreateEditDto().number());
         verify(driverRepository).save(defaultDriver);
         verify(driverMapper).toReadDto(defaultDriver);
     }
@@ -193,34 +193,32 @@ class DriverServiceTest {
     }
 
     @Test
-    void update_whenCarIsNotFound_thenThrowCarNotFoundException() {
+    void update_whenCarIsNotFound_thenReturnDriverReadDto() {
         Driver defaultDriver = getDriverBuilder().build();
         DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
+        DriverReadDto readDriver = getDriverReadDtoBuilder().build();
+        Car car = getCarBuilder().build();
+        CarReadDto carReadDto = getCarReadDtoBuilder().build();
 
         when(driverRepository.findByIdAndIsDeletedFalse(DEFAULT_ID)).thenReturn(Optional.of(defaultDriver));
         when(driverRepository.findByEmailAndIsDeletedFalse(createDriver.email()))
                 .thenReturn(Optional.empty());
-//        when(carRepository.findByIdAndIsDeletedFalse(createDriver.carId())).thenReturn(Optional.empty());
-//        when(messageSource.getMessage(
-//                ExceptionConstants.CAR_NOT_FOUND,
-//                new Object[]{createDriver.carId()},
-//                LocaleContextHolder.getLocale()))
-//                .thenReturn(ExceptionConstants.CAR_NOT_FOUND);
+        when(carRepository.findByNumberAndIsDeletedFalse(createDriver.carCreateEditDto().number())).thenReturn(Optional.empty());
+        when(carService.create(createDriver.carCreateEditDto())).thenReturn(carReadDto);
+        when(carMapper.toCar(carReadDto)).thenReturn(car);
+        when(driverRepository.save(defaultDriver)).thenReturn(defaultDriver);
+        when(driverMapper.toReadDto(defaultDriver)).thenReturn(readDriver);
 
-        CarNotFoundException exception = assertThrows(CarNotFoundException.class,
-                () -> driverService.update(DEFAULT_ID, createDriver));
-
-        assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.CAR_NOT_FOUND);
+        assertThat(driverService.update(DEFAULT_ID, createDriver)).isNotNull();
         verify(driverRepository).findByIdAndIsDeletedFalse(DEFAULT_ID);
         verify(driverRepository).findByEmailAndIsDeletedFalse(createDriver.email());
-        //verify(carRepository).findByIdAndIsDeletedFalse(createDriver.carId());
+        verify(carRepository).findByNumberAndIsDeletedFalse(createDriver.carCreateEditDto().number());
         verify(driverMapper).map(defaultDriver, createDriver);
-        verify(driverRepository, never()).save(any());
-        verify(driverMapper, never()).toReadDto(any());
-//        verify(messageSource).getMessage(
-//                ExceptionConstants.CAR_NOT_FOUND,
-//                new Object[]{createDriver.carId()},
-//                LocaleContextHolder.getLocale());
+        verify(carService).create(createDriver.carCreateEditDto());
+        verify(carMapper).toCar(carReadDto);
+        verify(driverRepository).save(defaultDriver);
+        verify(driverMapper).toReadDto(defaultDriver);
+
     }
 
     @Test

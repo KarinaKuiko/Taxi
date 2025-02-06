@@ -23,28 +23,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.example.driver.util.DataUtil.DEFAULT_EMAIL;
-import static org.example.driver.util.DataUtil.DEFAULT_ID;
-import static org.example.driver.util.DataUtil.DEFAULT_PHONE;
-import static org.example.driver.util.DataUtil.DEFAULT_NAME;
-import static org.example.driver.util.DataUtil.DRIVER_ENTITY;
-import static org.example.driver.util.DataUtil.LIMIT;
-import static org.example.driver.util.DataUtil.LIMIT_VALUE;
-import static org.example.driver.util.DataUtil.PAGE;
-import static org.example.driver.util.DataUtil.PAGE_VALUE;
-import static org.example.driver.util.DataUtil.URL;
-import static org.example.driver.util.DataUtil.URL_WITH_ID;
-import static org.example.driver.util.DataUtil.getDriverCreateEditDtoBuilder;
-import static org.example.driver.util.DataUtil.getDriverReadDtoBuilder;
+import static org.example.driver.util.DataUtil.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -53,6 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = DriverController.class)
 @Import(MessageSourceConfig.class)
+@WithMockUser
 class DriverControllerTest {
 
     @Autowired
@@ -155,7 +146,8 @@ class DriverControllerTest {
 
             mockMvc.perform(post(URL, DRIVER_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver)))
+                            .content(objectMapper.writeValueAsString(createDriver))
+                            .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
 
@@ -168,7 +160,8 @@ class DriverControllerTest {
 
             mockMvc.perform(post(URL, DRIVER_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver)))
+                            .content(objectMapper.writeValueAsString(createDriver))
+                            .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
 
@@ -180,7 +173,7 @@ class DriverControllerTest {
             assertThat(driverCaptor.getValue().email()).isEqualTo(DEFAULT_EMAIL);
             assertThat(driverCaptor.getValue().phone()).isEqualTo(DEFAULT_PHONE);
             assertThat(driverCaptor.getValue().gender()).isEqualTo(Gender.MALE);
-        //    assertThat(driverCaptor.getValue().carId()).isEqualTo(1L);
+            assertThat(driverCaptor.getValue().carCreateEditDto()).isEqualTo(getCarCreateEditDtoBuilder().build());
         }
 
         @Test
@@ -192,7 +185,8 @@ class DriverControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(post(URL, DRIVER_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver)))
+                            .content(objectMapper.writeValueAsString(createDriver))
+                            .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
 
@@ -205,18 +199,21 @@ class DriverControllerTest {
         void create_whenInvalidInput_thenReturn400AndValidationResponse() throws Exception {
             DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
                             .firstName(null)
+                            .lastName(null)
                             .email(null)
                             .phone(null)
                             .build();
 
             MvcResult mvcResult = mockMvc.perform(post(URL, DRIVER_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver)))
+                            .content(objectMapper.writeValueAsString(createDriver))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
             ValidationResponse expectedValidationResponse = new ValidationResponse(
-                    List.of(new Violation("name", "Name cannot be blank"),
+                    List.of(new Violation("firstName", "Name cannot be blank"),
+                            new Violation("lastName", "Name cannot be blank"),
                             new Violation("email", "Email cannot be blank"),
                             new Violation("phone", "Phone cannot be blank")));
             ValidationResponse actualResponse = objectMapper.readValue(
@@ -234,7 +231,8 @@ class DriverControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(post(URL, DRIVER_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver)))
+                            .content(objectMapper.writeValueAsString(createDriver))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -256,7 +254,8 @@ class DriverControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(post(URL, DRIVER_ENTITY)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver)))
+                            .content(objectMapper.writeValueAsString(createDriver))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -280,7 +279,8 @@ class DriverControllerTest {
 
             mockMvc.perform(put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver)))
+                            .content(objectMapper.writeValueAsString(createDriver))
+                            .with(csrf()))
                     .andExpect(status().isOk());
 
             verify(driverService, times(1)).update(DEFAULT_ID, createDriver);
@@ -292,7 +292,8 @@ class DriverControllerTest {
 
             mockMvc.perform(put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver)))
+                            .content(objectMapper.writeValueAsString(createDriver))
+                            .with(csrf()))
                     .andExpect(status().isOk());
 
             ArgumentCaptor<DriverCreateEditDto> driverCaptor = ArgumentCaptor.forClass(DriverCreateEditDto.class);
@@ -305,6 +306,7 @@ class DriverControllerTest {
             assertThat(driverCaptor.getValue().email()).isEqualTo(DEFAULT_EMAIL);
             assertThat(driverCaptor.getValue().phone()).isEqualTo(DEFAULT_PHONE);
             assertThat(driverCaptor.getValue().gender()).isEqualTo(Gender.MALE);
+            assertThat(driverCaptor.getValue().carCreateEditDto()).isEqualTo(getCarCreateEditDtoBuilder().build());
         }
 
         @Test
@@ -316,7 +318,8 @@ class DriverControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver)))
+                            .content(objectMapper.writeValueAsString(createDriver))
+                            .with(csrf()))
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -329,18 +332,21 @@ class DriverControllerTest {
         void update_whenInvalidInput_thenReturn400AndValidationResponse() throws Exception {
             DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
                             .firstName(null)
+                            .lastName(null)
                             .email(null)
                             .phone(null)
                             .build();
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver)))
+                            .content(objectMapper.writeValueAsString(createDriver))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
             ValidationResponse expectedValidationResponse = new ValidationResponse(
-                    List.of(new Violation("name", "Name cannot be blank"),
+                    List.of(new Violation("firstName", "Name cannot be blank"),
+                            new Violation("lastName", "Name cannot be blank"),
                             new Violation("email", "Email cannot be blank"),
                             new Violation("phone", "Phone cannot be blank")));
             ValidationResponse actualResponse = objectMapper.readValue(
@@ -358,7 +364,8 @@ class DriverControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver)))
+                            .content(objectMapper.writeValueAsString(createDriver))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -380,7 +387,8 @@ class DriverControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver)))
+                            .content(objectMapper.writeValueAsString(createDriver))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -400,7 +408,8 @@ class DriverControllerTest {
     public class deleteTests {
         @Test
         void delete_whenVerifyingRequestMatching_thenReturn401() throws Exception {
-            mockMvc.perform(delete(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID))
+            mockMvc.perform(delete(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
+                            .with(csrf()))
                     .andExpect(status().isNoContent());
 
             verify(driverService, times(1)).safeDelete(DEFAULT_ID);

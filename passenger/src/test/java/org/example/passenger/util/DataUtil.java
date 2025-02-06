@@ -22,7 +22,7 @@ public class DataUtil {
 
     //Exception
     public static final String PASSENGER_NOT_FOUND_EXCEPTION_MESSAGE = "Passenger was not found";
-    public static final String PASSENGER_DUPlICATED_EMAIL_MESSAGE = "Passenger with this email already exists";
+    public static final String PASSENGER_DUPLICATED_EMAIL_MESSAGE = "Passenger with this email already exists";
 
 
     //Passenger

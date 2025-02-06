@@ -93,8 +93,8 @@ public class DataUtil {
                 .lastName(DEFAULT_NAME)
                 .email(DEFAULT_EMAIL)
                 .phone(DEFAULT_PHONE)
-                .gender(Gender.MALE);
-                //.carId(DEFAULT_ID);
+                .gender(Gender.MALE)
+                .carCreateEditDto(getCarCreateEditDtoBuilder().build());
     }
 
     public static Driver.DriverBuilder getDriverBuilder() {
