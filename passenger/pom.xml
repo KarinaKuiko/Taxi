@@ -42,6 +42,7 @@
         <failsafe.plugin.version>3.5.2</failsafe.plugin.version>
         <cucumber.version>7.19.0</cucumber.version>
         <extentsreport.version>1.14.0</extentsreport.version>
+        <logstash.logback.encoder.version>8.0</logstash.logback.encoder.version>
     </properties>
     <dependencies>
         <dependency>
@@ -177,6 +178,11 @@
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <version>${logstash.logback.encoder.version}</version>
         </dependency>
     </dependencies>
 

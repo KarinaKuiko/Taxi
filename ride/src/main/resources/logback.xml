@@ -1,0 +1,22 @@
+<configuration>
+    <appender name="LOGSTASH" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeMdc>true</includeMdc>
+            <customFields>{"service.name":"ride"}</customFields>
+            <pattern>
+                {
+                "timestamp": "%date{yyyy-MM-dd HH:mm:ss}",
+                "level": "%level",
+                "message": "%message",
+                "logger": "%logger",
+                "traceId": "%X{traceId}",
+                "spanId": "%X{spanId}"
+                }
+            </pattern>
+        </encoder>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="LOGSTASH"/>
+    </root>
+</configuration>
