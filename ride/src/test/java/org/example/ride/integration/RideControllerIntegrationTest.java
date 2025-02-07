@@ -28,20 +28,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import static org.example.ride.util.DataUtil.DEFAULT_ADDRESS_FROM;
-import static org.example.ride.util.DataUtil.DEFAULT_ADDRESS_TO;
-import static org.example.ride.util.DataUtil.DEFAULT_ID;
-import static org.example.ride.util.DataUtil.DRIVER_NOT_FOUND_EXCEPTION_MESSAGE;
-import static org.example.ride.util.DataUtil.DRIVER_STATUS;
-import static org.example.ride.util.DataUtil.INVALID_PROPOSED_STATUS_MESSAGE;
-import static org.example.ride.util.DataUtil.IRRELEVANT_DRIVER_STATUS;
-import static org.example.ride.util.DataUtil.MESSAGE;
-import static org.example.ride.util.DataUtil.PASSENGER_NOT_FOUND_EXCEPTION_MESSAGE;
-import static org.example.ride.util.DataUtil.PASSENGER_STATUS;
-import static org.example.ride.util.DataUtil.RIDE_NOT_FOUND_EXCEPTION_MESSAGE;
-import static org.example.ride.util.DataUtil.URL;
-import static org.example.ride.util.DataUtil.URL_WITH_ID;
-import static org.example.ride.util.DataUtil.getRideCreateEditDtoBuilder;
+import static org.example.ride.util.DataUtil.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
@@ -101,6 +88,8 @@ public class RideControllerIntegrationTest {
     @Test
     void findAll_whenCorrectParams_thenReturn() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .get(URL)
                 .then()
@@ -111,6 +100,8 @@ public class RideControllerIntegrationTest {
     @Test
     void findById_whenRideIsFound_thenReturn200AndRideReadDto() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .get(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
@@ -125,6 +116,8 @@ public class RideControllerIntegrationTest {
     @Test
     void findById_whenRideIsNotFound_thenReturn404() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .get(URL_WITH_ID, "10")
                 .then()
@@ -138,6 +131,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
@@ -153,6 +147,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
@@ -168,6 +163,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
@@ -183,6 +179,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
@@ -198,6 +195,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
@@ -213,6 +211,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
@@ -231,6 +230,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(createRide)
                 .when()
@@ -250,6 +250,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(createRide)
                 .when()
@@ -268,6 +269,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(createRide)
                 .when()
@@ -289,6 +291,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateRide)
                 .when()
@@ -313,6 +316,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateRide)
                 .when()
@@ -334,6 +338,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateRide)
                 .when()
@@ -349,6 +354,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateRide)
                 .when()
