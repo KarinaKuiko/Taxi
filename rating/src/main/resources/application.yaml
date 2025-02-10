@@ -93,3 +93,6 @@ eureka:
       "prometheus.scrape": "true"
       "prometheus.path": "/actuator/prometheus"
       "prometheus.port": "8084"
+
+logging:
+  config: classpath:logback.xml

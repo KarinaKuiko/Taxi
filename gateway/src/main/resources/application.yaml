@@ -3,6 +3,10 @@ spring:
     name: gateway
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
       routes:
         - id: driver
           uri: lb://driver
@@ -36,3 +40,14 @@ eureka:
   client:
     service-url:
       defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+
+logging:
+  config: classpath:logback.xml
+management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans

@@ -344,6 +344,7 @@ services:
     ports:
       - "5044:5044"
       - "9600:9600"
+      - "5000:5000"
     volumes:
       - ./elk-config/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
       - ./elk-config/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
@@ -372,25 +373,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-
-  filebeat:
-    image: elastic/filebeat:7.14.0
-    container_name: filebeat
-    user: root
-    command: [ "filebeat", "-e", "--strict.perms=false" ]
-    volumes:
-      - ./elk-config/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /var/log/syslog:/var/log/syslog:ro
-      - /var/log/auth.log:/var/log/auth.log:ro
-    networks:
-      - taxi-network
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-      kibana:
-        condition: service_healthy
 
   grafana:
     build: './grafana'

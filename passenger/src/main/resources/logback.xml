@@ -1,22 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+
 <configuration>
-    <appender name="LOGSTASH" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-            <includeMdc>true</includeMdc>
-            <customFields>{"service.name":"passenger"}</customFields>
-            <pattern>
-                {
-                "timestamp": "%date{yyyy-MM-dd HH:mm:ss}",
-                "level": "%level",
-                "message": "%message",
-                "logger": "%logger",
-                "traceId": "%X{traceId}",
-                "spanId": "%X{spanId}"
-                }
-            </pattern>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+
+    <appender name="logstash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>logstash:5000</destination>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <mdc/>
+                <context/>
+                <version/>
+                <logLevel/>
+                <loggerName/>
+                <pattern>
+                    <pattern>
+                        <omitEmptyFields>true</omitEmptyFields>
+                        {
+                        "application": {
+                        "name": "%applicationName"
+                        },
+                        "trace": {
+                        "trace_id": "%mdc{traceId}",
+                        "span_id": "%mdc{spanId}"
+                        }
+                        }
+                    </pattern>
+                </pattern>
+                <threadName/>
+                <message/>
+                <logstashMarkers/>
+                <arguments/>
+                <stackTrace/>
+            </providers>
         </encoder>
     </appender>
 
-    <root level="info">
-        <appender-ref ref="LOGSTASH"/>
+    <root level="INFO">
+        <appender-ref ref="logstash"/>
     </root>
+
+    <logger name="org.example" level="DEBUG" additivity="false">
+        <appender-ref ref="logstash"/>
+    </logger>
+
+
 </configuration>
