@@ -1,7 +1,8 @@
 Feature: Ride API
 
   Scenario: Create ride
-    Given request body to create or update ride
+    Given access token
+    And request body to create or update ride
       """
         {
           "driverId": 1,
@@ -26,6 +27,7 @@ Feature: Ride API
       """
 
   Scenario: Get ride by id
+    Given access token
     When get ride with id 3
     Then response status is 200
     And response body contain ride data
@@ -42,7 +44,8 @@ Feature: Ride API
       """
 
   Scenario: Update ride
-    Given request body to create or update ride
+    Given access token
+    And request body to create or update ride
       """
         {
           "driverId": 1,
@@ -67,7 +70,8 @@ Feature: Ride API
       """
 
   Scenario: Update driver status ride with id
-    Given request body to create or update driver ride status
+    Given access token
+    And request body to create or update driver ride status
       """
         {
           "rideStatus": "ACCEPTED"
@@ -89,7 +93,8 @@ Feature: Ride API
       """
 
   Scenario: Update passenger status ride with id
-    Given request body to create or update passenger ride status
+    Given access token
+    And request body to create or update passenger ride status
       """
         {
           "rideStatus": "GETTING_OUT"

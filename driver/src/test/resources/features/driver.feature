@@ -1,7 +1,8 @@
 Feature: Driver API
 
   Scenario: Create car
-    Given request body to create or update car
+    Given access token
+    And request body to create or update car
       """
         {
           "color": "red",
@@ -25,6 +26,7 @@ Feature: Driver API
       """
 
   Scenario: Get car by id
+    Given access token
     When get car with id 3
     Then response status is 200
     And response body contain car data
@@ -40,7 +42,8 @@ Feature: Driver API
       """
 
   Scenario: Update car
-    Given request body to create or update car
+    Given access token
+    And request body to create or update car
       """
         {
           "color": "yellow",
@@ -64,14 +67,21 @@ Feature: Driver API
       """
 
   Scenario: Create driver
-    Given request body to create or update driver
+    Given access token
+    And request body to create or update driver
       """
         {
-          "name": "Driver",
+          "firstName": "Driver",
+          "lastName": "Driver",
           "email": "driver@gmail.com",
           "phone": "+375331234567",
           "gender": "MALE",
-          "carId": 1
+          "carCreateEditDto": {
+              "color": "red",
+              "brand": "BMW",
+              "number": "AB123CD",
+              "year": 2023
+          }
         }
       """
     When create driver
@@ -80,7 +90,8 @@ Feature: Driver API
       """
         {
           "id": 3,
-          "name": "Driver",
+          "firstName": "Driver",
+          "lastName": "Driver",
           "email": "driver@gmail.com",
           "phone": "+375331234567",
           "gender": "MALE",
@@ -90,13 +101,15 @@ Feature: Driver API
       """
 
   Scenario: Get driver by id
+    Given access token
     When get driver with id 3
     Then response status is 200
     And response body contain driver data
       """
         {
           "id": 3,
-          "name": "Driver",
+          "firstName": "Driver",
+          "lastName": "Driver",
           "email": "driver@gmail.com",
           "phone": "+375331234567",
           "gender": "MALE",
@@ -106,14 +119,21 @@ Feature: Driver API
       """
 
   Scenario: Update driver
-    Given request body to create or update driver
+    Given access token
+    And request body to create or update driver
       """
         {
-          "name": "Driver",
+          "firstName": "Driver",
+          "lastName": "Driver",
           "email": "driver@gmail.com",
           "phone": "+375331234567",
           "gender": "FEMALE",
-          "carId": 1
+          "carCreateEditDto": {
+              "color": "red",
+              "brand": "BMW",
+              "number": "AB123CD",
+              "year": 2023
+          }
         }
       """
     When update driver with id 3
@@ -122,7 +142,8 @@ Feature: Driver API
       """
         {
           "id": 3,
-          "name": "Driver",
+          "firstName": "Driver",
+          "lastName": "Driver",
           "email": "driver@gmail.com",
           "phone": "+375331234567",
           "gender": "FEMALE",
@@ -132,9 +153,11 @@ Feature: Driver API
       """
 
   Scenario: Delete driver
+    Given access token
     When delete driver with id 3
     Then response status is 204
 
   Scenario: Delete car
+    Given access token
     When delete car with id 3
     Then response status is 204

@@ -9,22 +9,32 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.example.rating.dto.create.RateCreateEditDto;
 import org.example.rating.dto.read.RateReadDto;
+import org.example.rating.util.TokenReadDto;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.example.rating.util.DataUtil.BASE_URL;
-import static org.example.rating.util.DataUtil.BASE_URL_WITH_ID;
-import static org.example.rating.util.DataUtil.DRIVER_URL_WITH_ID;
-import static org.example.rating.util.DataUtil.HOST_PORT;
-import static org.example.rating.util.DataUtil.PASSENGER_URL_WITH_ID;
+import static org.example.rating.util.DataUtil.*;
 
 public class RateSteps {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private RateCreateEditDto rateRequestDto;
     private Response response;
+    private String accessToken;
 
-    @Given("request body to create or update rate")
+    @Given("access token")
+    public void accessToken() {
+        Response token_response = given()
+                .contentType(ContentType.JSON)
+                .body(signInUserDto())
+                .when()
+                .post(AUTH_URL);
+
+        TokenReadDto tokenReadDto = token_response.as(TokenReadDto.class);
+        accessToken = tokenReadDto.accessToken();
+    }
+
+    @And("request body to create or update rate")
     public void requestBodyToCreateOrUpdateRate(String requestBody) throws Exception {
         rateRequestDto = objectMapper.readValue(requestBody, RateCreateEditDto.class);
     }
@@ -32,6 +42,7 @@ public class RateSteps {
     @When("create rate")
     public void createRate() {
         response = given()
+                .header(AUTHORIZATION, BEARER + accessToken)
                 .contentType(ContentType.JSON)
                 .body(rateRequestDto)
                 .when()
@@ -54,6 +65,7 @@ public class RateSteps {
     @When("get passenger rate with id {int}")
     public void getPassengerRateWithId(int id) {
         response = given()
+                .header(AUTHORIZATION, BEARER + accessToken)
                 .when()
                 .get(HOST_PORT + PASSENGER_URL_WITH_ID, id);
     }
@@ -61,6 +73,7 @@ public class RateSteps {
     @When("get driver rate with id {int}")
     public void getDriverRateWithId(int id) {
         response = given()
+                .header(AUTHORIZATION, BEARER + accessToken)
                 .when()
                 .get(HOST_PORT + DRIVER_URL_WITH_ID, id);
     }
@@ -68,6 +81,7 @@ public class RateSteps {
     @When("update rate with id {int}")
     public void updateRateWithId(int id) {
         response = given()
+                .header(AUTHORIZATION, BEARER + accessToken)
                 .contentType(ContentType.JSON)
                 .body(rateRequestDto)
                 .when()
