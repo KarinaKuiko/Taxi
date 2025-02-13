@@ -39,4 +39,6 @@ public class Passenger extends AuditingEntity {
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
+
+    private String imageUrl;
 }

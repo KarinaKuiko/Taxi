@@ -63,3 +63,9 @@ management:
   zipkin:
     tracing:
       endpoint: http://zipkin:9411/api/v2/spans
+
+minio:
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
+  url: http://localhost:9000
+  bucket-name: ${MINIO_BUCKET_NAME}
