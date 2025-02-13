@@ -31,4 +31,10 @@
         <tagDatabase tag="v003"/>
     </changeSet>
 
+    <include file="v4/db.changelog-v.4.0.xml" relativeToChangelogFile="true"/>
+
+    <changeSet id="80" author="KarinaIhorevna@gmail.com">
+        <tagDatabase tag="v004"/>
+    </changeSet>
+
 </databaseChangeLog>
