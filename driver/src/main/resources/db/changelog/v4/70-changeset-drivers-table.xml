@@ -6,9 +6,9 @@
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
     <changeSet id="70" author="KarinaIhorevna@gmail.com">
-        <sqlFile path="80-add-image-url-column.sql" relativeToChangelogFile="true"/>
+        <sqlFile path="70-add-image-url-column.sql" relativeToChangelogFile="true"/>
         <rollback>
-            <sqlFile path="80-drop-image-url-column.sql" relativeToChangelogFile="true"/>
+            <sqlFile path="70-drop-image-url-column.sql" relativeToChangelogFile="true"/>
         </rollback>
     </changeSet>
 

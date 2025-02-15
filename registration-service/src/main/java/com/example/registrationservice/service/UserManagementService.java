@@ -2,9 +2,11 @@ package com.example.registrationservice.service;
 
 import com.example.registrationservice.client.DriverClient;
 import com.example.registrationservice.client.PassengerClient;
+import com.example.registrationservice.dto.create.DriverCreateEditDto;
 import com.example.registrationservice.dto.create.SignUpDto;
 import com.example.registrationservice.dto.read.ExceptionDto;
 import com.example.registrationservice.exception.KeycloakException;
+import com.example.registrationservice.mapper.CommonMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.Response;
@@ -22,6 +24,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,12 +47,13 @@ public class UserManagementService {
     private final DriverClient driverClient;
     private final PassengerClient passengerClient;
     private final ObjectMapper objectMapper;
+    private final CommonMapper commonMapper;
 
     @Value("${keycloak.realm}")
     private String realm;
 
-    public UserRepresentation signUp(SignUpDto signUpDto) {
-        UserRepresentation keycloakUser = getUserRepresentation(signUpDto);
+    public UserRepresentation signUp(SignUpDto dto, MultipartFile file) {
+        UserRepresentation keycloakUser = getUserRepresentation(dto);
         RealmResource realmResource = keycloak.realm(realm);
         UsersResource usersResource = realmResource.users();
         Response response = usersResource.create(keycloakUser);
@@ -57,12 +61,16 @@ public class UserManagementService {
         if (response.getStatus() == HttpStatus.CREATED.value()) {
             String adminClientAccessToken = keycloak.tokenManager().getAccessTokenString();
             try {
-                if (Objects.equals(signUpDto.role().name(), PASSENGER_ROLE)) {
-                    passengerClient.createPassenger(signUpDto,
+                if (Objects.equals(dto.role().name(), PASSENGER_ROLE)) {
+                    passengerClient.createPassenger(dto, file,
                             BEARER_PREFIX + adminClientAccessToken);
-                } else if (Objects.equals(signUpDto.role().name(), DRIVER_ROLE)){
-                    driverClient.createDriver(signUpDto,
+                } else if (Objects.equals(dto.role().name(), DRIVER_ROLE)){
+                    log.info("Creating new driver");
+                    DriverCreateEditDto driverCreateEditDto = commonMapper.toDriverCreateEditDto(dto);
+                    log.info("Mapper " + driverCreateEditDto.toString());
+                    driverClient.createDriver(driverCreateEditDto, file,
                             BEARER_PREFIX + adminClientAccessToken);
+                    log.info("Driver created");
                 }
             } catch (Exception exception) {
                 usersResource.delete(CreatedResponseUtil.getCreatedId(response));
@@ -77,7 +85,7 @@ public class UserManagementService {
         }
 
         RolesResource rolesResource = realmResource.roles();
-        RoleRepresentation role = rolesResource.get(signUpDto.role().name()).toRepresentation();
+        RoleRepresentation role = rolesResource.get(dto.role().name()).toRepresentation();
         UserResource userById = usersResource.get(CreatedResponseUtil.getCreatedId(response));
         userById.roles()
                 .realmLevel()

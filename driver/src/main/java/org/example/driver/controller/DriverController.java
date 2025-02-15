@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.driver.dto.create.DriverCreateEditDto;
 import org.example.driver.dto.read.DriverReadDto;
 import org.example.driver.dto.read.PageResponse;
@@ -27,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/drivers")
 @Validated
+@Slf4j
 public class DriverController {
     private final DriverService driverService;
 
@@ -45,6 +47,7 @@ public class DriverController {
     @ResponseStatus(HttpStatus.CREATED)
     public DriverReadDto create(@RequestPart @Valid DriverCreateEditDto dto,
                                 @RequestPart(required = false) MultipartFile file) {
+        log.info("Service step");
         return driverService.create(dto, file);
     }
 

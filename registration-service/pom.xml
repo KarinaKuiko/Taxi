@@ -33,6 +33,7 @@
         <swagger.version>2.6.0</swagger.version>
         <keycloak.version>26.0.3</keycloak.version>
         <resteasy.version>6.2.11.Final</resteasy.version>
+        <mapstruct.version>1.6.2</mapstruct.version>
     </properties>
     <dependencies>
         <dependency>
@@ -127,6 +128,26 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.github.openfeign.form/feign-form -->
+        <dependency>
+            <groupId>io.github.openfeign.form</groupId>
+            <artifactId>feign-form</artifactId>
+            <version>3.8.0</version>
+        </dependency>
+
     </dependencies>
     <dependencyManagement>
         <dependencies>
@@ -150,6 +171,11 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>

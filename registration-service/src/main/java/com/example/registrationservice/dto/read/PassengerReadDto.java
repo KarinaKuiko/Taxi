@@ -6,6 +6,7 @@ public record PassengerReadDto(
         String secondName,
         String email,
         String phone,
-        double rating
+        double rating,
+        String imageUrl
 ) {
 }
