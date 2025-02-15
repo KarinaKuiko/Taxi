@@ -23,7 +23,26 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import static org.example.rating.util.DataUtil.*;
+import static org.example.rating.util.DataUtil.ACCESS_TOKEN;
+import static org.example.rating.util.DataUtil.AUTHORIZATION;
+import static org.example.rating.util.DataUtil.BEARER;
+import static org.example.rating.util.DataUtil.DEFAULT_COMMENT;
+import static org.example.rating.util.DataUtil.DEFAULT_ID;
+import static org.example.rating.util.DataUtil.DEFAULT_RATE;
+import static org.example.rating.util.DataUtil.DRIVER_URL;
+import static org.example.rating.util.DataUtil.DRIVER_URL_WITH_ID;
+import static org.example.rating.util.DataUtil.LIMIT;
+import static org.example.rating.util.DataUtil.LIMIT_VALUE;
+import static org.example.rating.util.DataUtil.MESSAGE;
+import static org.example.rating.util.DataUtil.PAGE;
+import static org.example.rating.util.DataUtil.PAGE_VALUE;
+import static org.example.rating.util.DataUtil.PASSENGER_URL;
+import static org.example.rating.util.DataUtil.PASSENGER_URL_WITH_ID;
+import static org.example.rating.util.DataUtil.RATE_NOT_FOUND_EXCEPTION_MESSAGE;
+import static org.example.rating.util.DataUtil.RIDE_NOT_FOUND_EXCEPTION_MESSAGE;
+import static org.example.rating.util.DataUtil.URL;
+import static org.example.rating.util.DataUtil.URL_WITH_ID;
+import static org.example.rating.util.DataUtil.getPassengerRateCreateEditDtoBuilder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 

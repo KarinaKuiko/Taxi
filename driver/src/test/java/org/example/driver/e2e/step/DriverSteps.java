@@ -8,17 +8,22 @@ import io.cucumber.java.en.When;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
-import net.jcip.annotations.GuardedBy;
 import org.example.driver.dto.create.CarCreateEditDto;
 import org.example.driver.dto.create.DriverCreateEditDto;
 import org.example.driver.dto.read.CarReadDto;
 import org.example.driver.dto.read.DriverReadDto;
 import org.example.driver.util.TokenReadDto;
-import org.testcontainers.shaded.org.checkerframework.checker.units.qual.A;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.example.driver.util.DataUtil.*;
+import static org.example.driver.util.DataUtil.AUTHORIZATION;
+import static org.example.driver.util.DataUtil.AUTH_URL;
+import static org.example.driver.util.DataUtil.BASE_URL;
+import static org.example.driver.util.DataUtil.BASE_URL_WITH_ID;
+import static org.example.driver.util.DataUtil.BEARER;
+import static org.example.driver.util.DataUtil.CAR_ENTITY;
+import static org.example.driver.util.DataUtil.DRIVER_ENTITY;
+import static org.example.driver.util.DataUtil.signInUserDto;
 
 
 @Slf4j
@@ -60,13 +65,13 @@ public class DriverSteps {
 
     @Given("access token")
     public void accessToken() {
-        Response token_response = given()
+        Response tokenResponse = given()
                 .contentType(ContentType.JSON)
                 .body(signInUserDto())
                 .when()
                 .post(AUTH_URL);
 
-        TokenReadDto tokenReadDto = token_response.as(TokenReadDto.class);
+        TokenReadDto tokenReadDto = tokenResponse.as(TokenReadDto.class);
         accessToken = tokenReadDto.accessToken();
     }
 

@@ -24,7 +24,12 @@ import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -38,7 +43,16 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.example.registrationservice.constants.AppConstants.BEARER_PREFIX;
-import static com.example.registrationservice.constants.ServiceConstants.*;
+import static com.example.registrationservice.constants.ServiceConstants.CLIENT_ID_FIELD;
+import static com.example.registrationservice.constants.ServiceConstants.CLIENT_SECRET_FIELD;
+import static com.example.registrationservice.constants.ServiceConstants.DRIVER_ROLE;
+import static com.example.registrationservice.constants.ServiceConstants.GENDER_FIELD;
+import static com.example.registrationservice.constants.ServiceConstants.GRANT_TYPE_FIELD;
+import static com.example.registrationservice.constants.ServiceConstants.GRANT_TYPE_PASSWORD_FIELD;
+import static com.example.registrationservice.constants.ServiceConstants.PASSENGER_ROLE;
+import static com.example.registrationservice.constants.ServiceConstants.PASSWORD_FIELD;
+import static com.example.registrationservice.constants.ServiceConstants.PHONE_FIELD;
+import static com.example.registrationservice.constants.ServiceConstants.USERNAME_FIELD;
 
 @Service
 @RequiredArgsConstructor

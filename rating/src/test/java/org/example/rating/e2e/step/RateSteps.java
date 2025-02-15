@@ -13,7 +13,16 @@ import org.example.rating.util.TokenReadDto;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.example.rating.util.DataUtil.*;
+import static org.example.rating.util.DataUtil.AUTHORIZATION;
+import static org.example.rating.util.DataUtil.AUTH_URL;
+import static org.example.rating.util.DataUtil.BASE_URL;
+import static org.example.rating.util.DataUtil.BASE_URL_WITH_ID;
+import static org.example.rating.util.DataUtil.BEARER;
+import static org.example.rating.util.DataUtil.DRIVER_URL_WITH_ID;
+import static org.example.rating.util.DataUtil.HOST_PORT;
+import static org.example.rating.util.DataUtil.PASSENGER_URL_WITH_ID;
+import static org.example.rating.util.DataUtil.signInUserDto;
+
 
 public class RateSteps {
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -24,13 +33,13 @@ public class RateSteps {
 
     @Given("access token")
     public void accessToken() {
-        Response token_response = given()
+        Response tokenResponse = given()
                 .contentType(ContentType.JSON)
                 .body(signInUserDto())
                 .when()
                 .post(AUTH_URL);
 
-        TokenReadDto tokenReadDto = token_response.as(TokenReadDto.class);
+        TokenReadDto tokenReadDto = tokenResponse.as(TokenReadDto.class);
         accessToken = tokenReadDto.accessToken();
     }
 

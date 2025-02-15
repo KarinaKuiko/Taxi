@@ -12,11 +12,19 @@ import org.example.ride.dto.create.PassengerRideStatusDto;
 import org.example.ride.dto.create.RideCreateEditDto;
 import org.example.ride.dto.read.RideReadDto;
 import org.example.ride.util.TokenReadDto;
-import org.testcontainers.shaded.org.checkerframework.checker.units.qual.A;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.example.ride.util.DataUtil.*;
+import static org.example.ride.util.DataUtil.AUTHORIZATION;
+import static org.example.ride.util.DataUtil.AUTH_URL;
+import static org.example.ride.util.DataUtil.BASE_URL;
+import static org.example.ride.util.DataUtil.BASE_URL_WITH_ID;
+import static org.example.ride.util.DataUtil.BEARER;
+import static org.example.ride.util.DataUtil.COST_FIELD;
+import static org.example.ride.util.DataUtil.DRIVER_STATUS;
+import static org.example.ride.util.DataUtil.PASSENGER_STATUS;
+import static org.example.ride.util.DataUtil.signInUserDto;
+
 
 public class RideSteps {
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -29,13 +37,13 @@ public class RideSteps {
 
     @Given("access token")
     public void accessToken() {
-        Response token_response = given()
+        Response tokenResponse = given()
                 .contentType(ContentType.JSON)
                 .body(signInUserDto())
                 .when()
                 .post(AUTH_URL);
 
-        TokenReadDto tokenReadDto = token_response.as(TokenReadDto.class);
+        TokenReadDto tokenReadDto = tokenResponse.as(TokenReadDto.class);
         accessToken = tokenReadDto.accessToken();
     }
 

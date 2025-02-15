@@ -28,7 +28,23 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import static org.example.ride.util.DataUtil.*;
+import static org.example.ride.util.DataUtil.ACCESS_TOKEN;
+import static org.example.ride.util.DataUtil.AUTHORIZATION;
+import static org.example.ride.util.DataUtil.BEARER;
+import static org.example.ride.util.DataUtil.DEFAULT_ADDRESS_FROM;
+import static org.example.ride.util.DataUtil.DEFAULT_ADDRESS_TO;
+import static org.example.ride.util.DataUtil.DEFAULT_ID;
+import static org.example.ride.util.DataUtil.DRIVER_NOT_FOUND_EXCEPTION_MESSAGE;
+import static org.example.ride.util.DataUtil.DRIVER_STATUS;
+import static org.example.ride.util.DataUtil.INVALID_PROPOSED_STATUS_MESSAGE;
+import static org.example.ride.util.DataUtil.IRRELEVANT_DRIVER_STATUS;
+import static org.example.ride.util.DataUtil.MESSAGE;
+import static org.example.ride.util.DataUtil.PASSENGER_NOT_FOUND_EXCEPTION_MESSAGE;
+import static org.example.ride.util.DataUtil.PASSENGER_STATUS;
+import static org.example.ride.util.DataUtil.RIDE_NOT_FOUND_EXCEPTION_MESSAGE;
+import static org.example.ride.util.DataUtil.URL;
+import static org.example.ride.util.DataUtil.URL_WITH_ID;
+import static org.example.ride.util.DataUtil.getRideCreateEditDtoBuilder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 

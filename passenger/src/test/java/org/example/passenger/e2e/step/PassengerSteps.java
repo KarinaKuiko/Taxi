@@ -13,7 +13,12 @@ import org.example.passenger.util.TokenReadDto;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.example.passenger.util.DataUtil.*;
+import static org.example.passenger.util.DataUtil.AUTHORIZATION;
+import static org.example.passenger.util.DataUtil.AUTH_URL;
+import static org.example.passenger.util.DataUtil.BASE_URL;
+import static org.example.passenger.util.DataUtil.BASE_URL_WITH_ID;
+import static org.example.passenger.util.DataUtil.BEARER;
+import static org.example.passenger.util.DataUtil.signInUserDto;
 
 public class PassengerSteps {
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -24,13 +29,13 @@ public class PassengerSteps {
 
     @Given("access token")
     public void accessToken() {
-        Response token_response = given()
+        Response tokenResponse = given()
                 .contentType(ContentType.JSON)
                 .body(signInUserDto())
                 .when()
                 .post(AUTH_URL);
 
-        TokenReadDto tokenReadDto = token_response.as(TokenReadDto.class);
+        TokenReadDto tokenReadDto = tokenResponse.as(TokenReadDto.class);
         accessToken = tokenReadDto.accessToken();
     }
 
