@@ -47,7 +47,6 @@ public class DriverController {
     @ResponseStatus(HttpStatus.CREATED)
     public DriverReadDto create(@RequestPart @Valid DriverCreateEditDto dto,
                                 @RequestPart(required = false) MultipartFile file) {
-        log.info("Service step");
         return driverService.create(dto, file);
     }
 

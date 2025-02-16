@@ -1,5 +1,6 @@
 package com.example.registrationservice.client;
 
+import com.example.registrationservice.config.FeignConfig;
 import com.example.registrationservice.dto.create.SignUpDto;
 import com.example.registrationservice.dto.read.PassengerReadDto;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
-@FeignClient(value = "passenger")
+@FeignClient(value = "passenger", configuration = FeignConfig.class)
 public interface PassengerClient {
 
     @PostMapping(value = "/api/v1/passengers",

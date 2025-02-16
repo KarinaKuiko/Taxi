@@ -2,11 +2,9 @@ package com.example.registrationservice.service;
 
 import com.example.registrationservice.client.DriverClient;
 import com.example.registrationservice.client.PassengerClient;
-import com.example.registrationservice.dto.create.DriverCreateEditDto;
 import com.example.registrationservice.dto.create.SignUpDto;
 import com.example.registrationservice.dto.read.ExceptionDto;
 import com.example.registrationservice.exception.KeycloakException;
-import com.example.registrationservice.mapper.CommonMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.Response;
@@ -47,7 +45,6 @@ public class UserManagementService {
     private final DriverClient driverClient;
     private final PassengerClient passengerClient;
     private final ObjectMapper objectMapper;
-    private final CommonMapper commonMapper;
 
     @Value("${keycloak.realm}")
     private String realm;
@@ -65,12 +62,8 @@ public class UserManagementService {
                     passengerClient.createPassenger(dto, file,
                             BEARER_PREFIX + adminClientAccessToken);
                 } else if (Objects.equals(dto.role().name(), DRIVER_ROLE)){
-                    log.info("Creating new driver");
-                    DriverCreateEditDto driverCreateEditDto = commonMapper.toDriverCreateEditDto(dto);
-                    log.info("Mapper " + driverCreateEditDto.toString());
-                    driverClient.createDriver(driverCreateEditDto, file,
+                    driverClient.createDriver(dto, file,
                             BEARER_PREFIX + adminClientAccessToken);
-                    log.info("Driver created");
                 }
             } catch (Exception exception) {
                 usersResource.delete(CreatedResponseUtil.getCreatedId(response));
