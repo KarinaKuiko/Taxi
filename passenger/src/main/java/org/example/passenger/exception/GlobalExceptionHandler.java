@@ -4,6 +4,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.example.passenger.constants.ExceptionConstants;
 import org.example.passenger.dto.read.ExceptionDto;
 import org.example.passenger.dto.read.ValidationResponse;
+import org.example.passenger.exception.minio.AvatarNotFoundException;
 import org.example.passenger.exception.passenger.DuplicatedPassengerEmailException;
 import org.example.passenger.exception.passenger.PassengerNotFoundException;
 import org.example.passenger.exception.violation.Violation;
@@ -29,6 +30,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PassengerNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ExceptionDto handlePassengerNotFoundException(PassengerNotFoundException exception) {
+        return new ExceptionDto(HttpStatus.NOT_FOUND, exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(AvatarNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ExceptionDto handleAvatarNotFoundException(AvatarNotFoundException exception) {
         return new ExceptionDto(HttpStatus.NOT_FOUND, exception.getMessage(), LocalDateTime.now());
     }
 

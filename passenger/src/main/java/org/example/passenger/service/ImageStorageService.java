@@ -23,9 +23,6 @@ public class ImageStorageService {
     @Value("${minio.bucket-name}")
     private String bucketName;
 
-    @Value("${minio.url}")
-    private String url;
-
     public String uploadImage(MultipartFile file) {
         String fileName = generateFileName(file);
         try (InputStream inputStream = file.getInputStream()) {
@@ -36,7 +33,7 @@ public class ImageStorageService {
                             .stream(inputStream, file.getSize(), -1)
                             .contentType(file.getContentType())
                             .build());
-            return url + "/" + bucketName + "/" + fileName;
+            return bucketName + "/" + fileName;
         } catch (Exception e) {
             throw new RuntimeException("Failed to upload image", e);
         }
@@ -51,7 +48,7 @@ public class ImageStorageService {
     }
 
     public void deleteImage(String imageUrl) {
-        String imageName = imageUrl.substring(imageUrl.indexOf("taxi/") + "taxi/".length());
+        String imageName = imageUrl.substring(imageUrl.indexOf(bucketName + "/") + bucketName.length() + 1);
 
         try {
             minioClient.removeObject(

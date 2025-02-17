@@ -33,7 +33,6 @@
         <swagger.version>2.6.0</swagger.version>
         <keycloak.version>26.0.3</keycloak.version>
         <resteasy.version>6.2.11.Final</resteasy.version>
-        <mapstruct.version>1.6.2</mapstruct.version>
     </properties>
     <dependencies>
         <dependency>

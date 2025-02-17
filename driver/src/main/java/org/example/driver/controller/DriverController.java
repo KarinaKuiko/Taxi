@@ -28,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/drivers")
 @Validated
-@Slf4j
 public class DriverController {
     private final DriverService driverService;
 

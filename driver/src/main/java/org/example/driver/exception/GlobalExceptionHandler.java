@@ -8,6 +8,7 @@ import org.example.driver.exception.car.CarNotFoundException;
 import org.example.driver.exception.car.DuplicatedCarNumberException;
 import org.example.driver.exception.driver.DriverNotFoundException;
 import org.example.driver.exception.driver.DuplicatedDriverEmailException;
+import org.example.driver.exception.minio.AvatarNotFoundException;
 import org.example.driver.exception.violation.Violation;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -43,6 +44,12 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionDto handleDuplicatedDriverEmailException(DuplicatedDriverEmailException exception) {
         return new ExceptionDto(HttpStatus.CONFLICT, exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(AvatarNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ExceptionDto handleAvatarNotFoundException(AvatarNotFoundException exception) {
+        return new ExceptionDto(HttpStatus.NOT_FOUND, exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(RuntimeException.class)
