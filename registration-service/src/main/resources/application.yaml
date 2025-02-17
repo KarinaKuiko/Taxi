@@ -17,3 +17,6 @@ keycloak:
   admin-client-secret: ${ADMIN_CLIENT_SECRET}
   auth-client-id: ${AUTH_CLIENT_ID}
   auth-client-secret: ${AUTH_CLIENT_SECRET}
+
+logging:
+  config: classpath:logback.xml
