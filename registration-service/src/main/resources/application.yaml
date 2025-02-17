@@ -15,3 +15,6 @@ keycloak:
   server-url: ${KEYCLOAK_SERVER_URL}
   admin-client-id: ${ADMIN_CLIENT_ID}
   admin-client-secret: ${ADMIN_CLIENT_SECRET}
+
+logging:
+  config: classpath:logback.xml

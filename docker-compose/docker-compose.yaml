@@ -4,6 +4,8 @@ x-defaults: &defaults
   EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
   KAFKA_BOOTSTRAP_SERVERS: kafka:9092
   KEYCLOAK_ISSUER_URI: http://keycloak:8484/realms/taxi_realm
+  ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+  LOGBACK_DESTINATION: logstash:5000
 
 services:
   eureka-server:
@@ -33,6 +35,8 @@ services:
     container_name: gateway
     environment:
       EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
+      ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+      LOGBACK_DESTINATION: logstash:5000
     ports:
       - "8080:8080"
     networks:
@@ -344,6 +348,7 @@ services:
     ports:
       - "5044:5044"
       - "9600:9600"
+      - "5000:5000"
     volumes:
       - ./elk-config/logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
       - ./elk-config/logstash/logstash.yml:/usr/share/logstash/config/logstash.yml
@@ -372,25 +377,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-
-  filebeat:
-    image: elastic/filebeat:7.14.0
-    container_name: filebeat
-    user: root
-    command: [ "filebeat", "-e", "--strict.perms=false" ]
-    volumes:
-      - ./elk-config/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /var/log/syslog:/var/log/syslog:ro
-      - /var/log/auth.log:/var/log/auth.log:ro
-    networks:
-      - taxi-network
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-      kibana:
-        condition: service_healthy
 
   grafana:
     build: './grafana'
@@ -474,11 +460,11 @@ services:
         SERVICE_NAME: registration-service
     container_name: registration-service
     environment:
-      EUREKA_SERVER_URL: http://eureka-server:8761/eureka/
       KEYCLOAK_SERVER_URL: http://keycloak:8484
       KEYCLOAK_ADMIN_CLIENT_ID: ${ADMIN_CLIENT_ID}
       KEYCLOAK_ADMIN_CLIENT_SECRET: ${ADMIN_CLIENT_SECRET}
       KEYCLOAK_REALM: ${REALM}
+      <<: *defaults
     ports:
       - "8085:8085"
     depends_on:
