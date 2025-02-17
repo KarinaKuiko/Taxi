@@ -18,7 +18,7 @@ public record TokenReadDto(
         @JsonProperty("token_type")
         String tokenType,
 
-        @JsonProperty("not_before_policy")
+        @JsonProperty("not-before-policy")
         Integer notBeforePolicy,
 
         @JsonProperty("session_state")
