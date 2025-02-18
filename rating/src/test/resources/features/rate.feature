@@ -1,7 +1,8 @@
 Feature: Rate API
 
   Scenario: Create rate
-    Given request body to create or update rate
+    Given access token
+    And request body to create or update rate
       """
         {
           "rideId": 1,
@@ -26,6 +27,7 @@ Feature: Rate API
       """
 
   Scenario: Get passenger rate by id
+    Given access token
     When get passenger rate with id 1
     Then response status is 200
     And response body contain rate data
@@ -41,6 +43,7 @@ Feature: Rate API
       """
 
   Scenario: Get driver rate by id
+    Given access token
     When get driver rate with id 1
     Then response status is 200
     And response body contain rate data
@@ -56,7 +59,8 @@ Feature: Rate API
       """
 
   Scenario: Update rate
-    Given request body to create or update rate
+    Given access token
+    And request body to create or update rate
       """
         {
           "rideId": 1,

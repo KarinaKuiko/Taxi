@@ -1,6 +1,7 @@
 package org.example.driver.integration;
 
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
+import org.example.driver.dto.create.CarCreateEditDto;
 import org.example.driver.dto.create.DriverCreateEditDto;
 import org.example.driver.entity.enumeration.Gender;
 import org.example.driver.repository.DriverRepository;
@@ -24,11 +25,13 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import static org.example.driver.util.DataUtil.CAR_NOT_FOUND;
+import static org.example.driver.util.DataUtil.ACCESS_TOKEN;
+import static org.example.driver.util.DataUtil.AUTHORIZATION;
+import static org.example.driver.util.DataUtil.BEARER;
 import static org.example.driver.util.DataUtil.DEFAULT_EMAIL;
 import static org.example.driver.util.DataUtil.DEFAULT_ID;
-import static org.example.driver.util.DataUtil.DEFAULT_PHONE;
 import static org.example.driver.util.DataUtil.DEFAULT_NAME;
+import static org.example.driver.util.DataUtil.DEFAULT_PHONE;
 import static org.example.driver.util.DataUtil.DRIVER_DUPLICATED_EMAIL;
 import static org.example.driver.util.DataUtil.DRIVER_ENTITY;
 import static org.example.driver.util.DataUtil.DRIVER_NOT_FOUND;
@@ -39,6 +42,7 @@ import static org.example.driver.util.DataUtil.PAGE;
 import static org.example.driver.util.DataUtil.PAGE_VALUE;
 import static org.example.driver.util.DataUtil.URL;
 import static org.example.driver.util.DataUtil.URL_WITH_ID;
+import static org.example.driver.util.DataUtil.getCarCreateEditDtoBuilder;
 import static org.example.driver.util.DataUtil.getDriverCreateEditDtoBuilder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -99,6 +103,7 @@ public class DriverControllerIntegrationTest {
     void findAll_whenCorrectParams_thenReturn200() {
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .param(PAGE, PAGE_VALUE)
                 .param(LIMIT, LIMIT_VALUE)
                 .when()
@@ -111,12 +116,15 @@ public class DriverControllerIntegrationTest {
     @Test
     void findById_whenDriverIsFound_thenReturn200AndDriverReadDto() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .get(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID.toString())
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("id", equalTo(DEFAULT_ID.intValue()))
-                .body("name", equalTo(DEFAULT_NAME))
+                .body("firstName", equalTo(DEFAULT_NAME))
+                .body("lastName", equalTo(DEFAULT_NAME))
                 .body("email", equalTo(DEFAULT_EMAIL))
                 .body("phone", equalTo(DEFAULT_PHONE))
                 .body("gender", equalTo(Gender.MALE.name()))
@@ -126,6 +134,8 @@ public class DriverControllerIntegrationTest {
     @Test
     void findById_whenDriverIsNotFound_thenReturn404() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .get(URL_WITH_ID, DRIVER_ENTITY, "10")
                 .then()
@@ -136,15 +146,12 @@ public class DriverControllerIntegrationTest {
     @Test
     void create_whenValidInput_thenReturn201AndDriverReadDto() {
         DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
-                .firstName("name")
                 .email("driver@gmail.com")
-                .phone("+375291122334")
-                .gender(Gender.MALE)
-               // .carId(DEFAULT_ID)
                 .build();
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(createDriver)
                 .when()
@@ -160,6 +167,7 @@ public class DriverControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(createDriver)
                 .when()
@@ -170,21 +178,25 @@ public class DriverControllerIntegrationTest {
     }
 
     @Test
-    void create_whenCarIdNotFound_thenReturn404() {
+    void create_whenCarNumberNotFound_thenReturn201() {
+        CarCreateEditDto createCar = getCarCreateEditDtoBuilder()
+                .number("AB123CL")
+                .build();
         DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
                 .email("driver@gmail.com")
-                //.carId(10L)
+                .carCreateEditDto(createCar)
                 .build();
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(createDriver)
                 .when()
                 .post(URL, DRIVER_ENTITY)
                 .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .body(MESSAGE, equalTo(CAR_NOT_FOUND));
+                .statusCode(HttpStatus.CREATED.value())
+                .body("id", notNullValue());
     }
 
     @Test
@@ -196,6 +208,7 @@ public class DriverControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateDriver)
                 .when()
@@ -204,6 +217,7 @@ public class DriverControllerIntegrationTest {
                 .statusCode(HttpStatus.OK.value())
                 .body("id", equalTo(DEFAULT_ID.intValue()))
                 .body("firstName", equalTo("testing"))
+                .body("lastName", equalTo("test"))
                 .body("email", equalTo(DEFAULT_EMAIL))
                 .body("phone", equalTo(DEFAULT_PHONE))
                 .body("gender", equalTo(Gender.FEMALE.name()))
@@ -216,6 +230,7 @@ public class DriverControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateDriver)
                 .when()
@@ -234,6 +249,7 @@ public class DriverControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateDriver)
                 .when()
@@ -244,25 +260,31 @@ public class DriverControllerIntegrationTest {
     }
 
     @Test
-    void update_whenCarIsNotFound_thenReturn404() {
+    void update_whenCarIsNotFound_thenReturn200() {
+        CarCreateEditDto createCar = getCarCreateEditDtoBuilder()
+                .number("AB123CL")
+                .build();
         DriverCreateEditDto updateDriver = getDriverCreateEditDtoBuilder()
-             //   .carId(10L)
+                .carCreateEditDto(createCar)
                 .build();
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateDriver)
                 .when()
                 .put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID.toString())
                 .then()
-                .statusCode(HttpStatus.NOT_FOUND.value())
-                .body(MESSAGE, equalTo(CAR_NOT_FOUND));
+                .statusCode(HttpStatus.OK.value())
+                .body("id", notNullValue());
     }
 
     @Test
     void safeDelete_whenDriverIsFound_thenReturn204() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .delete(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID.toString())
                 .then()
@@ -275,6 +297,8 @@ public class DriverControllerIntegrationTest {
     @Test
     void safeDelete_whenDriverIsNotFound_thenReturn404() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .delete(URL_WITH_ID, DRIVER_ENTITY, "10")
                 .then()

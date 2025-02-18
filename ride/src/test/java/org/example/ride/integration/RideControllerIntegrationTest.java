@@ -28,6 +28,9 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import static org.example.ride.util.DataUtil.ACCESS_TOKEN;
+import static org.example.ride.util.DataUtil.AUTHORIZATION;
+import static org.example.ride.util.DataUtil.BEARER;
 import static org.example.ride.util.DataUtil.DEFAULT_ADDRESS_FROM;
 import static org.example.ride.util.DataUtil.DEFAULT_ADDRESS_TO;
 import static org.example.ride.util.DataUtil.DEFAULT_ID;
@@ -101,6 +104,8 @@ public class RideControllerIntegrationTest {
     @Test
     void findAll_whenCorrectParams_thenReturn() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .get(URL)
                 .then()
@@ -111,6 +116,8 @@ public class RideControllerIntegrationTest {
     @Test
     void findById_whenRideIsFound_thenReturn200AndRideReadDto() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .get(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
@@ -125,6 +132,8 @@ public class RideControllerIntegrationTest {
     @Test
     void findById_whenRideIsNotFound_thenReturn404() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .get(URL_WITH_ID, "10")
                 .then()
@@ -138,6 +147,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
@@ -153,6 +163,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
@@ -168,6 +179,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
@@ -183,6 +195,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
@@ -198,6 +211,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
@@ -213,6 +227,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(rideStatusDto)
                 .when()
@@ -231,6 +246,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(createRide)
                 .when()
@@ -250,6 +266,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(createRide)
                 .when()
@@ -268,6 +285,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(createRide)
                 .when()
@@ -289,6 +307,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateRide)
                 .when()
@@ -313,6 +332,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateRide)
                 .when()
@@ -334,6 +354,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateRide)
                 .when()
@@ -349,6 +370,7 @@ public class RideControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateRide)
                 .when()

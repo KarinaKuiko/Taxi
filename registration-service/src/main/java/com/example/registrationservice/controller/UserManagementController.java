@@ -1,6 +1,8 @@
 package com.example.registrationservice.controller;
 
+import com.example.registrationservice.dto.create.SignInUserDto;
 import com.example.registrationservice.dto.create.SignUpDto;
+import com.example.registrationservice.dto.read.TokenReadDto;
 import com.example.registrationservice.service.UserManagementService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,5 +29,10 @@ public class UserManagementController {
     @ResponseStatus(HttpStatus.CREATED)
     public UserRepresentation signUp(@Valid @RequestBody SignUpDto signUpDto) {
         return userManagementService.signUp(signUpDto);
+    }
+
+    @PostMapping("/sign-in")
+    public TokenReadDto signIn(@Valid @RequestBody SignInUserDto signInDto) {
+        return userManagementService.signIn(signInDto);
     }
 }

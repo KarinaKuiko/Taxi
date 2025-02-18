@@ -23,6 +23,9 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import static org.example.driver.util.DataUtil.ACCESS_TOKEN;
+import static org.example.driver.util.DataUtil.AUTHORIZATION;
+import static org.example.driver.util.DataUtil.BEARER;
 import static org.example.driver.util.DataUtil.CAR_DUPLICATED_NUMBER;
 import static org.example.driver.util.DataUtil.CAR_ENTITY;
 import static org.example.driver.util.DataUtil.CAR_NOT_FOUND;
@@ -96,6 +99,7 @@ public class CarControllerIntegrationTest {
     void findAll_whenCorrectParams_thenReturn200() {
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .param(PAGE, PAGE_VALUE)
                 .param(LIMIT, LIMIT_VALUE)
                 .when()
@@ -108,6 +112,8 @@ public class CarControllerIntegrationTest {
     @Test
     void findById_whenCarIsFound_thenReturn200AndCarReadDto() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .get(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID.toString())
                 .then()
@@ -122,6 +128,8 @@ public class CarControllerIntegrationTest {
     @Test
     void findById_whenCarIsNotFound_thenReturn404() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .get(URL_WITH_ID, CAR_ENTITY, "10")
                 .then()
@@ -137,6 +145,7 @@ public class CarControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(createCar)
                 .when()
@@ -152,6 +161,7 @@ public class CarControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(createCar)
                 .when()
@@ -170,6 +180,7 @@ public class CarControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateCar)
                 .when()
@@ -193,6 +204,7 @@ public class CarControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateCar)
                 .when()
@@ -208,6 +220,7 @@ public class CarControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateCar)
                 .when()
@@ -220,6 +233,8 @@ public class CarControllerIntegrationTest {
     @Test
     void safeDelete_whenCarIsFound_thenReturn204() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .delete(URL_WITH_ID, CAR_ENTITY, DEFAULT_ID.toString())
                 .then()
@@ -232,6 +247,8 @@ public class CarControllerIntegrationTest {
     @Test
     void safeDelete_whenCarIsNotFound_thenReturn404() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .delete(URL_WITH_ID, CAR_ENTITY, "10")
                 .then()

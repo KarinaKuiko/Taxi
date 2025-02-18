@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -43,6 +44,7 @@ import static org.example.passenger.util.DataUtil.getPassengerReadDtoBuilder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -51,6 +53,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = PassengerController.class)
 @Import(MessageSourceConfig.class)
+@WithMockUser
 class PassengerControllerTest {
 
     @Autowired
@@ -153,7 +156,8 @@ class PassengerControllerTest {
 
             mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger)))
+                            .content(objectMapper.writeValueAsString(createPassenger))
+                            .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
 
@@ -166,7 +170,8 @@ class PassengerControllerTest {
 
             mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger)))
+                            .content(objectMapper.writeValueAsString(createPassenger))
+                            .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
 
@@ -188,7 +193,8 @@ class PassengerControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger)))
+                            .content(objectMapper.writeValueAsString(createPassenger))
+                            .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
 
@@ -201,18 +207,21 @@ class PassengerControllerTest {
         void create_whenInvalidInput_thenReturn400AndValidationResponse() throws Exception {
             PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder()
                                 .firstName(null)
+                                .lastName(null)
                                 .email(null)
                                 .phone(null)
                                 .build();
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger)))
+                            .content(objectMapper.writeValueAsString(createPassenger))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
             ValidationResponse expectedValidationResponse = new ValidationResponse(
-                    List.of(new Violation("name", "Name cannot be blank"),
+                    List.of(new Violation("firstName", "Name cannot be blank"),
+                            new Violation("lastName", "Name cannot be blank"),
                             new Violation("email", "Email cannot be blank"),
                             new Violation("phone", "Phone cannot be blank")));
             ValidationResponse actualResponse = objectMapper.readValue(
@@ -231,7 +240,8 @@ class PassengerControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger)))
+                            .content(objectMapper.writeValueAsString(createPassenger))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -253,7 +263,8 @@ class PassengerControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger)))
+                            .content(objectMapper.writeValueAsString(createPassenger))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -276,7 +287,8 @@ class PassengerControllerTest {
 
             mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger)))
+                            .content(objectMapper.writeValueAsString(createPassenger))
+                            .with(csrf()))
                     .andExpect(status().isOk());
 
             verify(passengerService, times(1)).update(DEFAULT_ID, createPassenger);
@@ -288,7 +300,8 @@ class PassengerControllerTest {
 
             mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger)))
+                            .content(objectMapper.writeValueAsString(createPassenger))
+                            .with(csrf()))
                     .andExpect(status().isOk());
 
             ArgumentCaptor<PassengerCreateEditDto> passengerCaptor =
@@ -313,7 +326,8 @@ class PassengerControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger)))
+                            .content(objectMapper.writeValueAsString(createPassenger))
+                            .with(csrf()))
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -326,18 +340,21 @@ class PassengerControllerTest {
         void update_whenInvalidInput_thenReturn400AndValidationResponse() throws Exception {
             PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder()
                                 .firstName(null)
+                                .lastName(null)
                                 .email(null)
                                 .phone(null)
                                 .build();
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger)))
+                            .content(objectMapper.writeValueAsString(createPassenger))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
             ValidationResponse expectedValidationResponse = new ValidationResponse(
-                    List.of(new Violation("name", "Name cannot be blank"),
+                    List.of(new Violation("firstName", "Name cannot be blank"),
+                            new Violation("lastName", "Name cannot be blank"),
                             new Violation("email", "Email cannot be blank"),
                             new Violation("phone", "Phone cannot be blank")));
             ValidationResponse actualResponse = objectMapper.readValue(
@@ -356,7 +373,8 @@ class PassengerControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger)))
+                            .content(objectMapper.writeValueAsString(createPassenger))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -378,7 +396,8 @@ class PassengerControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger)))
+                            .content(objectMapper.writeValueAsString(createPassenger))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -397,7 +416,8 @@ class PassengerControllerTest {
     public class deleteTests {
         @Test
         void delete_whenVerifyingRequestMatching_thenReturn401() throws Exception {
-            mockMvc.perform(delete(URL_WITH_ID, DEFAULT_ID))
+            mockMvc.perform(delete(URL_WITH_ID, DEFAULT_ID)
+                            .with(csrf()))
                     .andExpect(status().isNoContent());
 
             verify(passengerService, times(1)).safeDelete(DEFAULT_ID);
