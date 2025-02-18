@@ -32,6 +32,7 @@ import static org.example.driver.util.DataUtil.CAR_NOT_FOUND;
 import static org.example.driver.util.DataUtil.DEFAULT_BRAND;
 import static org.example.driver.util.DataUtil.DEFAULT_COLOR;
 import static org.example.driver.util.DataUtil.DEFAULT_ID;
+import static org.example.driver.util.DataUtil.DEFAULT_NAME;
 import static org.example.driver.util.DataUtil.DEFAULT_NUMBER;
 import static org.example.driver.util.DataUtil.DEFAULT_YEAR;
 import static org.example.driver.util.DataUtil.LIMIT;
@@ -63,6 +64,14 @@ public class CarControllerIntegrationTest {
         registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
         registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
         registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
+    }
+
+    @DynamicPropertySource
+    static void minioProperties(DynamicPropertyRegistry registry) {
+        registry.add("minio.access-key", () -> DEFAULT_NAME);
+        registry.add("minio.secret-key", () -> DEFAULT_NAME);
+        registry.add("minio.bucket-name", () -> DEFAULT_NAME);
+        registry.add("minio.url", () -> DEFAULT_NAME);
     }
 
     @Container
