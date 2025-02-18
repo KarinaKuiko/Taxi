@@ -23,6 +23,9 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import static org.example.rating.util.DataUtil.ACCESS_TOKEN;
+import static org.example.rating.util.DataUtil.AUTHORIZATION;
+import static org.example.rating.util.DataUtil.BEARER;
 import static org.example.rating.util.DataUtil.DEFAULT_COMMENT;
 import static org.example.rating.util.DataUtil.DEFAULT_ID;
 import static org.example.rating.util.DataUtil.DEFAULT_RATE;
@@ -98,6 +101,7 @@ public class RatingControllerIntegrationTest {
     void findAllDriversRates_whenValidParams_thenReturn200() {
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .param(PAGE, PAGE_VALUE)
                 .param(LIMIT, LIMIT_VALUE)
                 .when()
@@ -110,6 +114,8 @@ public class RatingControllerIntegrationTest {
     @Test
     void findAllPassengersRates_whenValidParams_thenReturn200() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .get(PASSENGER_URL)
                 .then()
@@ -120,6 +126,8 @@ public class RatingControllerIntegrationTest {
     @Test
     void findDriverRateById_whenRateIsFound_thenReturn200AndRateReadDto() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .get(DRIVER_URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
@@ -133,6 +141,8 @@ public class RatingControllerIntegrationTest {
     @Test
     void findDriverRateById_whenRateIsNotFound_thenReturn404() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .get(DRIVER_URL_WITH_ID, "2")
                 .then()
@@ -143,6 +153,8 @@ public class RatingControllerIntegrationTest {
     @Test
     void findPassengerRateById_whenRateIsFound_thenReturn200AndRateReadDto() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .get(PASSENGER_URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
@@ -156,6 +168,8 @@ public class RatingControllerIntegrationTest {
     @Test
     void findPassengerRateById_whenRateIsNotFound_thenReturn404() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .get(PASSENGER_URL_WITH_ID, "2")
                 .then()
@@ -171,6 +185,7 @@ public class RatingControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(createRate)
                 .when()
@@ -188,6 +203,7 @@ public class RatingControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(createRate)
                 .when()
@@ -207,6 +223,7 @@ public class RatingControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateRate)
                 .when()
@@ -227,6 +244,7 @@ public class RatingControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateRate)
                 .when()
@@ -242,6 +260,7 @@ public class RatingControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updateRate)
                 .when()

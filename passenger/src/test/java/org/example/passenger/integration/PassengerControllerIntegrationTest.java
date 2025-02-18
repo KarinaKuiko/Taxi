@@ -24,6 +24,9 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import static org.example.passenger.util.DataUtil.ACCESS_TOKEN;
+import static org.example.passenger.util.DataUtil.AUTHORIZATION;
+import static org.example.passenger.util.DataUtil.BEARER;
 import static org.example.passenger.util.DataUtil.DEFAULT_EMAIL;
 import static org.example.passenger.util.DataUtil.DEFAULT_ID;
 import static org.example.passenger.util.DataUtil.DEFAULT_NAME;
@@ -33,7 +36,7 @@ import static org.example.passenger.util.DataUtil.LIMIT_VALUE;
 import static org.example.passenger.util.DataUtil.MESSAGE;
 import static org.example.passenger.util.DataUtil.PAGE;
 import static org.example.passenger.util.DataUtil.PAGE_VALUE;
-import static org.example.passenger.util.DataUtil.PASSENGER_DUPlICATED_EMAIL_MESSAGE;
+import static org.example.passenger.util.DataUtil.PASSENGER_DUPLICATED_EMAIL_MESSAGE;
 import static org.example.passenger.util.DataUtil.PASSENGER_NOT_FOUND_EXCEPTION_MESSAGE;
 import static org.example.passenger.util.DataUtil.URL;
 import static org.example.passenger.util.DataUtil.URL_WITH_ID;
@@ -97,6 +100,7 @@ public class PassengerControllerIntegrationTest {
     void findAll_whenCorrectParams_thenReturn200() {
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .param(PAGE, PAGE_VALUE)
                 .param(LIMIT, LIMIT_VALUE)
                 .when()
@@ -109,12 +113,15 @@ public class PassengerControllerIntegrationTest {
     @Test
     void findById_whenPassengerIsFound_thenReturn200AndPassengerReadDto() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .get(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("id", equalTo(DEFAULT_ID.intValue()))
-                .body("name", equalTo(DEFAULT_NAME))
+                .body("firstName", equalTo(DEFAULT_NAME))
+                .body("lastName", equalTo(DEFAULT_NAME))
                 .body("email", equalTo(DEFAULT_EMAIL))
                 .body("phone", equalTo(DEFAULT_PHONE));
     }
@@ -122,6 +129,8 @@ public class PassengerControllerIntegrationTest {
     @Test
     void findById_whenPassengerIsNotFound_thenReturn404() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .get(URL_WITH_ID, "2")
                 .then()
@@ -137,6 +146,7 @@ public class PassengerControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(createPassenger)
                 .when()
@@ -152,13 +162,14 @@ public class PassengerControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(createPassenger)
                 .when()
                 .post(URL)
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .body(MESSAGE, equalTo(PASSENGER_DUPlICATED_EMAIL_MESSAGE));
+                .body(MESSAGE, equalTo(PASSENGER_DUPLICATED_EMAIL_MESSAGE));
     }
 
     @Test
@@ -169,6 +180,7 @@ public class PassengerControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updatePassenger)
                 .when()
@@ -177,6 +189,7 @@ public class PassengerControllerIntegrationTest {
                 .statusCode(HttpStatus.OK.value())
                 .body("id", equalTo(DEFAULT_ID.intValue()))
                 .body("firstName", equalTo("naming"))
+                .body("lastName", equalTo(DEFAULT_NAME))
                 .body("email", equalTo(DEFAULT_EMAIL))
                 .body("phone", equalTo(DEFAULT_PHONE));
     }
@@ -196,13 +209,14 @@ public class PassengerControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updatePassenger)
                 .when()
                 .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value())
-                .body(MESSAGE, equalTo(PASSENGER_DUPlICATED_EMAIL_MESSAGE));
+                .body(MESSAGE, equalTo(PASSENGER_DUPLICATED_EMAIL_MESSAGE));
     }
 
     @Test
@@ -211,6 +225,7 @@ public class PassengerControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(updatePassenger)
                 .when()
@@ -223,6 +238,8 @@ public class PassengerControllerIntegrationTest {
     @Test
     void safeDelete_whenCarIsFound_thenReturn204() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .delete(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
@@ -235,6 +252,8 @@ public class PassengerControllerIntegrationTest {
     @Test
     void safeDelete_whenCarIsNotFound_thenReturn404() {
         RestAssuredMockMvc
+                .given()
+                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
                 .when()
                 .delete(URL_WITH_ID,"2")
                 .then()

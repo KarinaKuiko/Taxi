@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -48,6 +49,7 @@ import static org.example.rating.util.DataUtil.getPassengerRateReadDtoBuilder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -55,6 +57,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = RateController.class)
 @Import(MessageSourceConfig.class)
+@WithMockUser
 class RateControllerTest {
 
     @Autowired
@@ -235,7 +238,8 @@ class RateControllerTest {
 
             mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(driverCreateEditDto)))
+                            .content(objectMapper.writeValueAsString(driverCreateEditDto))
+                            .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
 
@@ -249,7 +253,8 @@ class RateControllerTest {
 
             mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(driverCreateEditDto)))
+                            .content(objectMapper.writeValueAsString(driverCreateEditDto))
+                            .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
 
@@ -272,7 +277,8 @@ class RateControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(driverCreateEditDto)))
+                            .content(objectMapper.writeValueAsString(driverCreateEditDto))
+                            .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
 
@@ -287,7 +293,8 @@ class RateControllerTest {
 
             mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(passengerCreateEditDto)))
+                            .content(objectMapper.writeValueAsString(passengerCreateEditDto))
+                            .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
 
@@ -310,7 +317,8 @@ class RateControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(passengerCreateEditDto)))
+                            .content(objectMapper.writeValueAsString(passengerCreateEditDto))
+                            .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
 
@@ -328,7 +336,8 @@ class RateControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(driverCreateEditDto)))
+                            .content(objectMapper.writeValueAsString(driverCreateEditDto))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -350,7 +359,8 @@ class RateControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(post(URL)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(driverCreateEditDto)))
+                            .content(objectMapper.writeValueAsString(driverCreateEditDto))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -373,7 +383,8 @@ class RateControllerTest {
 
             mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(driverCreateEditDto)))
+                            .content(objectMapper.writeValueAsString(driverCreateEditDto))
+                            .with(csrf()))
                     .andExpect(status().isOk());
 
             verify(driverRateService, times(1)).update(DEFAULT_ID, driverCreateEditDto);
@@ -386,7 +397,8 @@ class RateControllerTest {
 
             mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(driverCreateEditDto)))
+                            .content(objectMapper.writeValueAsString(driverCreateEditDto))
+                            .with(csrf()))
                     .andExpect(status().isOk());
 
             ArgumentCaptor<RateCreateEditDto> rateCaptor = ArgumentCaptor.forClass(RateCreateEditDto.class);
@@ -410,7 +422,8 @@ class RateControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(driverCreateEditDto)))
+                            .content(objectMapper.writeValueAsString(driverCreateEditDto))
+                            .with(csrf()))
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -425,7 +438,8 @@ class RateControllerTest {
 
             mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(passengerCreateEditDto)))
+                            .content(objectMapper.writeValueAsString(passengerCreateEditDto))
+                            .with(csrf()))
                     .andExpect(status().isOk());
 
             ArgumentCaptor<RateCreateEditDto> rateCaptor = ArgumentCaptor.forClass(RateCreateEditDto.class);
@@ -449,7 +463,8 @@ class RateControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(passengerCreateEditDto)))
+                            .content(objectMapper.writeValueAsString(passengerCreateEditDto))
+                            .with(csrf()))
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -467,7 +482,8 @@ class RateControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(driverCreateEditDto)))
+                            .content(objectMapper.writeValueAsString(driverCreateEditDto))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 
@@ -489,7 +505,8 @@ class RateControllerTest {
 
             MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
                             .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(driverCreateEditDto)))
+                            .content(objectMapper.writeValueAsString(driverCreateEditDto))
+                            .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
 

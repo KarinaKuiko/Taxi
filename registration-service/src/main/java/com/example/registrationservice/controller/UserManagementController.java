@@ -1,6 +1,8 @@
 package com.example.registrationservice.controller;
 
+import com.example.registrationservice.dto.create.SignInUserDto;
 import com.example.registrationservice.dto.create.SignUpDto;
+import com.example.registrationservice.dto.read.TokenReadDto;
 import com.example.registrationservice.service.UserManagementService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,5 +34,10 @@ public class UserManagementController {
     public UserRepresentation signUp(@Valid @RequestPart SignUpDto dto,
                                      @RequestPart(required = false) MultipartFile file) {
         return userManagementService.signUp(dto, file);
+    }
+
+    @PostMapping("/sign-in")
+    public TokenReadDto signIn(@Valid @RequestBody SignInUserDto signInDto) {
+        return userManagementService.signIn(signInDto);
     }
 }

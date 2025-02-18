@@ -2,13 +2,17 @@ package com.example.registrationservice.service;
 
 import com.example.registrationservice.client.DriverClient;
 import com.example.registrationservice.client.PassengerClient;
+import com.example.registrationservice.dto.create.SignInUserDto;
 import com.example.registrationservice.dto.create.SignUpDto;
 import com.example.registrationservice.dto.read.ExceptionDto;
+import com.example.registrationservice.dto.read.TokenReadDto;
 import com.example.registrationservice.exception.KeycloakException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
@@ -20,20 +24,36 @@ import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import static com.example.registrationservice.constants.AppConstants.BEARER_PREFIX;
+import static com.example.registrationservice.constants.ServiceConstants.CLIENT_ID_FIELD;
+import static com.example.registrationservice.constants.ServiceConstants.CLIENT_SECRET_FIELD;
 import static com.example.registrationservice.constants.ServiceConstants.DRIVER_ROLE;
 import static com.example.registrationservice.constants.ServiceConstants.GENDER_FIELD;
+import static com.example.registrationservice.constants.ServiceConstants.GRANT_TYPE_FIELD;
+import static com.example.registrationservice.constants.ServiceConstants.GRANT_TYPE_PASSWORD_FIELD;
 import static com.example.registrationservice.constants.ServiceConstants.PASSENGER_ROLE;
+import static com.example.registrationservice.constants.ServiceConstants.PASSWORD_FIELD;
 import static com.example.registrationservice.constants.ServiceConstants.PHONE_FIELD;
+import static com.example.registrationservice.constants.ServiceConstants.USERNAME_FIELD;
 
 @Service
 @RequiredArgsConstructor
@@ -45,9 +65,19 @@ public class UserManagementService {
     private final DriverClient driverClient;
     private final PassengerClient passengerClient;
     private final ObjectMapper objectMapper;
+    private final RestTemplate restTemplate;
 
     @Value("${keycloak.realm}")
     private String realm;
+  
+    @Value("${keycloak.auth-client-id}")
+    private String authClientId;
+
+    @Value("${keycloak.auth-client-secret}")
+    private String authClientSecret;
+
+    @Value("${keycloak.server-url}")
+    private String serverUrl;
 
     public UserRepresentation signUp(SignUpDto dto, MultipartFile file) {
         UserRepresentation keycloakUser = getUserRepresentation(dto);
@@ -116,5 +146,41 @@ public class UserManagementService {
             return response.readEntity(String.class);
         }
         return "";
+    }
+
+    @SneakyThrows
+    public TokenReadDto signIn(@Valid SignInUserDto signInDto) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add(GRANT_TYPE_FIELD, GRANT_TYPE_PASSWORD_FIELD);
+        body.add(USERNAME_FIELD, signInDto.email());
+        body.add(PASSWORD_FIELD, signInDto.password());
+        body.add(CLIENT_ID_FIELD, authClientId);
+        body.add(CLIENT_SECRET_FIELD, authClientSecret);
+
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
+
+        ResponseEntity<String> response = getToken(requestEntity);
+
+
+        return objectMapper.readValue(response.getBody(),
+                TokenReadDto.class);
+    }
+
+    private ResponseEntity<String> getToken(HttpEntity<MultiValueMap<String, String>> requestEntity) {
+        String authUrl = serverUrl + "/realms/" + realm + "/protocol/openid-connect/token";
+
+        ResponseEntity<String> response;
+        try {
+            response = restTemplate.exchange(authUrl, HttpMethod.POST, requestEntity, String.class);
+        } catch (HttpClientErrorException e) {
+            throw new KeycloakException(
+                    new ExceptionDto(HttpStatus.valueOf(e.getStatusCode().value()),
+                            e.getMessage(),
+                            LocalDateTime.now()));
+        }
+        return response;
     }
 }
