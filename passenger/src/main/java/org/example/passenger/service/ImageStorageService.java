@@ -3,14 +3,24 @@ package org.example.passenger.service;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
+import io.minio.errors.MinioException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.passenger.constants.ExceptionConstants;
+import org.example.passenger.exception.minio.FileDeleteException;
+import org.example.passenger.exception.minio.FileUploadException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 @Slf4j
@@ -19,6 +29,7 @@ import java.util.Objects;
 public class ImageStorageService {
 
     private final MinioClient minioClient;
+    private final MessageSource messageSource;
 
     @Value("${minio.bucket-name}")
     private String bucketName;
@@ -34,8 +45,13 @@ public class ImageStorageService {
                             .contentType(file.getContentType())
                             .build());
             return bucketName + "/" + fileName;
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to upload image", e);
+        } catch (MinioException | InvalidKeyException | NoSuchAlgorithmException e) {
+            throw new FileUploadException(messageSource.getMessage(
+                    ExceptionConstants.FILE_UPLOAD_EXCEPTION,
+                    new Object[]{fileName},
+                    LocaleContextHolder.getLocale()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -55,12 +71,18 @@ public class ImageStorageService {
                     RemoveObjectArgs.builder()
                             .bucket(bucketName)
                             .object(imageName).build());
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to delete image", e);
+        } catch (MinioException | InvalidKeyException | NoSuchAlgorithmException e) {
+            throw new FileDeleteException(messageSource.getMessage(
+                    ExceptionConstants.FILE_DELETE_EXCEPTION,
+                    new Object[]{},
+                    LocaleContextHolder.getLocale()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
     private String generateFileName(MultipartFile file) {
-        return new Date().getTime() + "-" + Objects.requireNonNull(file.getOriginalFilename()).replace(" ", "_");
+        String timestamp = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(Instant.now());
+        return timestamp + "-" + Objects.requireNonNull(file.getOriginalFilename()).replace(" ", "_");
     }
 }

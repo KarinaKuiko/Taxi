@@ -5,6 +5,8 @@ import org.example.passenger.constants.ExceptionConstants;
 import org.example.passenger.dto.read.ExceptionDto;
 import org.example.passenger.dto.read.ValidationResponse;
 import org.example.passenger.exception.minio.AvatarNotFoundException;
+import org.example.passenger.exception.minio.FileDeleteException;
+import org.example.passenger.exception.minio.FileUploadException;
 import org.example.passenger.exception.passenger.DuplicatedPassengerEmailException;
 import org.example.passenger.exception.passenger.PassengerNotFoundException;
 import org.example.passenger.exception.violation.Violation;
@@ -37,6 +39,18 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ExceptionDto handleAvatarNotFoundException(AvatarNotFoundException exception) {
         return new ExceptionDto(HttpStatus.NOT_FOUND, exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(FileUploadException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ExceptionDto handleFileUploadException(FileUploadException exception) {
+        return new ExceptionDto(HttpStatus.SERVICE_UNAVAILABLE, exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(FileDeleteException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ExceptionDto handleFileDeleteException(FileDeleteException exception) {
+        return new ExceptionDto(HttpStatus.SERVICE_UNAVAILABLE, exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(RuntimeException.class)
