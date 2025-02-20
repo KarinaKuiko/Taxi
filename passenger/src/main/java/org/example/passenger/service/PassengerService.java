@@ -1,5 +1,7 @@
 package org.example.passenger.service;
 
+import com.example.exceptionhandlerstarter.exception.passenger.DuplicatedPassengerEmailException;
+import com.example.exceptionhandlerstarter.exception.passenger.PassengerNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.passenger.constants.CommonConstants;
@@ -9,8 +11,6 @@ import org.example.passenger.dto.read.PassengerReadDto;
 import org.example.passenger.dto.read.RideReadDto;
 import org.example.passenger.dto.read.UserRateDto;
 import org.example.passenger.entity.Passenger;
-import org.example.passenger.exception.passenger.DuplicatedPassengerEmailException;
-import org.example.passenger.exception.passenger.PassengerNotFoundException;
 import org.example.passenger.mapper.PassengerMapper;
 import org.example.passenger.repository.PassengerRepository;
 import org.springframework.context.MessageSource;

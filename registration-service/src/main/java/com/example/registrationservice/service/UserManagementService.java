@@ -1,12 +1,12 @@
 package com.example.registrationservice.service;
 
+import com.example.exceptionhandlerstarter.dto.ExceptionDto;
+import com.example.exceptionhandlerstarter.keycloak.KeycloakException;
 import com.example.registrationservice.client.DriverClient;
 import com.example.registrationservice.client.PassengerClient;
 import com.example.registrationservice.dto.create.SignInUserDto;
 import com.example.registrationservice.dto.create.SignUpDto;
-import com.example.registrationservice.dto.read.ExceptionDto;
 import com.example.registrationservice.dto.read.TokenReadDto;
-import com.example.registrationservice.exception.KeycloakException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;

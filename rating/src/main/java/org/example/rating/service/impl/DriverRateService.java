@@ -1,5 +1,6 @@
 package org.example.rating.service.impl;
 
+import com.example.exceptionhandlerstarter.exception.rate.RateNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.example.rating.constants.ExceptionConstants;
 import org.example.rating.dto.create.RateCreateEditDto;
@@ -7,7 +8,6 @@ import org.example.rating.dto.read.RateReadDto;
 import org.example.rating.dto.read.RideReadDto;
 import org.example.rating.dto.read.UserRateDto;
 import org.example.rating.entity.DriverRate;
-import org.example.rating.exception.rate.RateNotFoundException;
 import org.example.rating.kafka.KafkaProducer;
 import org.example.rating.mapper.RateMapper;
 import org.example.rating.repository.DriverRateRepository;

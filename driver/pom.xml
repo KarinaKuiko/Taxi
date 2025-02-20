@@ -43,6 +43,7 @@
         <cucumber.version>7.19.0</cucumber.version>
         <extentsreport.version>1.14.0</extentsreport.version>
         <logstash.logback.encoder.version>8.0</logstash.logback.encoder.version>
+        <exception.handler.starter.version>0.0.1-SNAPSHOT</exception.handler.starter.version>
     </properties>
     <dependencies>
         <dependency>
@@ -191,6 +192,11 @@
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
             <version>${logstash.logback.encoder.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>exception-handler-starter</artifactId>
+            <version>${exception.handler.starter.version}</version>
         </dependency>
     </dependencies>
 
