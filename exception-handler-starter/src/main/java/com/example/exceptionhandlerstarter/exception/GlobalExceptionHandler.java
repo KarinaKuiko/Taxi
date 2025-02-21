@@ -95,9 +95,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ClientException.class)
-    public ResponseEntity<ExceptionDto> handleClientException(ClientException e) {
-        ExceptionDto exceptionDto = e.getExceptionDto();
-        return ResponseEntity.status(exceptionDto.status()).body(exceptionDto);
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ExceptionDto handleClientException(ClientException e) {
+        ExceptionDto exception = e.getExceptionDto();
+        return new ExceptionDto(exception.status(), exception.message(), exception.time());
     }
 
     @ExceptionHandler(ServiceUnavailableException.class)
@@ -113,9 +114,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(KeycloakException.class)
-    public ResponseEntity<ExceptionDto> handleKeycloakException(KeycloakException e) {
-        ExceptionDto exceptionDto = e.getExceptionDto();
-        return ResponseEntity.status(exceptionDto.status()).body(exceptionDto);
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ExceptionDto handleKeycloakException(KeycloakException e) {
+        ExceptionDto exception = e.getExceptionDto();
+        return new ExceptionDto(exception.status(), exception.message(), exception.time());
     }
 
     @ExceptionHandler(IrrelevantDriverStatusException.class)
