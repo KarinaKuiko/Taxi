@@ -1,5 +1,6 @@
 package org.example.ride.unit.controller;
 
+import com.example.exceptionhandlerstarter.config.HandlerConfiguration;
 import com.example.exceptionhandlerstarter.dto.ValidationResponse;
 import com.example.exceptionhandlerstarter.dto.Violation;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,7 +55,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = RideController.class)
-@Import(MessageSourceConfig.class)
+@Import({MessageSourceConfig.class, HandlerConfiguration.class})
 @WithMockUser
 class RideControllerTest {
 
