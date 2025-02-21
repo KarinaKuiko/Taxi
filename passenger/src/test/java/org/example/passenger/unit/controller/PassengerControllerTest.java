@@ -1,12 +1,12 @@
 package org.example.passenger.unit.controller;
 
+import com.example.exceptionhandlerstarter.dto.ValidationResponse;
+import com.example.exceptionhandlerstarter.dto.Violation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.passenger.config.MessageSourceConfig;
 import org.example.passenger.controller.PassengerController;
 import org.example.passenger.dto.create.PassengerCreateEditDto;
 import org.example.passenger.dto.read.PassengerReadDto;
-import org.example.passenger.dto.read.ValidationResponse;
-import org.example.passenger.exception.violation.Violation;
 import org.example.passenger.service.PassengerService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

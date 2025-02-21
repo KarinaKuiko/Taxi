@@ -1,6 +1,6 @@
-package org.example.driver.exception.minio;
+package com.example.exceptionhandlerstarter.exception.minio;
 
-import org.example.driver.exception.BaseException;
+import com.example.exceptionhandlerstarter.exception.BaseException;
 
 public class FileDeleteException extends BaseException {
     public FileDeleteException(String message) {

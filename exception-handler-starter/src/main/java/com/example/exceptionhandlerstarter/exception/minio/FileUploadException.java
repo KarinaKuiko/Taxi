@@ -1,6 +1,6 @@
-package org.example.passenger.exception.minio;
+package com.example.exceptionhandlerstarter.exception.minio;
 
-import org.example.passenger.exception.BaseException;
+import com.example.exceptionhandlerstarter.exception.BaseException;
 
 public class FileUploadException extends BaseException {
     public FileUploadException(String message) {

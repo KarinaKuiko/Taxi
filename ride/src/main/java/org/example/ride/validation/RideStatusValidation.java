@@ -1,12 +1,12 @@
 package org.example.ride.validation;
 
+import com.example.exceptionhandlerstarter.exception.ride.CanceledRideStatusException;
+import com.example.exceptionhandlerstarter.exception.ride.InvalidRideStatusForChangingException;
+import com.example.exceptionhandlerstarter.exception.ride.IrrelevantDriverStatusException;
 import lombok.RequiredArgsConstructor;
 import org.example.ride.constants.ExceptionConstants;
 import org.example.ride.entity.Ride;
 import org.example.ride.entity.enumeration.DriverRideStatus;
-import org.example.ride.exception.ride.CanceledRideStatusException;
-import org.example.ride.exception.ride.InvalidRideStatusForChangingException;
-import org.example.ride.exception.ride.IrrelevantDriverStatusException;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;

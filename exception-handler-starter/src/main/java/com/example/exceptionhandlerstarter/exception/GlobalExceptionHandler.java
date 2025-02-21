@@ -8,6 +8,9 @@ import com.example.exceptionhandlerstarter.exception.car.CarNotFoundException;
 import com.example.exceptionhandlerstarter.exception.car.DuplicatedCarNumberException;
 import com.example.exceptionhandlerstarter.exception.driver.DriverNotFoundException;
 import com.example.exceptionhandlerstarter.exception.driver.DuplicatedDriverEmailException;
+import com.example.exceptionhandlerstarter.exception.minio.AvatarNotFoundException;
+import com.example.exceptionhandlerstarter.exception.minio.FileDeleteException;
+import com.example.exceptionhandlerstarter.exception.minio.FileUploadException;
 import com.example.exceptionhandlerstarter.exception.param.InvalidCountParametersException;
 import com.example.exceptionhandlerstarter.exception.passenger.DuplicatedPassengerEmailException;
 import com.example.exceptionhandlerstarter.exception.passenger.PassengerNotFoundException;
@@ -34,7 +37,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestControllerAdvice
-public class BasicExceptionHandler {
+public class GlobalExceptionHandler {
 
     @ExceptionHandler(CarNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -137,6 +140,24 @@ public class BasicExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionDto handleInvalidRideStatusForChangingException(InvalidRideStatusForChangingException exception) {
         return new ExceptionDto(HttpStatus.CONFLICT, exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(AvatarNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ExceptionDto handleAvatarNotFoundException(AvatarNotFoundException exception) {
+        return new ExceptionDto(HttpStatus.NOT_FOUND, exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(FileUploadException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ExceptionDto handleFileUploadException(FileUploadException exception) {
+        return new ExceptionDto(HttpStatus.SERVICE_UNAVAILABLE, exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(FileDeleteException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ExceptionDto handleFileDeleteException(FileDeleteException exception) {
+        return new ExceptionDto(HttpStatus.SERVICE_UNAVAILABLE, exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(IOException.class)

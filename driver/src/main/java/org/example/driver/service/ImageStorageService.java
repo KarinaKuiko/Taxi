@@ -1,5 +1,7 @@
 package org.example.driver.service;
 
+import com.example.exceptionhandlerstarter.exception.minio.FileDeleteException;
+import com.example.exceptionhandlerstarter.exception.minio.FileUploadException;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
@@ -7,8 +9,6 @@ import io.minio.errors.MinioException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.driver.constants.ExceptionConstants;
-import org.example.driver.exception.minio.FileDeleteException;
-import org.example.driver.exception.minio.FileUploadException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;

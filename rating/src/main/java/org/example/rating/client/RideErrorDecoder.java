@@ -1,12 +1,12 @@
 package org.example.rating.client;
 
+import com.example.exceptionhandlerstarter.dto.ExceptionDto;
+import com.example.exceptionhandlerstarter.exception.ride.RideException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import lombok.SneakyThrows;
-import org.example.rating.dto.read.ExceptionDto;
-import org.example.rating.exception.ride.RideException;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;

@@ -1,13 +1,13 @@
 package org.example.driver.unit.controller;
 
+import com.example.exceptionhandlerstarter.dto.ValidationResponse;
+import com.example.exceptionhandlerstarter.dto.Violation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.driver.config.MessageSourceConfig;
 import org.example.driver.controller.DriverController;
 import org.example.driver.dto.create.DriverCreateEditDto;
 import org.example.driver.dto.read.DriverReadDto;
-import org.example.driver.dto.read.ValidationResponse;
 import org.example.driver.entity.enumeration.Gender;
-import org.example.driver.exception.violation.Violation;
 import org.example.driver.service.DriverService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

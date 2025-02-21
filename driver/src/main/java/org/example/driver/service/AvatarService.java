@@ -1,5 +1,6 @@
 package org.example.driver.service;
 
+import com.example.exceptionhandlerstarter.exception.minio.AvatarNotFoundException;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.StatObjectArgs;
@@ -9,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.example.driver.constants.ExceptionConstants;
 import org.example.driver.dto.read.MinioAvatar;
-import org.example.driver.exception.minio.AvatarNotFoundException;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.MediaType;
