@@ -1,5 +1,8 @@
 package org.example.ride.unit.controller;
 
+import com.example.exceptionhandlerstarter.config.HandlerConfiguration;
+import com.example.exceptionhandlerstarter.dto.ValidationResponse;
+import com.example.exceptionhandlerstarter.dto.Violation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.ride.config.MessageSourceConfig;
 import org.example.ride.controller.RideController;
@@ -7,10 +10,8 @@ import org.example.ride.dto.create.DriverRideStatusDto;
 import org.example.ride.dto.create.PassengerRideStatusDto;
 import org.example.ride.dto.create.RideCreateEditDto;
 import org.example.ride.dto.read.RideReadDto;
-import org.example.ride.dto.read.ValidationResponse;
 import org.example.ride.entity.enumeration.DriverRideStatus;
 import org.example.ride.entity.enumeration.PassengerRideStatus;
-import org.example.ride.exception.violation.Violation;
 import org.example.ride.service.RideService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -54,7 +55,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = RideController.class)
-@Import(MessageSourceConfig.class)
+@Import({MessageSourceConfig.class, HandlerConfiguration.class})
 @WithMockUser
 class RideControllerTest {
 

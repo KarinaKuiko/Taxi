@@ -1,7 +1,15 @@
-FROM maven:3.9.5-eclipse-temurin-21-alpine AS build
+FROM maven:3.9.5-eclipse-temurin-21-alpine AS exception-handler-starter-build
 WORKDIR /app
-COPY pom.xml /app/
-COPY src /app/src/
+COPY /exception-handler-starter/pom.xml /app/
+COPY /exception-handler-starter/src /app/src
+RUN mvn clean install -DskipTests
+
+FROM maven:3.9.5-eclipse-temurin-21-alpine AS build
+ARG SERVICE_NAME
+WORKDIR /app
+COPY --from=exception-handler-starter-build /root/.m2 /root/.m2
+COPY /${SERVICE_NAME}/pom.xml /app/
+COPY /${SERVICE_NAME}/src /app/src/
 RUN mvn --file /app/pom.xml clean package -DskipTests
 
 FROM openjdk:21-slim AS extract

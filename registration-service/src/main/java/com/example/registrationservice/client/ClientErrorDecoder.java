@@ -1,9 +1,8 @@
 package com.example.registrationservice.client;
 
-
-import com.example.registrationservice.dto.read.ExceptionDto;
-import com.example.registrationservice.exception.ClientException;
-import com.example.registrationservice.exception.keycloak.UnauthorizedException;
+import com.example.exceptionhandlerstarter.dto.ExceptionDto;
+import com.example.exceptionhandlerstarter.keycloak.ClientException;
+import com.example.exceptionhandlerstarter.keycloak.UnauthorizedException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;

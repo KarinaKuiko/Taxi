@@ -1,5 +1,7 @@
 package org.example.driver.unit.sevice;
 
+import com.example.exceptionhandlerstarter.exception.driver.DriverNotFoundException;
+import com.example.exceptionhandlerstarter.exception.driver.DuplicatedDriverEmailException;
 import org.example.driver.constants.ExceptionConstants;
 import org.example.driver.dto.create.DriverCreateEditDto;
 import org.example.driver.dto.read.CarReadDto;
@@ -7,8 +9,6 @@ import org.example.driver.dto.read.DriverReadDto;
 import org.example.driver.dto.read.UserRateDto;
 import org.example.driver.entity.Car;
 import org.example.driver.entity.Driver;
-import org.example.driver.exception.driver.DriverNotFoundException;
-import org.example.driver.exception.driver.DuplicatedDriverEmailException;
 import org.example.driver.mapper.CarMapper;
 import org.example.driver.mapper.DriverMapper;
 import org.example.driver.repository.CarRepository;

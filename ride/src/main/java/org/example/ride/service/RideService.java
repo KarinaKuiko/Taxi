@@ -1,5 +1,7 @@
 package org.example.ride.service;
 
+import com.example.exceptionhandlerstarter.exception.param.InvalidCountParametersException;
+import com.example.exceptionhandlerstarter.exception.ride.RideNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.ride.constants.ExceptionConstants;
@@ -10,8 +12,6 @@ import org.example.ride.dto.read.RideReadDto;
 import org.example.ride.entity.Ride;
 import org.example.ride.entity.enumeration.DriverRideStatus;
 import org.example.ride.entity.enumeration.PassengerRideStatus;
-import org.example.ride.exception.param.InvalidCountParametersException;
-import org.example.ride.exception.ride.RideNotFoundException;
 import org.example.ride.kafka.KafkaProducer;
 import org.example.ride.mapper.RideMapper;
 import org.example.ride.repository.RideRepository;

@@ -1,13 +1,13 @@
 package org.example.driver.service;
 
+import com.example.exceptionhandlerstarter.exception.car.CarNotFoundException;
+import com.example.exceptionhandlerstarter.exception.car.DuplicatedCarNumberException;
 import lombok.RequiredArgsConstructor;
 import org.example.driver.constants.ExceptionConstants;
 import org.example.driver.dto.create.CarCreateEditDto;
 import org.example.driver.dto.read.CarReadDto;
 import org.example.driver.entity.Car;
 import org.example.driver.entity.Driver;
-import org.example.driver.exception.car.CarNotFoundException;
-import org.example.driver.exception.car.DuplicatedCarNumberException;
 import org.example.driver.mapper.CarMapper;
 import org.example.driver.repository.CarRepository;
 import org.example.driver.repository.DriverRepository;

@@ -1,5 +1,6 @@
 package org.example.passenger.service;
 
+import com.example.exceptionhandlerstarter.exception.minio.AvatarNotFoundException;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;
 import io.minio.StatObjectArgs;
@@ -9,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.example.passenger.constants.ExceptionConstants;
 import org.example.passenger.dto.read.MinioAvatar;
-import org.example.passenger.exception.minio.AvatarNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;

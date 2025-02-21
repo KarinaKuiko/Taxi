@@ -1,5 +1,7 @@
 package org.example.driver.service;
 
+import com.example.exceptionhandlerstarter.exception.driver.DriverNotFoundException;
+import com.example.exceptionhandlerstarter.exception.driver.DuplicatedDriverEmailException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.driver.constants.CommonConstants;
@@ -11,8 +13,7 @@ import org.example.driver.dto.read.RideReadDto;
 import org.example.driver.dto.read.UserRateDto;
 import org.example.driver.entity.Car;
 import org.example.driver.entity.Driver;
-import org.example.driver.exception.driver.DriverNotFoundException;
-import org.example.driver.exception.driver.DuplicatedDriverEmailException;
+
 import org.example.driver.mapper.CarMapper;
 import org.example.driver.mapper.DriverMapper;
 import org.example.driver.repository.CarRepository;

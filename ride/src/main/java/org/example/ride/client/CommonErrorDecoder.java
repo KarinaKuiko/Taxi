@@ -1,12 +1,12 @@
 package org.example.ride.client;
 
+import com.example.exceptionhandlerstarter.dto.ExceptionDto;
+import com.example.exceptionhandlerstarter.keycloak.ClientException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import lombok.SneakyThrows;
-import org.example.ride.dto.read.ExceptionDto;
-import org.example.ride.exception.CommonClientException;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -22,7 +22,7 @@ public class CommonErrorDecoder implements ErrorDecoder {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(new JavaTimeModule());
-            return new CommonClientException(objectMapper.readValue(readResponseBody(response), ExceptionDto.class));
+            return new ClientException(objectMapper.readValue(readResponseBody(response), ExceptionDto.class));
         } catch (IOException e) {
             throw new RuntimeException("I/O error while reading response: " + e.getMessage(), e);
         }

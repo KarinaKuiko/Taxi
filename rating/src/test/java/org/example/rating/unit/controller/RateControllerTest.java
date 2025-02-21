@@ -1,13 +1,14 @@
 package org.example.rating.unit.controller;
 
+import com.example.exceptionhandlerstarter.config.HandlerConfiguration;
+import com.example.exceptionhandlerstarter.dto.ValidationResponse;
+import com.example.exceptionhandlerstarter.dto.Violation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.rating.config.MessageSourceConfig;
 import org.example.rating.controller.RateController;
 import org.example.rating.dto.create.RateCreateEditDto;
 import org.example.rating.dto.read.RateReadDto;
-import org.example.rating.dto.read.ValidationResponse;
 import org.example.rating.entity.enumeration.UserType;
-import org.example.rating.exception.violation.Violation;
 import org.example.rating.service.impl.DriverRateService;
 import org.example.rating.service.impl.PassengerRateService;
 import org.junit.jupiter.api.DisplayName;
@@ -56,7 +57,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = RateController.class)
-@Import(MessageSourceConfig.class)
+@Import({MessageSourceConfig.class, HandlerConfiguration.class})
 @WithMockUser
 class RateControllerTest {
 

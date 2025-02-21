@@ -10,8 +10,8 @@ x-defaults: &defaults
 services:
   eureka-server:
     build:
-      context: ../eureka-server
-      dockerfile: ../docker-compose/Dockerfile
+      context: ..
+      dockerfile: ./docker-compose/Dockerfile
       args:
         SERVICE_NAME: eureka-server
     container_name: eureka-server
@@ -28,8 +28,8 @@ services:
 
   gateway:
     build:
-      context: ../gateway
-      dockerfile: ../docker-compose/Dockerfile
+      context: ..
+      dockerfile: ./docker-compose/Dockerfile
       args:
         SERVICE_NAME: gateway
     container_name: gateway
@@ -53,8 +53,8 @@ services:
 
   driver:
     build:
-      context: ../driver
-      dockerfile: ../docker-compose/Dockerfile
+      context: ..
+      dockerfile: ./docker-compose/Dockerfile
       args:
         SERVICE_NAME: driver
     container_name: driver
@@ -93,8 +93,8 @@ services:
 
   passenger:
     build:
-      context: ../passenger
-      dockerfile: ../docker-compose/Dockerfile
+      context: ..
+      dockerfile: ./docker-compose/Dockerfile
       args:
         SERVICE_NAME: passenger
     container_name: passenger
@@ -131,8 +131,8 @@ services:
 
   ride:
     build:
-      context: ../ride
-      dockerfile: ../docker-compose/Dockerfile
+      context: ..
+      dockerfile: ./docker-compose/Dockerfile
       args:
         SERVICE_NAME: ride
     container_name: ride
@@ -169,8 +169,8 @@ services:
 
   rating:
     build:
-      context: ../rating
-      dockerfile: ../docker-compose/Dockerfile
+      context: ..
+      dockerfile: ./docker-compose/Dockerfile
       args:
         SERVICE_NAME: rating
     container_name: rating
@@ -464,8 +464,8 @@ services:
 
   registration-service:
     build:
-      context: ../registration-service
-      dockerfile: ../docker-compose/Dockerfile
+      context: ..
+      dockerfile: ./docker-compose/Dockerfile
       args:
         SERVICE_NAME: registration-service
     container_name: registration-service

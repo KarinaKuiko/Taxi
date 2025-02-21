@@ -9,6 +9,7 @@ on:
       - 'passenger/**'
       - 'rating/**'
       - 'ride/**'
+      - 'exception-handler-starter/**'
   pull_request:
     branches:
       - master
@@ -17,6 +18,7 @@ on:
       - 'passenger/**'
       - 'rating/**'
       - 'ride/**'
+      - 'exception-handler-starter/**'
 
 jobs:
   test:
@@ -42,6 +44,11 @@ jobs:
               - 'rating/**'
             ride:
               - 'ride/**'
+            exception-handler-starter:
+              - 'exception-handler-starter/**'
+      - name: Build EXCEPTION HANDLER STARTER
+        if: steps.changes.outputs.exception-handler-starter == 'true'
+        run: mvn -B clean install --file exception-handler-starter/pom.xml
       - name: Run unit and integration tests DRIVER
         if: steps.changes.outputs.driver == 'true'
         run:  mvn -B clean install --file driver/pom.xml

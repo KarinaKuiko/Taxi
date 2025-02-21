@@ -1,12 +1,12 @@
 package org.example.passenger.unit.serivce;
 
+import com.example.exceptionhandlerstarter.exception.passenger.DuplicatedPassengerEmailException;
+import com.example.exceptionhandlerstarter.exception.passenger.PassengerNotFoundException;
 import org.example.passenger.constants.ExceptionConstants;
 import org.example.passenger.dto.create.PassengerCreateEditDto;
 import org.example.passenger.dto.read.PassengerReadDto;
 import org.example.passenger.dto.read.UserRateDto;
 import org.example.passenger.entity.Passenger;
-import org.example.passenger.exception.passenger.DuplicatedPassengerEmailException;
-import org.example.passenger.exception.passenger.PassengerNotFoundException;
 import org.example.passenger.mapper.PassengerMapper;
 import org.example.passenger.repository.PassengerRepository;
 import org.example.passenger.service.ImageStorageService;
