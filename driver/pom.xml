@@ -42,6 +42,7 @@
         <failsafe.plugin.version>3.5.2</failsafe.plugin.version>
         <cucumber.version>7.19.0</cucumber.version>
         <extentsreport.version>1.14.0</extentsreport.version>
+        <minio.version>8.5.17</minio.version>
         <logstash.logback.encoder.version>8.0</logstash.logback.encoder.version>
         <exception.handler.starter.version>0.0.1-SNAPSHOT</exception.handler.starter.version>
     </properties>
@@ -188,6 +189,13 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-oauth2-jose</artifactId>
         </dependency>
+      
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>${minio.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>

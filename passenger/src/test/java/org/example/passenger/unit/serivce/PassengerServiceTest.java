@@ -9,6 +9,7 @@ import org.example.passenger.exception.passenger.DuplicatedPassengerEmailExcepti
 import org.example.passenger.exception.passenger.PassengerNotFoundException;
 import org.example.passenger.mapper.PassengerMapper;
 import org.example.passenger.repository.PassengerRepository;
+import org.example.passenger.service.ImageStorageService;
 import org.example.passenger.service.PassengerService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,6 +50,9 @@ class PassengerServiceTest {
 
     @Mock
     private PassengerMapper passengerMapper;
+
+    @Mock
+    private ImageStorageService imageStorageService;
 
     @Mock
     private MessageSource messageSource;
@@ -135,7 +139,7 @@ class PassengerServiceTest {
         when(passengerRepository.save(defaultPassenger)).thenReturn(defaultPassenger);
         when(passengerMapper.toReadDto(defaultPassenger)).thenReturn(readPassenger);
 
-        assertThat(passengerService.create(createPassenger)).isNotNull();
+        assertThat(passengerService.create(createPassenger, null)).isNotNull();
         verify(passengerRepository).findByEmailAndIsDeletedFalse(createPassenger.email());
         verify(passengerMapper).toPassenger(createPassenger);
         verify(passengerRepository).save(defaultPassenger);
@@ -156,7 +160,7 @@ class PassengerServiceTest {
                 .thenReturn(ExceptionConstants.PASSENGER_DUPlICATED_EMAIL_MESSAGE);
 
         DuplicatedPassengerEmailException exception = assertThrows(DuplicatedPassengerEmailException.class,
-                () -> passengerService.create(createPassenger));
+                () -> passengerService.create(createPassenger, null));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.PASSENGER_DUPlICATED_EMAIL_MESSAGE);
         verify(messageSource).getMessage(
@@ -178,10 +182,11 @@ class PassengerServiceTest {
         when(passengerRepository.findByIdAndIsDeletedFalse(DEFAULT_ID)).thenReturn(Optional.of(defaultPassenger));
         when(passengerRepository.findByEmailAndIsDeletedFalse(createPassenger.email()))
                 .thenReturn(Optional.of(defaultPassenger));
+        when(imageStorageService.updateImage(null, null)).thenReturn(null);
         when(passengerRepository.save(defaultPassenger)).thenReturn(defaultPassenger);
         when(passengerMapper.toReadDto(defaultPassenger)).thenReturn(readPassenger);
 
-        assertThat(passengerService.update(DEFAULT_ID, createPassenger)).isNotNull();
+        assertThat(passengerService.update(DEFAULT_ID, createPassenger, null)).isNotNull();
         verify(passengerRepository).findByIdAndIsDeletedFalse(DEFAULT_ID);
         verify(passengerRepository).findByEmailAndIsDeletedFalse(createPassenger.email());
         verify(passengerMapper).map(defaultPassenger, createPassenger);
@@ -204,7 +209,7 @@ class PassengerServiceTest {
                 .thenReturn(ExceptionConstants.PASSENGER_DUPlICATED_EMAIL_MESSAGE);
 
         DuplicatedPassengerEmailException exception = assertThrows(DuplicatedPassengerEmailException.class,
-                () -> passengerService.update(2L, createPassenger));
+                () -> passengerService.update(2L, createPassenger, null));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.PASSENGER_DUPlICATED_EMAIL_MESSAGE);
         verify(passengerRepository).findByEmailAndIsDeletedFalse(createPassenger.email());
@@ -229,7 +234,7 @@ class PassengerServiceTest {
                 .thenReturn(ExceptionConstants.PASSENGER_NOT_FOUND_MESSAGE);
 
         PassengerNotFoundException exception = assertThrows(PassengerNotFoundException.class,
-                () -> passengerService.update(DEFAULT_ID, createPassenger));
+                () -> passengerService.update(DEFAULT_ID, createPassenger, null));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.PASSENGER_NOT_FOUND_MESSAGE);
         verify(passengerRepository).findByIdAndIsDeletedFalse(DEFAULT_ID);

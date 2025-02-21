@@ -1,5 +1,6 @@
 package org.example.driver.integration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.example.driver.dto.create.CarCreateEditDto;
 import org.example.driver.dto.create.DriverCreateEditDto;
@@ -69,6 +70,14 @@ public class DriverControllerIntegrationTest {
         registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
     }
 
+    @DynamicPropertySource
+    static void minioProperties(DynamicPropertyRegistry registry) {
+        registry.add("minio.access-key", () -> DEFAULT_NAME);
+        registry.add("minio.secret-key", () -> DEFAULT_NAME);
+        registry.add("minio.bucket-name", () -> DEFAULT_NAME);
+        registry.add("minio.url", () -> DEFAULT_NAME);
+    }
+
     @Container
     public static KafkaContainer kafkaContainer = new KafkaContainer(
             DockerImageName.parse("confluentinc/cp-kafka:latest"));
@@ -83,6 +92,9 @@ public class DriverControllerIntegrationTest {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @BeforeAll
     static void setUp() {
@@ -144,7 +156,7 @@ public class DriverControllerIntegrationTest {
     }
 
     @Test
-    void create_whenValidInput_thenReturn201AndDriverReadDto() {
+    void create_whenValidInput_thenReturn201AndDriverReadDto() throws Exception {
         DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
                 .email("driver@gmail.com")
                 .build();
@@ -152,8 +164,7 @@ public class DriverControllerIntegrationTest {
         RestAssuredMockMvc
                 .given()
                 .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(createDriver)
+                .multiPart("dto", objectMapper.writeValueAsString(createDriver), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(URL, DRIVER_ENTITY)
                 .then()
@@ -162,14 +173,13 @@ public class DriverControllerIntegrationTest {
     }
 
     @Test
-    void create_whenEmailIsDuplicated_thenReturn409() {
+    void create_whenEmailIsDuplicated_thenReturn409() throws Exception {
         DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
 
         RestAssuredMockMvc
                 .given()
                 .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(createDriver)
+                .multiPart("dto", objectMapper.writeValueAsString(createDriver), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(URL, DRIVER_ENTITY)
                 .then()
@@ -178,7 +188,7 @@ public class DriverControllerIntegrationTest {
     }
 
     @Test
-    void create_whenCarNumberNotFound_thenReturn201() {
+    void create_whenCarNumberNotFound_thenReturn201() throws Exception {
         CarCreateEditDto createCar = getCarCreateEditDtoBuilder()
                 .number("AB123CL")
                 .build();
@@ -190,8 +200,7 @@ public class DriverControllerIntegrationTest {
         RestAssuredMockMvc
                 .given()
                 .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(createDriver)
+                .multiPart("dto", objectMapper.writeValueAsString(createDriver), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(URL, DRIVER_ENTITY)
                 .then()
@@ -200,7 +209,7 @@ public class DriverControllerIntegrationTest {
     }
 
     @Test
-    void update_whenValidInput_thenReturn200AndDriverReadDto() {
+    void update_whenValidInput_thenReturn200AndDriverReadDto() throws Exception {
         DriverCreateEditDto updateDriver = getDriverCreateEditDtoBuilder()
                 .firstName("testing")
                 .gender(Gender.FEMALE)
@@ -209,8 +218,7 @@ public class DriverControllerIntegrationTest {
         RestAssuredMockMvc
                 .given()
                 .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(updateDriver)
+                .multiPart("dto", objectMapper.writeValueAsString(updateDriver), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID.toString())
                 .then()
@@ -225,14 +233,13 @@ public class DriverControllerIntegrationTest {
     }
 
     @Test
-    void update_whenDriverIsNotFound_thenReturn404() {
+    void update_whenDriverIsNotFound_thenReturn404() throws Exception {
         DriverCreateEditDto updateDriver = getDriverCreateEditDtoBuilder().build();
 
         RestAssuredMockMvc
                 .given()
                 .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(updateDriver)
+                .multiPart("dto", objectMapper.writeValueAsString(updateDriver), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(URL_WITH_ID, DRIVER_ENTITY, "10")
                 .then()
@@ -241,7 +248,7 @@ public class DriverControllerIntegrationTest {
     }
 
     @Test
-    void update_whenEmailIsDuplicated_thenReturn409() {
+    void update_whenEmailIsDuplicated_thenReturn409() throws Exception {
         DriverCreateEditDto updateDriver = getDriverCreateEditDtoBuilder()
                 .firstName("testing")
                 .email("name@gmail.com")
@@ -250,8 +257,7 @@ public class DriverControllerIntegrationTest {
         RestAssuredMockMvc
                 .given()
                 .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(updateDriver)
+                .multiPart("dto", objectMapper.writeValueAsString(updateDriver), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID.toString())
                 .then()
@@ -260,7 +266,7 @@ public class DriverControllerIntegrationTest {
     }
 
     @Test
-    void update_whenCarIsNotFound_thenReturn200() {
+    void update_whenCarIsNotFound_thenReturn200() throws Exception {
         CarCreateEditDto createCar = getCarCreateEditDtoBuilder()
                 .number("AB123CL")
                 .build();
@@ -271,8 +277,7 @@ public class DriverControllerIntegrationTest {
         RestAssuredMockMvc
                 .given()
                 .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(updateDriver)
+                .multiPart("dto", objectMapper.writeValueAsString(updateDriver), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID.toString())
                 .then()

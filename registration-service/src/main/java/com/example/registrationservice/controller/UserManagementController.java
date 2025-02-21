@@ -9,12 +9,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Validated
 @RestController
@@ -25,10 +28,12 @@ public class UserManagementController {
 
     private final UserManagementService userManagementService;
 
-    @PostMapping("/sign-up")
+    @PostMapping(value = "/sign-up",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public UserRepresentation signUp(@Valid @RequestBody SignUpDto signUpDto) {
-        return userManagementService.signUp(signUpDto);
+    public UserRepresentation signUp(@Valid @RequestPart SignUpDto dto,
+                                     @RequestPart(required = false) MultipartFile file) {
+        return userManagementService.signUp(dto, file);
     }
 
     @PostMapping("/sign-in")
