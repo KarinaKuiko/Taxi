@@ -22,7 +22,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockPart;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -44,14 +46,14 @@ import static org.example.driver.util.DataUtil.URL_WITH_ID;
 import static org.example.driver.util.DataUtil.getCarCreateEditDtoBuilder;
 import static org.example.driver.util.DataUtil.getDriverCreateEditDtoBuilder;
 import static org.example.driver.util.DataUtil.getDriverReadDtoBuilder;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = DriverController.class)
@@ -156,31 +158,35 @@ class DriverControllerTest {
         @Test
         void create_whenVerifyingRequestMatching_thenReturn200() throws Exception {
             DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createDriver).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            mockMvc.perform(post(URL, DRIVER_ENTITY)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver))
+            mockMvc.perform(multipart(URL, DRIVER_ENTITY)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
 
-            verify(driverService, times(1)).create(createDriver);
+            verify(driverService, times(1)).create(createDriver, null);
         }
 
         @Test
         void create_whenValidInput_thenMapsToBusinessModel() throws Exception {
             DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createDriver).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            mockMvc.perform(post(URL, DRIVER_ENTITY)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver))
+            mockMvc.perform(multipart(URL, DRIVER_ENTITY)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
 
             ArgumentCaptor<DriverCreateEditDto> driverCaptor = ArgumentCaptor.forClass(DriverCreateEditDto.class);
 
-            verify(driverService, times(1)).create(driverCaptor.capture());
+            verify(driverService, times(1)).create(driverCaptor.capture(), any());
             assertThat(driverCaptor.getValue().firstName()).isEqualTo(DEFAULT_NAME);
             assertThat(driverCaptor.getValue().lastName()).isEqualTo(DEFAULT_NAME);
             assertThat(driverCaptor.getValue().email()).isEqualTo(DEFAULT_EMAIL);
@@ -190,15 +196,17 @@ class DriverControllerTest {
         }
 
         @Test
-        void create_whenValidInput_thenReturn201AndCarReadDto() throws Exception {
+        void create_whenValidInput_thenReturn201AndDriverReadDto() throws Exception {
             DriverReadDto readDriver = getDriverReadDtoBuilder().build();
             DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createDriver).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            when(driverService.create(createDriver)).thenReturn(readDriver);
+            when(driverService.create(createDriver, null)).thenReturn(readDriver);
 
-            MvcResult mvcResult = mockMvc.perform(post(URL, DRIVER_ENTITY)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver))
+            MvcResult mvcResult = mockMvc.perform(multipart(URL, DRIVER_ENTITY)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
@@ -216,10 +224,12 @@ class DriverControllerTest {
                             .email(null)
                             .phone(null)
                             .build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createDriver).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            MvcResult mvcResult = mockMvc.perform(post(URL, DRIVER_ENTITY)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver))
+            MvcResult mvcResult = mockMvc.perform(multipart(URL, DRIVER_ENTITY)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
@@ -241,10 +251,12 @@ class DriverControllerTest {
             DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
                             .email("test.gmail")
                             .build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createDriver).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            MvcResult mvcResult = mockMvc.perform(post(URL, DRIVER_ENTITY)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver))
+            MvcResult mvcResult = mockMvc.perform(multipart(URL, DRIVER_ENTITY)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
@@ -264,10 +276,12 @@ class DriverControllerTest {
             DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
                             .phone(number)
                             .build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createDriver).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            MvcResult mvcResult = mockMvc.perform(post(URL, DRIVER_ENTITY)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver))
+            MvcResult mvcResult = mockMvc.perform(multipart(URL, DRIVER_ENTITY)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
@@ -289,30 +303,34 @@ class DriverControllerTest {
         @Test
         void update_whenValidInput_thenReturn200() throws Exception {
             DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createDriver).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            mockMvc.perform(put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver))
+            mockMvc.perform(multipart(HttpMethod.PUT, URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isOk());
 
-            verify(driverService, times(1)).update(DEFAULT_ID, createDriver);
+            verify(driverService, times(1)).update(DEFAULT_ID, createDriver, null);
         }
 
         @Test
         void update_whenValidInput_thenMapsToBusinessModel() throws Exception {
             DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createDriver).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            mockMvc.perform(put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver))
+            mockMvc.perform(multipart(HttpMethod.PUT, URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isOk());
 
             ArgumentCaptor<DriverCreateEditDto> driverCaptor = ArgumentCaptor.forClass(DriverCreateEditDto.class);
             ArgumentCaptor<Long> idCaptor = ArgumentCaptor.forClass(Long.class);
 
-            verify(driverService, times(1)).update(idCaptor.capture(), driverCaptor.capture());
+            verify(driverService, times(1)).update(idCaptor.capture(), driverCaptor.capture(), any());
             assertThat(idCaptor.getValue()).isEqualTo(DEFAULT_ID);
             assertThat(driverCaptor.getValue().firstName()).isEqualTo(DEFAULT_NAME);
             assertThat(driverCaptor.getValue().lastName()).isEqualTo(DEFAULT_NAME);
@@ -323,15 +341,17 @@ class DriverControllerTest {
         }
 
         @Test
-        void update_whenValidInput_thenReturn200AndCarReadDto() throws Exception {
+        void update_whenValidInput_thenReturn200AndDriverReadDto() throws Exception {
             DriverReadDto readDriver = getDriverReadDtoBuilder().build();
             DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder().build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createDriver).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            when(driverService.update(DEFAULT_ID, createDriver)).thenReturn(readDriver);
+            when(driverService.update(DEFAULT_ID, createDriver, null)).thenReturn(readDriver);
 
-            MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver))
+            MvcResult mvcResult = mockMvc.perform(multipart(HttpMethod.PUT, URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isOk())
                     .andReturn();
@@ -349,10 +369,12 @@ class DriverControllerTest {
                             .email(null)
                             .phone(null)
                             .build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createDriver).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver))
+            MvcResult mvcResult = mockMvc.perform(multipart(HttpMethod.PUT, URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
@@ -374,10 +396,12 @@ class DriverControllerTest {
             DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
                             .email("test.gmail")
                             .build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createDriver).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver))
+            MvcResult mvcResult = mockMvc.perform(multipart(HttpMethod.PUT, URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
@@ -397,10 +421,12 @@ class DriverControllerTest {
             DriverCreateEditDto createDriver = getDriverCreateEditDtoBuilder()
                             .phone(number)
                             .build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createDriver).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createDriver))
+            MvcResult mvcResult = mockMvc.perform(multipart(HttpMethod.PUT, URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();

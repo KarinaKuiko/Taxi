@@ -10,6 +10,7 @@ public record PassengerReadDto(
         String email,
         String phone,
         double rating,
-        String gender
+        String gender,
+        String imageUrl
 ) {
 }

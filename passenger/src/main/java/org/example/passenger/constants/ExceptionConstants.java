@@ -11,5 +11,7 @@ public final class ExceptionConstants {
     public static final String INTERNAL_SERVER_ERROR_MESSAGE = "Something went wrong. Please, try again later";
 
     public static final String PHONE_PATTERN = "^(\\+375(29|33|44|25|17|16|15|44|29|33|44)?[0-9]{7}|80(29|33|44|25|17|16|15|44)?[0-9]{7})$";
-
+    public static final String AVATAR_NOT_FOUND = "avatar.not.found";
+    public static final String FILE_UPLOAD_EXCEPTION = "file.upload.exception";
+    public static final String FILE_DELETE_EXCEPTION = "file.delete.exception";
 }

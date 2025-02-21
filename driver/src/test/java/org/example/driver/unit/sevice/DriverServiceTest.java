@@ -15,6 +15,7 @@ import org.example.driver.repository.CarRepository;
 import org.example.driver.repository.DriverRepository;
 import org.example.driver.service.CarService;
 import org.example.driver.service.DriverService;
+import org.example.driver.service.ImageStorageService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -64,6 +65,9 @@ class DriverServiceTest {
     private CarService carService;
 
     @Mock
+    private ImageStorageService imageStorageService;
+
+    @Mock
     private CarMapper carMapper;
 
     @Mock
@@ -83,7 +87,7 @@ class DriverServiceTest {
         when(driverRepository.save(defaultDriver)).thenReturn(defaultDriver);
         when(driverMapper.toReadDto(defaultDriver)).thenReturn(readDriver);
 
-        assertThat(driverService.create(createDriver)).isNotNull();
+        assertThat(driverService.create(createDriver, null)).isNotNull();
         verify(driverRepository).findByEmailAndIsDeletedFalse(createDriver.email());
         verify(driverMapper).toDriver(createDriver);
         verify(carRepository).findByNumberAndIsDeletedFalse(createDriver.carCreateEditDto().number());
@@ -108,7 +112,7 @@ class DriverServiceTest {
         when(driverRepository.save(defaultDriver)).thenReturn(defaultDriver);
         when(driverMapper.toReadDto(defaultDriver)).thenReturn(readDriver);
 
-        assertThat(driverService.create(createDriver)).isNotNull();
+        assertThat(driverService.create(createDriver, null)).isNotNull();
         verify(driverRepository).findByEmailAndIsDeletedFalse(createDriver.email());
         verify(driverMapper).toDriver(createDriver);
         verify(carRepository).findByNumberAndIsDeletedFalse(createDriver.carCreateEditDto().number());
@@ -132,7 +136,7 @@ class DriverServiceTest {
                 .thenReturn(ExceptionConstants.DRIVER_DUPLICATED_EMAIL);
 
         DuplicatedDriverEmailException exception = assertThrows(DuplicatedDriverEmailException.class,
-                () -> driverService.create(createDriver));
+                () -> driverService.create(createDriver, null));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.DRIVER_DUPLICATED_EMAIL);
         verify(driverRepository).findByEmailAndIsDeletedFalse(createDriver.email());
@@ -157,10 +161,11 @@ class DriverServiceTest {
         when(driverRepository.findByEmailAndIsDeletedFalse(createDriver.email()))
                 .thenReturn(Optional.of(defaultDriver));
         when(carRepository.findByNumberAndIsDeletedFalse(createDriver.carCreateEditDto().number())).thenReturn(Optional.of(car));
+        when(imageStorageService.updateImage(null, null)).thenReturn(null);
         when(driverRepository.save(defaultDriver)).thenReturn(defaultDriver);
         when(driverMapper.toReadDto(defaultDriver)).thenReturn(readDriver);
 
-        assertThat(driverService.update(DEFAULT_ID, createDriver)).isNotNull();
+        assertThat(driverService.update(DEFAULT_ID, createDriver, null)).isNotNull();
         verify(driverRepository).findByIdAndIsDeletedFalse(DEFAULT_ID);
         verify(driverRepository).findByEmailAndIsDeletedFalse(createDriver.email());
         verify(driverMapper).map(defaultDriver, createDriver);
@@ -184,7 +189,7 @@ class DriverServiceTest {
                 .thenReturn(ExceptionConstants.DRIVER_DUPLICATED_EMAIL);
 
         DuplicatedDriverEmailException exception = assertThrows(DuplicatedDriverEmailException.class,
-                () -> driverService.update(2L, createDriver));
+                () -> driverService.update(2L, createDriver, null));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.DRIVER_DUPLICATED_EMAIL);
         verify(driverRepository).findByEmailAndIsDeletedFalse(createDriver.email());
@@ -212,10 +217,11 @@ class DriverServiceTest {
         when(carRepository.findByNumberAndIsDeletedFalse(createDriver.carCreateEditDto().number())).thenReturn(Optional.empty());
         when(carService.create(createDriver.carCreateEditDto())).thenReturn(carReadDto);
         when(carMapper.toCar(carReadDto)).thenReturn(car);
+        when(imageStorageService.updateImage(null, null)).thenReturn(null);
         when(driverRepository.save(defaultDriver)).thenReturn(defaultDriver);
         when(driverMapper.toReadDto(defaultDriver)).thenReturn(readDriver);
 
-        assertThat(driverService.update(DEFAULT_ID, createDriver)).isNotNull();
+        assertThat(driverService.update(DEFAULT_ID, createDriver, null)).isNotNull();
         verify(driverRepository).findByIdAndIsDeletedFalse(DEFAULT_ID);
         verify(driverRepository).findByEmailAndIsDeletedFalse(createDriver.email());
         verify(carRepository).findByNumberAndIsDeletedFalse(createDriver.carCreateEditDto().number());
@@ -224,7 +230,6 @@ class DriverServiceTest {
         verify(carMapper).toCar(carReadDto);
         verify(driverRepository).save(defaultDriver);
         verify(driverMapper).toReadDto(defaultDriver);
-
     }
 
     @Test
@@ -239,7 +244,7 @@ class DriverServiceTest {
                 .thenReturn(ExceptionConstants.DRIVER_NOT_FOUND);
 
         DriverNotFoundException exception = assertThrows(DriverNotFoundException.class,
-                () -> driverService.update(DEFAULT_ID, createDriver));
+                () -> driverService.update(DEFAULT_ID, createDriver, null));
 
         assertThat(exception.getMessage()).isEqualTo(ExceptionConstants.DRIVER_NOT_FOUND);
         verify(driverRepository).findByIdAndIsDeletedFalse(DEFAULT_ID);

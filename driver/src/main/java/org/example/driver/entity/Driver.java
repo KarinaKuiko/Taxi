@@ -42,4 +42,6 @@ public class Driver extends AuditingEntity {
     private Car car;
 
     private Double rating;
+
+    private String imageUrl;
 }

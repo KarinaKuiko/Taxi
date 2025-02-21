@@ -1,0 +1,2 @@
+ALTER TABLE drivers
+ADD COLUMN image_url VARCHAR(255);

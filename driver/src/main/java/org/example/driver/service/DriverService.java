@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -34,9 +35,10 @@ public class DriverService {
     private final MessageSource messageSource;
     private final CarService carService;
     private final CarMapper carMapper;
+    private final ImageStorageService imageStorageService;
 
     @Transactional
-    public DriverReadDto create(DriverCreateEditDto driverDto) {
+    public DriverReadDto create(DriverCreateEditDto driverDto, MultipartFile multipartFile) {
         driverRepository.findByEmailAndIsDeletedFalse(driverDto.email())
                 .ifPresent(driver -> {
                     throw new DuplicatedDriverEmailException(messageSource.getMessage(
@@ -53,12 +55,16 @@ public class DriverService {
                 });
         driver.setCar(car);
         driver.setRating(CommonConstants.DEFAULT_RATING);
+        if (multipartFile != null) {
+            String imageUrl = imageStorageService.uploadImage(multipartFile);
+            driver.setImageUrl(imageUrl);
+        }
         return driverMapper.toReadDto(driverRepository.save(driver));
 
     }
 
     @Transactional
-    public DriverReadDto update(Long id, DriverCreateEditDto driverDto) {
+    public DriverReadDto update(Long id, DriverCreateEditDto driverDto, MultipartFile file) {
         return driverRepository.findByIdAndIsDeletedFalse(id)
                 .map(driver -> {
                     driverRepository.findByEmailAndIsDeletedFalse(driverDto.email())
@@ -77,6 +83,8 @@ public class DriverService {
                                 return carMapper.toCar(carReadDto);
                             });
                     driver.setCar(car);
+                    String newImageUrl = imageStorageService.updateImage(driver.getImageUrl(), file);
+                    driver.setImageUrl(newImageUrl);
                     return driver;
                 })
                 .map(driverRepository::save)

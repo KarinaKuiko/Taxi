@@ -21,7 +21,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockPart;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -41,14 +43,14 @@ import static org.example.passenger.util.DataUtil.URL;
 import static org.example.passenger.util.DataUtil.URL_WITH_ID;
 import static org.example.passenger.util.DataUtil.getPassengerCreateEditDtoBuilder;
 import static org.example.passenger.util.DataUtil.getPassengerReadDtoBuilder;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = PassengerController.class)
@@ -153,31 +155,35 @@ class PassengerControllerTest {
         @Test
         void create_whenVerifyingRequestMatching_thenReturn200() throws Exception {
             PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createPassenger).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            mockMvc.perform(post(URL)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger))
+            mockMvc.perform(multipart(URL)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
 
-            verify(passengerService, times(1)).create(createPassenger);
+            verify(passengerService, times(1)).create(createPassenger, null);
         }
 
         @Test
         void create_whenValidInput_thenMapsToBusinessModel() throws Exception {
             PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createPassenger).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            mockMvc.perform(post(URL)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger))
+            mockMvc.perform(multipart(URL)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
 
             ArgumentCaptor<PassengerCreateEditDto> carCaptor = ArgumentCaptor.forClass(PassengerCreateEditDto.class);
 
-            verify(passengerService, times(1)).create(carCaptor.capture());
+            verify(passengerService, times(1)).create(carCaptor.capture(), any());
             assertThat(carCaptor.getValue().firstName()).isEqualTo(DEFAULT_NAME);
             assertThat(carCaptor.getValue().lastName()).isEqualTo(DEFAULT_NAME);
             assertThat(carCaptor.getValue().email()).isEqualTo(DEFAULT_EMAIL);
@@ -188,12 +194,14 @@ class PassengerControllerTest {
         void create_whenValidInput_thenReturn201AndCarReadDto() throws Exception {
             PassengerReadDto readPassenger = getPassengerReadDtoBuilder().build();
             PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createPassenger).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            when(passengerService.create(createPassenger)).thenReturn(readPassenger);
+            when(passengerService.create(createPassenger, null)).thenReturn(readPassenger);
 
-            MvcResult mvcResult = mockMvc.perform(post(URL)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger))
+            MvcResult mvcResult = mockMvc.perform(multipart(URL)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isCreated())
                     .andReturn();
@@ -211,10 +219,12 @@ class PassengerControllerTest {
                                 .email(null)
                                 .phone(null)
                                 .build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createPassenger).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            MvcResult mvcResult = mockMvc.perform(post(URL)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger))
+            MvcResult mvcResult = mockMvc.perform(multipart(URL)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
@@ -237,10 +247,12 @@ class PassengerControllerTest {
             PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder()
                                 .phone(number)
                                 .build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createPassenger).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            MvcResult mvcResult = mockMvc.perform(post(URL)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger))
+            MvcResult mvcResult = mockMvc.perform(multipart(URL)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
@@ -260,10 +272,12 @@ class PassengerControllerTest {
             PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder()
                                 .email("passenger.gmail")
                                 .build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createPassenger).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            MvcResult mvcResult = mockMvc.perform(post(URL)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger))
+            MvcResult mvcResult = mockMvc.perform(multipart(URL)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
@@ -284,23 +298,27 @@ class PassengerControllerTest {
         @Test
         void update_whenVerifyingRequestMatching_thenReturn200() throws Exception {
             PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createPassenger).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger))
+            mockMvc.perform(multipart(HttpMethod.PUT, URL_WITH_ID, DEFAULT_ID)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isOk());
 
-            verify(passengerService, times(1)).update(DEFAULT_ID, createPassenger);
+            verify(passengerService, times(1)).update(DEFAULT_ID, createPassenger, null);
         }
 
         @Test
         void update_whenValidInput_thenMapsToBusinessModel() throws Exception {
             PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createPassenger).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger))
+            mockMvc.perform(multipart(HttpMethod.PUT, URL_WITH_ID, DEFAULT_ID)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isOk());
 
@@ -309,7 +327,7 @@ class PassengerControllerTest {
             ArgumentCaptor<Long> idCaptor = ArgumentCaptor.forClass(Long.class);
 
             verify(passengerService, times(1)).update(
-                    idCaptor.capture(), passengerCaptor.capture());
+                    idCaptor.capture(), passengerCaptor.capture(), any());
             assertThat(idCaptor.getValue()).isEqualTo(DEFAULT_ID);
             assertThat(passengerCaptor.getValue().firstName()).isEqualTo(DEFAULT_NAME);
             assertThat(passengerCaptor.getValue().lastName()).isEqualTo(DEFAULT_NAME);
@@ -321,12 +339,14 @@ class PassengerControllerTest {
         void update_whenValidInput_thenReturn200AndCarReadDto() throws Exception {
             PassengerReadDto readPassenger = getPassengerReadDtoBuilder().build();
             PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createPassenger).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            when(passengerService.update(DEFAULT_ID, createPassenger)).thenReturn(readPassenger);
+            when(passengerService.update(DEFAULT_ID, createPassenger, null)).thenReturn(readPassenger);
 
-            MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger))
+            MvcResult mvcResult = mockMvc.perform(multipart(HttpMethod.PUT, URL_WITH_ID, DEFAULT_ID)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isOk())
                     .andReturn();
@@ -344,10 +364,12 @@ class PassengerControllerTest {
                                 .email(null)
                                 .phone(null)
                                 .build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createPassenger).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger))
+            MvcResult mvcResult = mockMvc.perform(multipart(HttpMethod.PUT, URL_WITH_ID, DEFAULT_ID)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
@@ -370,10 +392,12 @@ class PassengerControllerTest {
             PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder()
                                 .phone(number)
                                 .build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createPassenger).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger))
+            MvcResult mvcResult = mockMvc.perform(multipart(HttpMethod.PUT, URL_WITH_ID, DEFAULT_ID)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();
@@ -393,10 +417,12 @@ class PassengerControllerTest {
             PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder()
                                 .email("passenger.gmail")
                                 .build();
+            MockPart part = new MockPart("dto", objectMapper.writeValueAsString(createPassenger).getBytes());
+            part.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
-            MvcResult mvcResult = mockMvc.perform(put(URL_WITH_ID, DEFAULT_ID)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createPassenger))
+            MvcResult mvcResult = mockMvc.perform(multipart(HttpMethod.PUT, URL_WITH_ID, DEFAULT_ID)
+                            .part(part)
+                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .with(csrf()))
                     .andExpect(status().isBadRequest())
                     .andReturn();

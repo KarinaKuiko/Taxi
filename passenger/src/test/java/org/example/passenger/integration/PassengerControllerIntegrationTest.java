@@ -1,5 +1,6 @@
 package org.example.passenger.integration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.example.passenger.dto.create.PassengerCreateEditDto;
 import org.example.passenger.entity.Passenger;
@@ -66,6 +67,14 @@ public class PassengerControllerIntegrationTest {
         registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
     }
 
+    @DynamicPropertySource
+    static void minioProperties(DynamicPropertyRegistry registry) {
+        registry.add("minio.access-key", () -> DEFAULT_NAME);
+        registry.add("minio.secret-key", () -> DEFAULT_NAME);
+        registry.add("minio.bucket-name", () -> DEFAULT_NAME);
+        registry.add("minio.url", () -> DEFAULT_NAME);
+    }
+
     @Container
     public static KafkaContainer kafkaContainer = new KafkaContainer(
             DockerImageName.parse("confluentinc/cp-kafka:latest"));
@@ -80,6 +89,9 @@ public class PassengerControllerIntegrationTest {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @BeforeAll
     static void setUp() {
@@ -139,7 +151,7 @@ public class PassengerControllerIntegrationTest {
     }
 
     @Test
-    void create_whenValidInput_thenReturn201AndPassengerReadDto() {
+    void create_whenValidInput_thenReturn201AndPassengerReadDto() throws Exception {
         PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder()
                                                 .email("test@gmail.com")
                                                 .build();
@@ -147,8 +159,7 @@ public class PassengerControllerIntegrationTest {
         RestAssuredMockMvc
                 .given()
                 .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(createPassenger)
+                .multiPart("dto", objectMapper.writeValueAsString(createPassenger), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(URL)
                 .then()
@@ -157,14 +168,13 @@ public class PassengerControllerIntegrationTest {
     }
 
     @Test
-    void create_whenDuplicatedEmail_thenReturn409() {
+    void create_whenDuplicatedEmail_thenReturn409() throws Exception {
         PassengerCreateEditDto createPassenger = getPassengerCreateEditDtoBuilder().build();
 
         RestAssuredMockMvc
                 .given()
                 .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(createPassenger)
+                .multiPart("dto", objectMapper.writeValueAsString(createPassenger), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(URL)
                 .then()
@@ -173,7 +183,7 @@ public class PassengerControllerIntegrationTest {
     }
 
     @Test
-    void update_whenValidInput_thenReturn200AndPassengerReadDto() {
+    void update_whenValidInput_thenReturn200AndPassengerReadDto() throws Exception {
         PassengerCreateEditDto updatePassenger = getPassengerCreateEditDtoBuilder()
                                                     .firstName("naming")
                                                     .build();
@@ -181,8 +191,7 @@ public class PassengerControllerIntegrationTest {
         RestAssuredMockMvc
                 .given()
                 .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(updatePassenger)
+                .multiPart("dto", objectMapper.writeValueAsString(updatePassenger), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
@@ -195,7 +204,7 @@ public class PassengerControllerIntegrationTest {
     }
 
     @Test
-    void update_whenEmailIsDuplicated_thenReturn409() {
+    void update_whenEmailIsDuplicated_thenReturn409() throws Exception {
         Passenger createPassenger = getPassengerBuilder()
                                     .id(2L)
                                     .email("test@gmail.com")
@@ -210,8 +219,7 @@ public class PassengerControllerIntegrationTest {
         RestAssuredMockMvc
                 .given()
                 .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(updatePassenger)
+                .multiPart("dto", objectMapper.writeValueAsString(updatePassenger), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
@@ -220,14 +228,13 @@ public class PassengerControllerIntegrationTest {
     }
 
     @Test
-    void update_whenPassengerIsNotFound_thenReturn404() {
+    void update_whenPassengerIsNotFound_thenReturn404() throws Exception {
         PassengerCreateEditDto updatePassenger = getPassengerCreateEditDtoBuilder().build();
 
         RestAssuredMockMvc
                 .given()
                 .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(updatePassenger)
+                .multiPart("dto", objectMapper.writeValueAsString(updatePassenger), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(URL_WITH_ID, "2")
                 .then()

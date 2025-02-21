@@ -31,6 +31,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
@@ -68,7 +69,7 @@ public class UserManagementService {
 
     @Value("${keycloak.realm}")
     private String realm;
-
+  
     @Value("${keycloak.auth-client-id}")
     private String authClientId;
 
@@ -78,8 +79,8 @@ public class UserManagementService {
     @Value("${keycloak.server-url}")
     private String serverUrl;
 
-    public UserRepresentation signUp(SignUpDto signUpDto) {
-        UserRepresentation keycloakUser = getUserRepresentation(signUpDto);
+    public UserRepresentation signUp(SignUpDto dto, MultipartFile file) {
+        UserRepresentation keycloakUser = getUserRepresentation(dto);
         RealmResource realmResource = keycloak.realm(realm);
         UsersResource usersResource = realmResource.users();
         Response response = usersResource.create(keycloakUser);
@@ -87,11 +88,11 @@ public class UserManagementService {
         if (response.getStatus() == HttpStatus.CREATED.value()) {
             String adminClientAccessToken = keycloak.tokenManager().getAccessTokenString();
             try {
-                if (Objects.equals(signUpDto.role().name(), PASSENGER_ROLE)) {
-                    passengerClient.createPassenger(signUpDto,
+                if (Objects.equals(dto.role().name(), PASSENGER_ROLE)) {
+                    passengerClient.createPassenger(dto, file,
                             BEARER_PREFIX + adminClientAccessToken);
-                } else if (Objects.equals(signUpDto.role().name(), DRIVER_ROLE)) {
-                    driverClient.createDriver(signUpDto,
+                } else if (Objects.equals(dto.role().name(), DRIVER_ROLE)){
+                    driverClient.createDriver(dto, file,
                             BEARER_PREFIX + adminClientAccessToken);
                 }
             } catch (Exception exception) {
@@ -107,7 +108,7 @@ public class UserManagementService {
         }
 
         RolesResource rolesResource = realmResource.roles();
-        RoleRepresentation role = rolesResource.get(signUpDto.role().name()).toRepresentation();
+        RoleRepresentation role = rolesResource.get(dto.role().name()).toRepresentation();
         UserResource userById = usersResource.get(CreatedResponseUtil.getCreatedId(response));
         userById.roles()
                 .realmLevel()

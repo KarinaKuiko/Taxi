@@ -8,6 +8,7 @@ public record DriverReadDto(
         String phone,
         String gender,
         Long carId,
-        double rating
+        double rating,
+        String imageUrl
 ) {
 }
