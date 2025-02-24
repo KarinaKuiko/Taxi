@@ -220,6 +220,10 @@
             <artifactId>exception-handler-starter</artifactId>
             <version>${exception.handler.starter.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
