@@ -18,6 +18,9 @@ import org.example.driver.mapper.CarMapper;
 import org.example.driver.mapper.DriverMapper;
 import org.example.driver.repository.CarRepository;
 import org.example.driver.repository.DriverRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -25,6 +28,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import static org.example.driver.constants.RedisConstants.DRIVER_CACHE_VALUE;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +44,7 @@ public class DriverService {
     private final ImageStorageService imageStorageService;
 
     @Transactional
+    @CachePut(value = DRIVER_CACHE_VALUE, key = "#result.id()")
     public DriverReadDto create(DriverCreateEditDto driverDto, MultipartFile multipartFile) {
         driverRepository.findByEmailAndIsDeletedFalse(driverDto.email())
                 .ifPresent(driver -> {
@@ -65,6 +71,7 @@ public class DriverService {
     }
 
     @Transactional
+    @CachePut(value = DRIVER_CACHE_VALUE, key = "#id")
     public DriverReadDto update(Long id, DriverCreateEditDto driverDto, MultipartFile file) {
         return driverRepository.findByIdAndIsDeletedFalse(id)
                 .map(driver -> {
@@ -97,6 +104,7 @@ public class DriverService {
     }
 
     @Transactional
+    @CacheEvict(value = DRIVER_CACHE_VALUE, key = "#id")
     public void safeDelete(Long id) {
         driverRepository.findByIdAndIsDeletedFalse(id)
                 .map(driver -> {
@@ -123,6 +131,7 @@ public class DriverService {
                 .map(driverMapper::toReadDto);
     }
 
+    @Cacheable(value = DRIVER_CACHE_VALUE, key = "#id")
     public DriverReadDto findById(Long id) {
         return driverRepository.findByIdAndIsDeletedFalse(id)
                 .map(driverMapper::toReadDto)

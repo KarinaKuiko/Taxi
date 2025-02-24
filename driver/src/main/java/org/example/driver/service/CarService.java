@@ -11,6 +11,9 @@ import org.example.driver.entity.Driver;
 import org.example.driver.mapper.CarMapper;
 import org.example.driver.repository.CarRepository;
 import org.example.driver.repository.DriverRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -21,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static org.example.driver.constants.RedisConstants.CAR_CACHE_VALUE;
+
 @Service
 @RequiredArgsConstructor
 public class CarService {
@@ -30,6 +35,7 @@ public class CarService {
     private final DriverRepository driverRepository;
 
     @Transactional
+    @CachePut(value = CAR_CACHE_VALUE, key = "#result.id()")
     public CarReadDto create(CarCreateEditDto carDto) {
         carRepository.findByNumberAndIsDeletedFalse(carDto.number())
                 .ifPresent(car -> {
@@ -45,6 +51,7 @@ public class CarService {
     }
 
     @Transactional
+    @CachePut(value = CAR_CACHE_VALUE, key = "#id")
     public CarReadDto update(Long id, CarCreateEditDto carDto) {
         return carRepository.findByIdAndIsDeletedFalse(id)
                 .map(car -> {
@@ -70,6 +77,7 @@ public class CarService {
     }
 
     @Transactional
+    @CacheEvict(value = CAR_CACHE_VALUE, key = "#id")
     public void safeDelete(Long id) {
         carRepository.findByIdAndIsDeletedFalse(id)
                 .map(car -> {
@@ -101,6 +109,7 @@ public class CarService {
                 .map(carMapper::toReadDto);
     }
 
+    @Cacheable(value = CAR_CACHE_VALUE, key = "#id")
     public CarReadDto findById(Long id) {
         return carRepository.findByIdAndIsDeletedFalse(id)
                 .map(carMapper::toReadDto)

@@ -17,6 +17,8 @@ import org.example.ride.mapper.RideMapper;
 import org.example.ride.repository.RideRepository;
 import org.example.ride.utils.PriceGenerator;
 import org.example.ride.validation.RideStatusValidation;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -24,6 +26,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static org.example.ride.constants.RedisConstants.RIDE_CACHE_VALUE;
 
 @Service
 @RequiredArgsConstructor
@@ -58,6 +62,7 @@ public class RideService {
                 .map(rideMapper::toReadDto);
     }
 
+    @Cacheable(value = RIDE_CACHE_VALUE, key = "#id")
     public RideReadDto findById(Long id) {
         return rideRepository.findById(id)
                 .map(rideMapper::toReadDto)
@@ -80,6 +85,7 @@ public class RideService {
     }
 
     @Transactional
+    @CachePut(value = RIDE_CACHE_VALUE, key = "#result.id()")
     public RideReadDto create(RideCreateEditDto rideDto) {
         driverClient.getDriver(rideDto.driverId());
         passengerClient.getPassenger(rideDto.passengerId());
@@ -93,6 +99,7 @@ public class RideService {
     }
 
     @Transactional
+    @CachePut(value = RIDE_CACHE_VALUE, key = "#id")
     public RideReadDto update(Long id, RideCreateEditDto rideDto) {
         return rideRepository.findById(id)
                 .map(ride -> {
@@ -110,6 +117,7 @@ public class RideService {
     }
 
     @Transactional
+    @CachePut(value = RIDE_CACHE_VALUE, key = "#id")
     public RideReadDto updateDriverStatus(Long id, DriverRideStatusDto driverRideStatusDto) {
         Ride ride = rideRepository.findById(id)
                 .orElseThrow(() -> new RideNotFoundException(messageSource.getMessage(
@@ -133,6 +141,7 @@ public class RideService {
     }
 
     @Transactional
+    @CachePut(value = RIDE_CACHE_VALUE, key = "#id")
     public RideReadDto updatePassengerStatus(Long id, PassengerRideStatusDto passengerRideStatusDto) {
         Ride ride = rideRepository.findById(id)
                 .orElseThrow(() -> new RideNotFoundException(messageSource.getMessage(

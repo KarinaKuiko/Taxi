@@ -3,6 +3,8 @@ package org.example.driver.dto.read;
 import lombok.Builder;
 import org.example.driver.entity.enumeration.Gender;
 
+import java.io.Serializable;
+
 @Builder
 public record DriverReadDto(
         long id,
@@ -14,5 +16,5 @@ public record DriverReadDto(
         Long carId,
         double rating,
         String imageUrl
-) {
+) implements Serializable {
 }

@@ -47,7 +47,6 @@ jobs:
             exception-handler-starter:
               - 'exception-handler-starter/**'
       - name: Build EXCEPTION HANDLER STARTER
-        if: steps.changes.outputs.exception-handler-starter == 'true'
         run: mvn -B clean install --file exception-handler-starter/pom.xml
       - name: Run unit and integration tests DRIVER
         if: steps.changes.outputs.driver == 'true'

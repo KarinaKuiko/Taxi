@@ -4,6 +4,7 @@ import lombok.Builder;
 import org.example.ride.entity.enumeration.DriverRideStatus;
 import org.example.ride.entity.enumeration.PassengerRideStatus;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Builder
@@ -16,5 +17,5 @@ public record RideReadDto(
         DriverRideStatus driverRideStatus,
         PassengerRideStatus passengerRideStatus,
         BigDecimal cost
-) {
+) implements Serializable {
 }

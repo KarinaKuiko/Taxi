@@ -2,6 +2,7 @@ package org.example.driver.dto.read;
 
 import lombok.Builder;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Builder
@@ -12,5 +13,5 @@ public record CarReadDto(
         String number,
         int year,
         List<DriverReadDto> drivers
-) {
+) implements Serializable {
 }

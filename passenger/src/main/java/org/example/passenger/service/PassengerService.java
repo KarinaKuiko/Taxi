@@ -13,6 +13,9 @@ import org.example.passenger.dto.read.UserRateDto;
 import org.example.passenger.entity.Passenger;
 import org.example.passenger.mapper.PassengerMapper;
 import org.example.passenger.repository.PassengerRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -21,6 +24,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import static org.example.passenger.constants.RedisConstants.PASSENGER_CACHE_VALUE;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +50,7 @@ public class PassengerService {
                 .map(passengerMapper::toReadDto);
     }
 
+    @Cacheable(value = PASSENGER_CACHE_VALUE, key = "#id")
     public PassengerReadDto findById(Long id) {
         return passengerRepository.findByIdAndIsDeletedFalse(id)
                 .map(passengerMapper::toReadDto)
@@ -55,6 +61,7 @@ public class PassengerService {
     }
 
     @Transactional
+    @CachePut(value = PASSENGER_CACHE_VALUE, key = "#result.id()")
     public PassengerReadDto create(PassengerCreateEditDto passengerDto, MultipartFile multipartFile) {
         passengerRepository.findByEmailAndIsDeletedFalse(passengerDto.email())
                 .ifPresent(passenger -> {
@@ -76,6 +83,7 @@ public class PassengerService {
     }
 
     @Transactional
+    @CachePut(value = PASSENGER_CACHE_VALUE, key = "#id")
     public PassengerReadDto update(Long id, PassengerCreateEditDto passengerDto, MultipartFile file) {
         return passengerRepository.findByIdAndIsDeletedFalse(id)
                 .map(passenger -> {
@@ -102,6 +110,7 @@ public class PassengerService {
     }
 
     @Transactional
+    @CacheEvict(value = PASSENGER_CACHE_VALUE, key = "#id")
     public void safeDelete(Long id) {
                 passengerRepository.findByIdAndIsDeletedFalse(id)
                         .map(passenger -> {

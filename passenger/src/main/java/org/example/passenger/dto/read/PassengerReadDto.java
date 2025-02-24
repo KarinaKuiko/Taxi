@@ -2,6 +2,8 @@ package org.example.passenger.dto.read;
 
 import lombok.Builder;
 
+import java.io.Serializable;
+
 @Builder
 public record PassengerReadDto(
         long id,
@@ -12,5 +14,5 @@ public record PassengerReadDto(
         double rating,
         String gender,
         String imageUrl
-) {
+) implements Serializable {
 }
