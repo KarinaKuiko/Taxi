@@ -34,9 +34,9 @@ public interface DriverController {
     @Operation(summary = "Find driver by ID",
             description = "Retrieves data of driver by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "driver's data was retrieved successfully"),
+            @ApiResponse(responseCode = "200", description = "Driver's data was retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "404", description = "driver was not found")
+            @ApiResponse(responseCode = "404", description = "Driver was not found")
     })
     DriverReadDto findById(@PathVariable("id") Long id);
 
