@@ -14,6 +14,8 @@ import org.example.rating.repository.PassengerRateRepository;
 import org.example.rating.service.RateCounterService;
 import org.example.rating.service.RateService;
 import org.example.rating.service.RideClientService;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -23,6 +25,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static org.example.rating.constants.RedisConstants.PASSENGER_RATE_CACHE_VALUE;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +46,7 @@ public class PassengerRateService implements RateService {
     }
 
     @Override
+    @Cacheable(value = PASSENGER_RATE_CACHE_VALUE, key = "#id")
     public RateReadDto findById(Long id) {
         return passengerRateRepository.findById(id)
                 .map(rateMapper::toReadDto)
@@ -54,6 +59,7 @@ public class PassengerRateService implements RateService {
 
     @Override
     @Transactional
+    @CachePut(value = PASSENGER_RATE_CACHE_VALUE, key = "#result.id()")
     public RateReadDto create(RateCreateEditDto rateDto) {
         PassengerRate rate = rateMapper.toPassengerRate(rateDto);
         RideReadDto rideReadDto = rideClient.getRide(rate.getRideId());
@@ -64,6 +70,7 @@ public class PassengerRateService implements RateService {
 
     @Override
     @Transactional
+    @CachePut(value = PASSENGER_RATE_CACHE_VALUE, key = "#id")
     public RateReadDto update(Long id, RateCreateEditDto rateDto) {
         return passengerRateRepository.findById(id)
                 .map(rate -> {

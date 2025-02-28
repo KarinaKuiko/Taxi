@@ -66,6 +66,8 @@ services:
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
       MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
       MINIO_URL: http://minio:9000
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_URL: ${REDIS_URL}
       <<: *defaults
     ports:
       - "8081:8081"
@@ -106,6 +108,8 @@ services:
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
       MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
       MINIO_URL: http://minio:9000
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_URL: ${REDIS_URL}
       <<: *defaults
     ports:
       - "8082:8082"
@@ -140,6 +144,8 @@ services:
       DB_URL: jdbc:postgresql://rides-db:5432/rides
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_URL: ${REDIS_URL}
       <<: *defaults
     ports:
       - "8083:8083"
@@ -178,6 +184,8 @@ services:
       DB_URL: jdbc:postgresql://rating-db:5432/rating
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_URL: ${REDIS_URL}
       <<: *defaults
     ports:
       - "8084:8084"
@@ -515,6 +523,29 @@ services:
     networks:
       - taxi-network
 
+  redis:
+    image: redis:7.4.2
+    container_name: redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - taxi-network
+
 volumes:
   rating_data:
   rides_data:
@@ -525,6 +556,7 @@ volumes:
   kb_data:
   keycloak_data:
   minio-storage:
+  redis_data:
 
 networks:
   taxi-network:
