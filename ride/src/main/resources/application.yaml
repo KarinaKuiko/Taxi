@@ -98,3 +98,15 @@ eureka:
 
 logging:
   config: classpath:logback.xml
+
+openapi:
+  service:
+    title: ride
+    version: 1.0.0
+    url: http://localhost:8080
+
+springdoc:
+  api-docs:
+    path: /ride/v3/api-docs
+  swagger-ui:
+    path: /ride/swagger-ui.html

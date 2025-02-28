@@ -72,3 +72,15 @@ minio:
   secret-key: ${MINIO_SECRET_KEY}
   url: ${MINIO_URL}
   bucket-name: ${MINIO_BUCKET_NAME}
+
+openapi:
+  service:
+    title: passenger
+    version: 1.0.0
+    url: http://localhost:8080
+
+springdoc:
+  api-docs:
+    path: /passenger/v3/api-docs
+  swagger-ui:
+    path: /passenger/swagger-ui.html

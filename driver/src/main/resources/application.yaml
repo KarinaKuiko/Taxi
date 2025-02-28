@@ -72,4 +72,15 @@ minio:
   secret-key: ${MINIO_SECRET_KEY}
   url: ${MINIO_URL}
   bucket-name: ${MINIO_BUCKET_NAME}
-      
+
+openapi:
+  service:
+    title: driver
+    version: 1.0.0
+    url: http://localhost:8080
+
+springdoc:
+  api-docs:
+    path: /driver/v3/api-docs
+  swagger-ui:
+    path: /driver/swagger-ui.html
