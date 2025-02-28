@@ -76,7 +76,7 @@ public interface RateController {
                     }
                     """)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Car was successfully created"),
+            @ApiResponse(responseCode = "200", description = "Rate was successfully created"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
@@ -100,9 +100,9 @@ public interface RateController {
                     }
                     """)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Car's data was updated successfully"),
+            @ApiResponse(responseCode = "200", description = "Rate's data was updated successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
-            @ApiResponse(responseCode = "404", description = "Car was not found")
+            @ApiResponse(responseCode = "404", description = "Rate was not found")
     })
     RateReadDto update(@PathVariable("id") Long id, @RequestBody @Valid RateCreateEditDto dto);
 }

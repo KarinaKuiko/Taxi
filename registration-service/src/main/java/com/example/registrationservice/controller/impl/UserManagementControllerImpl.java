@@ -1,5 +1,6 @@
 package com.example.registrationservice.controller.impl;
 
+import com.example.registrationservice.controller.UserManagementController;
 import com.example.registrationservice.dto.create.SignInUserDto;
 import com.example.registrationservice.dto.create.SignUpDto;
 import com.example.registrationservice.dto.read.TokenReadDto;
@@ -24,7 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/v1/taxi")
 @RequiredArgsConstructor
 @Slf4j
-public class UserManagementControllerImpl {
+public class UserManagementControllerImpl implements UserManagementController {
 
     private final UserManagementService userManagementService;
 

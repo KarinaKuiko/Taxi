@@ -85,6 +85,7 @@ public interface PassengerController {
             @ApiResponse(responseCode = "200", description = "Passenger was successfully updated"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Passenger was not found"),
             @ApiResponse(responseCode = "409", description = "Passenger with this email already exists")
     })
     PassengerReadDto update(@PathVariable("id") Long id,

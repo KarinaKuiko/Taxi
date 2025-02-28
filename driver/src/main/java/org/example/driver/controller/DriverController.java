@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "Driver controller", description = """
         Driver controller contains endpoints for creating a new driver, finding, updating and deleting driver by id,\s
-        retrieving list of cars
+        retrieving list of drivers
         """)
 public interface DriverController {
 
@@ -69,6 +69,7 @@ public interface DriverController {
             @ApiResponse(responseCode = "200", description = "Driver was successfully updated"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Driver was not found"),
             @ApiResponse(responseCode = "409", description = "Driver with this email already exists")
     })
     DriverReadDto update(@PathVariable("id") Long id,
