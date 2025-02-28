@@ -4,12 +4,16 @@ import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.example.driver.dto.create.CarCreateEditDto;
 import org.example.driver.repository.CarRepository;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -17,11 +21,14 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+
+import java.io.IOException;
 
 import static org.example.driver.util.DataUtil.ACCESS_TOKEN;
 import static org.example.driver.util.DataUtil.AUTHORIZATION;
@@ -89,19 +96,38 @@ public class CarControllerIntegrationTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
+    static GenericContainer<?> redisContainer = new GenericContainer<>(
+            DockerImageName.parse("redis:7.4.2")).withExposedPorts(6379);
+
+    @DynamicPropertySource
+    static void properties(DynamicPropertyRegistry r) {
+        r.add("spring.data.redis.host", redisContainer::getContainerIpAddress);
+        r.add("spring.data.redis.port", redisContainer::getFirstMappedPort);
+    }
+
     @BeforeAll
     static void setUp() {
         kafkaContainer.start();
+        redisContainer.start();
     }
 
     @AfterAll
     static void tearDown() {
         kafkaContainer.stop();
+        redisContainer.stop();
     }
 
     @BeforeEach
     void init() {
         RestAssuredMockMvc.mockMvc(MockMvcBuilders.webAppContextSetup(webApplicationContext).build());
+    }
+
+    @AfterEach
+    void tearDownRedis() {
+        redisTemplate.getConnectionFactory().getConnection().flushAll();
     }
 
     @Test
