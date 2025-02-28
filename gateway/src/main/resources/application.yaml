@@ -8,30 +8,65 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-        - id: driver
+        - id: driverAPI
           uri: lb://driver
           predicates:
             - Path=${commonApiPath}/cars/**, ${commonApiPath}/drivers/**
 
-        - id: passenger
+        - id: driverDocs
+          uri: lb://driver
+          predicates:
+            - Path=/driver/v3/api-docs, /driver/swagger-ui.html
+          filters:
+            - StripPrefix=1
+
+        - id: passengerAPI
           uri: lb://passenger
           predicates:
             - Path=${commonApiPath}/passengers/**
 
-        - id: rating
+        - id: passengerDocs
+          uri: lb://passenger
+          predicates:
+            - Path=/passenger/v3/api-docs, /passenger/swagger-ui.html
+          filters:
+            - StripPrefix=1
+
+        - id: ratingAPI
           uri: lb://rating
           predicates:
             - Path=${commonApiPath}/rates/**
 
-        - id: ride
+        - id: ratingDocs
+          uri: lb://rating
+          predicates:
+            - Path=/rating/v3/api-docs, /rating/swagger-ui.html
+          filters:
+            - StripPrefix=1
+
+        - id: rideAPI
           uri: lb://ride
           predicates:
             - Path=${commonApiPath}/rides/**
 
-        - id: registration-service
+        - id: rideDocs
+          uri: lb://ride
+          predicates:
+            - Path=/ride/v3/api-docs, /ride/swagger-ui.html
+          filters:
+            - StripPrefix=1
+
+        - id: registration-serviceAPI
           uri: lb://registration-service
           predicates:
             - Path=${commonApiPath}/taxi/**
+
+        - id: registration-serviceDocs
+          uri: lb://registration-service
+          predicates:
+            - Path=/registration-service/v3/api-docs, /registration-service/swagger-ui.html
+          filters:
+            - StripPrefix=1
 
 commonApiPath: /api/v1
 server:
@@ -51,3 +86,25 @@ management:
   zipkin:
     tracing:
       endpoint: ${ZIPKIN_TRACING_ENDPOINT}
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    urls:
+      - url: /v3/api-docs
+        name: API Gateway Service
+      - url: /driver/v3/api-docs
+        name: Driver service
+      - url: /passenger/v3/api-docs
+        name: Passenger service
+      - url: /rating/v3/api-docs
+        name: Rating service
+      - url: /ride/v3/api-docs
+        name: Ride service
+      - url: /registration-service/v3/api-docs
+        name: Registration service

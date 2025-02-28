@@ -20,3 +20,16 @@ keycloak:
 
 logging:
   config: classpath:logback.xml
+
+openapi:
+  service:
+    title: registration-service
+    version: 1.0.0
+    url: http://localhost:8080
+
+springdoc:
+  api-docs:
+    path: /registration-service/v3/api-docs
+  swagger-ui:
+    path: /registration-service/swagger-ui.html
+

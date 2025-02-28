@@ -1,59 +1,97 @@
 package org.example.driver.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import lombok.RequiredArgsConstructor;
 import org.example.driver.dto.create.CarCreateEditDto;
 import org.example.driver.dto.read.CarReadDto;
 import org.example.driver.dto.read.PageResponse;
-import org.example.driver.service.CarService;
-import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequiredArgsConstructor
-@RequestMapping("/api/v1/cars")
-@Validated
-public class CarController {
-    private final CarService carService;
+@Tag(name = "Car controller", description = """
+        Car controller contains endpoints for creating a new car, finding, updating and deleting car by id,\s
+        retrieving list of cars
+        """)
+public interface CarController {
 
-    @GetMapping
-    public PageResponse<CarReadDto> findAll(@RequestParam(defaultValue = "0") Integer page,
-                                            @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer limit) {
-        return PageResponse.of(carService.findAll(page, limit));
-    }
+    @Operation(summary = "Find all cars",
+            description = "Retrieves page of cars")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cars retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Validation error"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    PageResponse<CarReadDto> findAll(@RequestParam(defaultValue = "0") Integer page,
+                                     @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer limit);
 
-    @GetMapping("/{id}")
-    public CarReadDto findById(@PathVariable("id") Long id) {
-        return carService.findById(id);
-    }
+    @Operation(summary = "Find car by ID",
+            description = "Retrieves data of car by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Car's data was retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Car was not found")
+    })
+    CarReadDto findById(@PathVariable("id") Long id);
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public CarReadDto create(@RequestBody @Valid CarCreateEditDto dto) {
-        return carService.create(dto);
-    }
+    @Operation(summary = "Create a new car",
+            description = """
+                    Required fields for creating a new car:\s
+                    - **color**: Color of the car (non-empty string)\s
+                    - **brand**: Brand of the car (non-empty string)\s
+                    - **number**: Unique number of the car (non-empty string, valid format)\s
+                    - **year** : Car's year of manufacture (non-empty string, valid range)
+                    Example:
+                    {
+                        "color": "blue",
+                        "brand": "BMW",
+                        "number": "AB125CK",
+                        "year": 2023
+                    }
+                    """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Car was successfully created"),
+            @ApiResponse(responseCode = "400", description = "Validation error"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "409", description = "Car with this number already exists")
+    })
+    CarReadDto create(@RequestBody @Valid CarCreateEditDto dto);
 
-    @PutMapping("/{id}")
-    public CarReadDto update(@PathVariable("id") Long id,
-                             @RequestBody @Valid CarCreateEditDto dto) {
-        return carService.update(id, dto);
-    }
+    @Operation(summary = "Updating car by ID",
+            description = """
+                    Updating car's data by ID. Fields to update:\s
+                    - **color**: Color of the car (non-empty string)\s
+                    - **brand**: Brand of the car (non-empty string)\s
+                    - **number**: Unique number of the car (non-empty string, valid format)\s
+                    - **year** : Car's year of manufacture (non-empty string, valid range)
+                    Example:
+                    {
+                        "color": "blue",
+                        "brand": "BMW",
+                        "number": "AB125CK",
+                        "year": 2023
+                    }
+                    """)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Car's data was updated successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Car was not found"),
+            @ApiResponse(responseCode = "409", description = "Car with this number already exists")
+    })
+    CarReadDto update(@PathVariable("id") Long id,
+                      @RequestBody @Valid CarCreateEditDto dto);
 
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("id") Long id) {
-        carService.safeDelete(id);
-    }
+    @Operation(summary = "Soft deleting car by ID",
+            description = "Mark car as deleted without removing it from the database")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Car was deleted successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "404", description = "Car was not found")
+    })
+    void delete(@PathVariable("id") Long id);
 }
