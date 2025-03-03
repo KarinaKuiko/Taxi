@@ -104,3 +104,15 @@ eureka:
 
 logging:
   config: classpath:logback.xml
+
+openapi:
+  service:
+    title: rating
+    version: 1.0.0
+    url: http://localhost:8080
+
+springdoc:
+  api-docs:
+    path: /rating/v3/api-docs
+  swagger-ui:
+    path: /rating/swagger-ui.html
