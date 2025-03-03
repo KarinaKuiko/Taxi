@@ -26,7 +26,8 @@ public interface PassengerController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Passengers retrieved successfully"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     PageResponse<PassengerReadDto> findAll(@RequestParam(defaultValue = "0") Integer page,
                                            @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer limit);
@@ -36,6 +37,7 @@ public interface PassengerController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Passenger's data was retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Passenger was not found")
     })
     PassengerReadDto findById(@PathVariable("id") Long id);
@@ -60,6 +62,7 @@ public interface PassengerController {
             @ApiResponse(responseCode = "200", description = "Passenger was successfully created"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "409", description = "Passenger with this email already exists")
     })
     PassengerReadDto create(@RequestPart @Valid PassengerCreateEditDto dto,
@@ -85,6 +88,7 @@ public interface PassengerController {
             @ApiResponse(responseCode = "200", description = "Passenger was successfully updated"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Passenger was not found"),
             @ApiResponse(responseCode = "409", description = "Passenger with this email already exists")
     })
@@ -97,6 +101,7 @@ public interface PassengerController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Passenger was deleted successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Passenger was not found")
     })
     void delete(@PathVariable("id") Long id);

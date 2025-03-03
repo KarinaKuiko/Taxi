@@ -25,7 +25,8 @@ public interface CarController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Cars retrieved successfully"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     PageResponse<CarReadDto> findAll(@RequestParam(defaultValue = "0") Integer page,
                                      @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer limit);
@@ -35,6 +36,7 @@ public interface CarController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Car's data was retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Car was not found")
     })
     CarReadDto findById(@PathVariable("id") Long id);
@@ -58,6 +60,7 @@ public interface CarController {
             @ApiResponse(responseCode = "200", description = "Car was successfully created"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "409", description = "Car with this number already exists")
     })
     CarReadDto create(@RequestBody @Valid CarCreateEditDto dto);
@@ -80,6 +83,7 @@ public interface CarController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Car's data was updated successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Car was not found"),
             @ApiResponse(responseCode = "409", description = "Car with this number already exists")
     })
@@ -91,6 +95,7 @@ public interface CarController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Car was deleted successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Car was not found")
     })
     void delete(@PathVariable("id") Long id);

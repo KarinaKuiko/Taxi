@@ -17,6 +17,7 @@ public interface AvatarController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Avatar was retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Avatar was not found")
     })
     ResponseEntity<InputStreamResource> getAvatar(@PathVariable("name") String name);

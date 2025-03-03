@@ -26,7 +26,8 @@ public interface DriverController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Drivers retrieved successfully"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     PageResponse<DriverReadDto> findAll(@RequestParam(defaultValue = "0") Integer page,
                                         @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer limit);
@@ -36,6 +37,7 @@ public interface DriverController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Driver's data was retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Driver was not found")
     })
     DriverReadDto findById(@PathVariable("id") Long id);
@@ -69,6 +71,7 @@ public interface DriverController {
             @ApiResponse(responseCode = "200", description = "Driver was successfully updated"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Driver was not found"),
             @ApiResponse(responseCode = "409", description = "Driver with this email already exists")
     })
@@ -105,6 +108,7 @@ public interface DriverController {
             @ApiResponse(responseCode = "200", description = "Driver was successfully created"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "409", description = "Driver with this email already exists")
     })
     DriverReadDto create(@RequestPart @Valid DriverCreateEditDto dto,
@@ -115,6 +119,7 @@ public interface DriverController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Driver was deleted successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Driver was not found")
     })
     void delete(@PathVariable("id") Long id);

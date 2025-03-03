@@ -25,7 +25,8 @@ public interface RateController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Driver's rates retrieved successfully"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     PageResponse<RateReadDto> findAllDriversRates(@RequestParam(defaultValue = "0") Integer page,
                                                   @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer limit);
@@ -35,7 +36,8 @@ public interface RateController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Passenger's rates retrieved successfully"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     PageResponse<RateReadDto> findAllPassengersRates(@RequestParam(defaultValue = "0") Integer page,
                                                      @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer limit);
@@ -45,6 +47,7 @@ public interface RateController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Driver's rate data was retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Driver's rate was not found")
     })
     RateReadDto findDriverRateById(@PathVariable("id") Long id);
@@ -54,6 +57,7 @@ public interface RateController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Passenger's rate data was retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Passenger's rate was not found")
     })
     RateReadDto findPassengerRateById(@PathVariable("id") Long id);
@@ -78,7 +82,8 @@ public interface RateController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Rate was successfully created"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     RateReadDto create(@RequestBody @Valid RateCreateEditDto dto);
 
@@ -102,6 +107,7 @@ public interface RateController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Rate's data was updated successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Rate was not found")
     })
     RateReadDto update(@PathVariable("id") Long id, @RequestBody @Valid RateCreateEditDto dto);

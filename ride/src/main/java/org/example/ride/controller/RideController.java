@@ -28,6 +28,7 @@ public interface RideController {
             @ApiResponse(responseCode = "200", description = "Rides retrieved successfully"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "409", description = "Only one id-parameter can be provided at a time")
     })
     PageResponse<RideReadDto> findAll(@RequestParam(name = "driverId", required = false) Long driverId,
@@ -40,6 +41,7 @@ public interface RideController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ride's data was retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Ride was not found")
     })
     RideReadDto findById(@PathVariable("id") Long id);
@@ -62,7 +64,8 @@ public interface RideController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ride was successfully created"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized")
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
     })
     RideReadDto create(@RequestBody @Valid RideCreateEditDto dto);
 
@@ -85,6 +88,7 @@ public interface RideController {
             @ApiResponse(responseCode = "200", description = "Ride was successfully updated"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Ride was not found")
     })
     RideReadDto update(@PathVariable("id") Long id, @RequestBody @Valid RideCreateEditDto dto);
@@ -103,6 +107,7 @@ public interface RideController {
             @ApiResponse(responseCode = "200", description = "Driver's status was successfully updated"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Ride was not found")
     })
     RideReadDto updateDriverStatus(@PathVariable("id") Long id, @RequestBody DriverRideStatusDto driverRideStatusDto);
@@ -120,6 +125,7 @@ public interface RideController {
             @ApiResponse(responseCode = "200", description = "Passenger's status was successfully updated"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
             @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Ride was not found")
     })
     RideReadDto updatePassengerStatus(@PathVariable("id") Long id, @RequestBody PassengerRideStatusDto passengerRideStatusDto);
