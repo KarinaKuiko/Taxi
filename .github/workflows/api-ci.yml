@@ -10,6 +10,7 @@ on:
       - 'rating/**'
       - 'ride/**'
       - 'exception-handler-starter/**'
+      - 'controller-logger-starter/**'
   pull_request:
     branches:
       - master
@@ -19,6 +20,7 @@ on:
       - 'rating/**'
       - 'ride/**'
       - 'exception-handler-starter/**'
+      - 'controller-logger-starter/**'
 
 jobs:
   test:
@@ -46,8 +48,12 @@ jobs:
               - 'ride/**'
             exception-handler-starter:
               - 'exception-handler-starter/**'
+            controller-logger-starter:
+              - 'controller-logger-starter/**'
       - name: Build EXCEPTION HANDLER STARTER
         run: mvn -B clean install --file exception-handler-starter/pom.xml
+      - name: Build CONTROLLER LOGGER STARTER
+        run: mvn -B clean install --file controller-logger-starter/pom.xml
       - name: Run unit and integration tests DRIVER
         if: steps.changes.outputs.driver == 'true'
         run:  mvn -B clean install --file driver/pom.xml
