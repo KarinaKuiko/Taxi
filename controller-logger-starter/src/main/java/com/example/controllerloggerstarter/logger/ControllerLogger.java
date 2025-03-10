@@ -81,7 +81,10 @@ public class ControllerLogger {
         while (headerNames.hasMoreElements()) {
             String headerName = headerNames.nextElement();
             String headerValue = request.getHeader(headerName);
-            headers.append(headerName).append(": ").append(headerValue).append("\n");
+            headers.append(headerName)
+                .append(": ")
+                .append(headerValue)
+                .append(System.lineSeparator());
         }
         return headers.toString();
     }
