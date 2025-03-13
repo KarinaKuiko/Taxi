@@ -30,6 +30,7 @@ public class SecurityConfig {
                                 "/ride/swagger-ui.html",
                                 "/ride/webjars/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/rides").hasRole(ROLE_ADMIN)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/rides/driver-list/{id}").hasRole(ROLE_ADMIN)
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

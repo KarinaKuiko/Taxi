@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Tag(name = "Driver controller", description = """
         Driver controller contains endpoints for creating a new driver, finding, updating and deleting driver by id,\s
         retrieving list of drivers
@@ -31,6 +33,16 @@ public interface DriverController {
     })
     PageResponse<DriverReadDto> findAll(@RequestParam(defaultValue = "0") Integer page,
                                         @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer limit);
+
+    @Operation(summary = "Find all drivers",
+            description = "Retrieves list of drivers")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Drivers retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Validation error"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
+    List<DriverReadDto> findFullList();
 
     @Operation(summary = "Find driver by ID",
             description = "Retrieves data of driver by ID")

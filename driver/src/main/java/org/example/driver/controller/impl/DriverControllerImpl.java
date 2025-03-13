@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/drivers")
@@ -35,6 +37,11 @@ public class DriverControllerImpl implements DriverController {
     public PageResponse<DriverReadDto> findAll(@RequestParam(defaultValue = "0") Integer page,
                                                @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer limit) {
         return PageResponse.of(driverService.findAll(page, limit));
+    }
+
+    @GetMapping("/list")
+    public List<DriverReadDto> findFullList() {
+            return driverService.findFullList();
     }
 
     @GetMapping("/{id}")
