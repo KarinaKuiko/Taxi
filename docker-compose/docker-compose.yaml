@@ -555,6 +555,8 @@ services:
     container_name: report-service
     environment:
       <<: *defaults
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
     ports:
       - "8086:8086"
     depends_on:
