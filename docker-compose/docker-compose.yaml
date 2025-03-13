@@ -546,6 +546,39 @@ services:
     networks:
       - taxi-network
 
+  report-service:
+    build:
+      context: ..
+      dockerfile: ./docker-compose/Dockerfile
+      args:
+        SERVICE_NAME: report-service
+    container_name: report-service
+    environment:
+      <<: *defaults
+    ports:
+      - "8086:8086"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      gateway:
+        condition: service_healthy
+      zookeeper:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      driver:
+        condition: service_healthy
+      ride:
+        condition: service_healthy
+    networks:
+      - taxi-network
+    healthcheck:
+      test: curl --fail --location http://report-service:8086/actuator/health
+      interval: 1s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
+
 volumes:
   rating_data:
   rides_data:

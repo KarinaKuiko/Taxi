@@ -29,6 +29,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 import static org.example.driver.constants.RedisConstants.DRIVER_CACHE_VALUE;
 
 @Service
@@ -123,6 +125,13 @@ public class DriverService {
         PageRequest request = PageRequest.of(page, limit);
         return driverRepository.findByIsDeletedFalse(request)
                 .map(driverMapper::toReadDto);
+    }
+
+    public List<DriverReadDto> findFullList() {
+        return driverRepository.findByIsDeletedFalse()
+                .stream()
+                .map(driverMapper::toReadDto)
+                .toList();
     }
 
     public Page<DriverReadDto> findAllWithDeleted(Integer page, Integer limit) {

@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: report-service
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: taxireportservice@gmail.com
+    password: xfgp vecd rlky cpyu
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: taxi_client
+            scope:
+              - openid
+        provider:
+          keycloak:
+            issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8484/realms/taxi_realm}
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8484/realms/taxi_realm}
+
+server:
+  port: 8086
+
+app:
+  report-scheduler:
+    interval: 30d
+
+sender:
+  address: KarinaIhorevna@gmail.com
+  subject: Taxi Report
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}

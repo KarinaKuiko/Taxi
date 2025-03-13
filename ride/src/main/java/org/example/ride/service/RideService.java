@@ -27,6 +27,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static org.example.ride.constants.RedisConstants.RIDE_CACHE_VALUE;
 
 @Service
@@ -82,6 +84,13 @@ public class RideService {
         Pageable request = PageRequest.of(page, limit);
         return rideRepository.findByDriverId(id, request)
                 .map(rideMapper::toReadDto);
+    }
+
+    public List<RideReadDto> findByDriverId(Long id) {
+        return rideRepository.findByDriverId(id)
+                .stream()
+                .map(rideMapper::toReadDto)
+                .toList();
     }
 
     @Transactional

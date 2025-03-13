@@ -68,6 +68,11 @@ spring:
           filters:
             - StripPrefix=1
 
+        - id: report-serviceAPI
+          uri: lb://report-service
+          predicates:
+            - Path=${commonApiPath}/report/**
+
 commonApiPath: /api/v1
 server:
   port: 8080

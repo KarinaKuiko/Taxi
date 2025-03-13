@@ -32,6 +32,7 @@ public class SecurityConfig {
                                 "/driver/webjars/**")
                         .permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/drivers").hasRole(ROLE_ADMIN)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/drivers/list").hasRole(ROLE_ADMIN)
                         .requestMatchers(HttpMethod.GET, "/api/v1/cars").hasRole(ROLE_ADMIN)
                         .anyRequest().authenticated()
                 )
