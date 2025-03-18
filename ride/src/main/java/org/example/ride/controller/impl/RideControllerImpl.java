@@ -41,8 +41,8 @@ public class RideControllerImpl implements RideController {
     }
 
     @GetMapping("/driver-list")
-    public List<RideReadDto> findFullListByDriverId(@RequestParam(name = "driverId") Long driverId) {
-        return rideService.findByDriverId(driverId);
+    public List<RideReadDto> findTop100ByDriverId(@RequestParam(name = "driverId") Long driverId) {
+        return rideService.findTop100ByDriverId(driverId);
     }
 
     @GetMapping("/{id}")

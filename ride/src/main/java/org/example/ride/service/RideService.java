@@ -86,8 +86,8 @@ public class RideService {
                 .map(rideMapper::toReadDto);
     }
 
-    public List<RideReadDto> findByDriverId(Long id) {
-        return rideRepository.findByDriverId(id)
+    public List<RideReadDto> findTop100ByDriverId(Long id) {
+        return rideRepository.findTop100ByDriverId(id)
                 .stream()
                 .map(rideMapper::toReadDto)
                 .toList();

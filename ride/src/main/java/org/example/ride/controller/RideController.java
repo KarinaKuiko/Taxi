@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import org.example.ride.dto.create.DriverRideStatusDto;
 import org.example.ride.dto.create.PassengerRideStatusDto;
 import org.example.ride.dto.create.RideCreateEditDto;
@@ -48,7 +47,7 @@ public interface RideController {
             @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "409", description = "Only one id-parameter can be provided at a time")
     })
-    List<RideReadDto> findFullListByDriverId(@RequestParam(name = "driverId") Long driverId);
+    List<RideReadDto> findTop100ByDriverId(@RequestParam(name = "driverId") Long driverId);
 
     @Operation(summary = "Find ride by ID",
             description = "Retrieves data of ride by ID")

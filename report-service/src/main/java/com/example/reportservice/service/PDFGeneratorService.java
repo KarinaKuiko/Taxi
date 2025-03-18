@@ -28,7 +28,7 @@ public class PDFGeneratorService {
         try (PdfWriter writer = new PdfWriter(outputStream);
              PdfDocument pdfDocument = new PdfDocument(writer);
         Document document = new Document(pdfDocument)) {
-        String title = String.format("Report for Driver: %s", driver);
+        String title = "Report for " + driver.firstName() + " " + driver.lastName();
             addTitleText(document, title);
             addReport(document, driver.id());
         }
@@ -45,7 +45,7 @@ public class PDFGeneratorService {
     }
 
     private void addReport(Document document, Long id) {
-        List<RideReadDto> rides = rideClient.findFullListByDriverId(id);
+        List<RideReadDto> rides = rideClient.findTop100ByDriverId(id);
 
         Table table = new Table(8);
         table.addCell(new Paragraph("ID").setFontSize(15));
@@ -69,7 +69,6 @@ public class PDFGeneratorService {
         }
 
         document.add(table);
-
 
     }
 }

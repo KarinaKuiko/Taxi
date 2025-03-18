@@ -84,6 +84,8 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - taxi-network
     healthcheck:
@@ -123,6 +125,10 @@ services:
       zookeeper:
         condition: service_healthy
       kafka:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - taxi-network
@@ -164,6 +170,8 @@ services:
         condition: service_healthy
       passenger:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - taxi-network
     healthcheck:
@@ -201,6 +209,8 @@ services:
       kafka:
         condition: service_healthy
       ride:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - taxi-network
