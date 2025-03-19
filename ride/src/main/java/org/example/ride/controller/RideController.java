@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @Tag(name = "Ride controller", description = """
         Ride controller contains endpoints for creating a new ride, finding, updating ride by id,\s
         retrieving list of rides
@@ -35,6 +37,17 @@ public interface RideController {
                                       @RequestParam(name = "passengerId", required = false) Long passengerId,
                                       @RequestParam(defaultValue = "0") Integer page,
                                       @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer limit);
+
+    @Operation(summary = "Find all rides by driver id",
+            description = "Retrieves list of rides by driver id.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Rides retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "Validation error"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+            @ApiResponse(responseCode = "409", description = "Only one id-parameter can be provided at a time")
+    })
+    List<RideReadDto> findTop100ByDriverId(@RequestParam(name = "driverId") Long driverId);
 
     @Operation(summary = "Find ride by ID",
             description = "Retrieves data of ride by ID")

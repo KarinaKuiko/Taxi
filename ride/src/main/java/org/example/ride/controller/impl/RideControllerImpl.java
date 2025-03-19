@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/rides")
 @RequiredArgsConstructor
@@ -36,6 +38,11 @@ public class RideControllerImpl implements RideController {
                                              @RequestParam(defaultValue = "0") Integer page,
                                              @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer limit) {
         return PageResponse.of(rideService.findRides(driverId, passengerId, page, limit));
+    }
+
+    @GetMapping("/driver-list")
+    public List<RideReadDto> findTop100ByDriverId(@RequestParam(name = "driverId") Long driverId) {
+        return rideService.findTop100ByDriverId(driverId);
     }
 
     @GetMapping("/{id}")

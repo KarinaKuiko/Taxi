@@ -24,8 +24,11 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static org.example.ride.constants.RedisConstants.RIDE_CACHE_VALUE;
 
@@ -82,6 +85,14 @@ public class RideService {
         Pageable request = PageRequest.of(page, limit);
         return rideRepository.findByDriverId(id, request)
                 .map(rideMapper::toReadDto);
+    }
+
+    public List<RideReadDto> findTop100ByDriverId(Long id) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "driverId");
+        return rideRepository.findTop100ByDriverId(id, sort)
+                .stream()
+                .map(rideMapper::toReadDto)
+                .toList();
     }
 
     @Transactional
