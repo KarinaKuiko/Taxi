@@ -24,6 +24,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -87,7 +88,8 @@ public class RideService {
     }
 
     public List<RideReadDto> findTop100ByDriverId(Long id) {
-        return rideRepository.findTop100ByDriverId(id)
+        Sort sort = Sort.by(Sort.Direction.DESC, "driverId");
+        return rideRepository.findTop100ByDriverId(id, sort)
                 .stream()
                 .map(rideMapper::toReadDto)
                 .toList();
