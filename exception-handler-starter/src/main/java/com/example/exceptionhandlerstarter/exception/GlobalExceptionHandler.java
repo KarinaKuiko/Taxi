@@ -20,6 +20,7 @@ import com.example.exceptionhandlerstarter.exception.ride.InvalidRideStatusForCh
 import com.example.exceptionhandlerstarter.exception.ride.IrrelevantDriverStatusException;
 import com.example.exceptionhandlerstarter.exception.ride.RideException;
 import com.example.exceptionhandlerstarter.exception.ride.RideNotFoundException;
+import com.example.exceptionhandlerstarter.exception.security.AccessDeniedException;
 import com.example.exceptionhandlerstarter.keycloak.ClientException;
 import com.example.exceptionhandlerstarter.keycloak.KeycloakException;
 import com.example.exceptionhandlerstarter.keycloak.UnauthorizedException;
@@ -162,6 +163,12 @@ public class GlobalExceptionHandler {
         return new ExceptionDto(HttpStatus.SERVICE_UNAVAILABLE, exception.getMessage(), LocalDateTime.now());
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ExceptionDto handleAccessDeniedException(AccessDeniedException exception) {
+        return new ExceptionDto(HttpStatus.FORBIDDEN, exception.getMessage(), LocalDateTime.now());
+    }
+
     @ExceptionHandler(IOException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionDto handleIOException(IOException exception) {
@@ -171,6 +178,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionDto handleRuntimeException(RuntimeException exception) {
+        exception.printStackTrace();
         return new ExceptionDto(HttpStatus.INTERNAL_SERVER_ERROR, ExceptionConstants.INTERNAL_SERVER_ERROR, LocalDateTime.now());
     }
 

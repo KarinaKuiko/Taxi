@@ -12,4 +12,5 @@ public class SecurityConstants {
     public static final String TAXI_CLIENT = "taxi_client";
     public static final String PREFIX_ROLE = "ROLE_";
     public static final String ROLE_ADMIN = "ADMIN";
+    public static final String EMAIL_CLAIM = "email";
 }

@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
@@ -82,7 +82,7 @@ public class ImageStorageService {
     }
 
     private String generateFileName(MultipartFile file) {
-        String timestamp = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(Instant.now());
+        String timestamp = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(LocalDateTime.now());
         return timestamp + "-" + Objects.requireNonNull(file.getOriginalFilename()).replace(" ", "_");
     }
 }

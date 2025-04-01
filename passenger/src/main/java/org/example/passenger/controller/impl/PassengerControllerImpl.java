@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.example.passenger.annotation.ValidateAccess;
 import org.example.passenger.controller.PassengerController;
 import org.example.passenger.dto.create.PassengerCreateEditDto;
 import org.example.passenger.dto.read.PageResponse;
@@ -11,6 +12,8 @@ import org.example.passenger.dto.read.PassengerReadDto;
 import org.example.passenger.service.PassengerService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,15 +54,21 @@ public class PassengerControllerImpl implements PassengerController {
 
     @PutMapping(value = "/{id}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ValidateAccess
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PASSENGER')")
     public PassengerReadDto update(@PathVariable("id") Long id,
                                    @RequestPart @Valid PassengerCreateEditDto dto,
-                                   @RequestPart(required = false) MultipartFile file) {
+                                   @RequestPart(required = false) MultipartFile file,
+                                   JwtAuthenticationToken token) {
         return passengerService.update(id, dto, file);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("id") Long id) {
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PASSENGER')")
+    @ValidateAccess
+    public void delete(@PathVariable("id") Long id,
+                       JwtAuthenticationToken token) {
         passengerService.safeDelete(id);
     }
 }

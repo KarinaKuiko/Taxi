@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.example.driver.annotation.ValidateAccess;
 import org.example.driver.controller.DriverController;
 import org.example.driver.dto.create.DriverCreateEditDto;
 import org.example.driver.dto.read.DriverReadDto;
@@ -11,6 +12,8 @@ import org.example.driver.dto.read.PageResponse;
 import org.example.driver.service.DriverService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,15 +61,21 @@ public class DriverControllerImpl implements DriverController {
 
     @PutMapping(value = "/{id}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ValidateAccess
+    @PreAuthorize("hasRole('ADMIN') or hasRole('DRIVER')")
     public DriverReadDto update(@PathVariable("id") Long id,
                                 @RequestPart @Valid DriverCreateEditDto dto,
-                                @RequestPart(required = false) MultipartFile file) {
+                                @RequestPart(required = false) MultipartFile file,
+                                JwtAuthenticationToken token) {
         return driverService.update(id, dto, file);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("id") Long id) {
+    @ValidateAccess
+    @PreAuthorize("hasRole('ADMIN') or hasRole('DRIVER')")
+    public void delete(@PathVariable("id") Long id,
+                       JwtAuthenticationToken token) {
         driverService.safeDelete(id);
     }
 }
