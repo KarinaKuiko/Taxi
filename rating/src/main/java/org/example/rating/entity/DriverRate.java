@@ -6,7 +6,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,8 +23,7 @@ import org.example.rating.entity.enumeration.UserType;
 @Builder
 public class DriverRate extends Rate {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "driver_rates_id_seq")
-    @SequenceGenerator(name = "driver_rates_id_seq", sequenceName = "driver_rates_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Long rideId;
