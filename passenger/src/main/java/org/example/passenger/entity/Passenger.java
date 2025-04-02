@@ -6,6 +6,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,7 +25,8 @@ import org.example.passenger.entity.enumeration.Gender;
 public class Passenger extends AuditingEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "passengers_id_seq")
+    @SequenceGenerator(name = "passengers_id_seq", sequenceName = "passengers_id_seq", allocationSize = 1)
     private Long id;
 
     private String firstName;

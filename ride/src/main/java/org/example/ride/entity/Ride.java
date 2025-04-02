@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,7 +28,8 @@ import java.math.BigDecimal;
 @Builder
 public class Ride extends AuditingEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "rides_id_seq")
+    @SequenceGenerator(name = "rides_id_seq", sequenceName = "rides_id_seq", allocationSize = 1)
     private Long id;
 
     private Long driverId;
