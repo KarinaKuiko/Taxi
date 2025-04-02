@@ -9,6 +9,7 @@ import org.example.passenger.controller.PassengerController;
 import org.example.passenger.dto.create.PassengerCreateEditDto;
 import org.example.passenger.dto.read.PassengerReadDto;
 import org.example.passenger.service.PassengerService;
+import org.example.passenger.util.DataUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockPart;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -40,6 +42,7 @@ import static org.example.passenger.util.DataUtil.LIMIT;
 import static org.example.passenger.util.DataUtil.LIMIT_VALUE;
 import static org.example.passenger.util.DataUtil.PAGE;
 import static org.example.passenger.util.DataUtil.PAGE_VALUE;
+import static org.example.passenger.util.DataUtil.SECURITY_ADMIN_ROLE;
 import static org.example.passenger.util.DataUtil.URL;
 import static org.example.passenger.util.DataUtil.URL_WITH_ID;
 import static org.example.passenger.util.DataUtil.getPassengerCreateEditDtoBuilder;
@@ -49,6 +52,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -305,7 +309,7 @@ class PassengerControllerTest {
             mockMvc.perform(multipart(HttpMethod.PUT, URL_WITH_ID, DEFAULT_ID)
                             .part(part)
                             .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                            .with(csrf()))
+                            .with(jwt().authorities(new SimpleGrantedAuthority(SECURITY_ADMIN_ROLE))))
                     .andExpect(status().isOk());
 
             verify(passengerService, times(1)).update(DEFAULT_ID, createPassenger, null);
@@ -320,7 +324,7 @@ class PassengerControllerTest {
             mockMvc.perform(multipart(HttpMethod.PUT, URL_WITH_ID, DEFAULT_ID)
                             .part(part)
                             .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                            .with(csrf()))
+                            .with(jwt().authorities(new SimpleGrantedAuthority(SECURITY_ADMIN_ROLE))))
                     .andExpect(status().isOk());
 
             ArgumentCaptor<PassengerCreateEditDto> passengerCaptor =
@@ -348,7 +352,7 @@ class PassengerControllerTest {
             MvcResult mvcResult = mockMvc.perform(multipart(HttpMethod.PUT, URL_WITH_ID, DEFAULT_ID)
                             .part(part)
                             .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                            .with(csrf()))
+                            .with(jwt().authorities(new SimpleGrantedAuthority(DataUtil.SECURITY_ADMIN_ROLE))))
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -444,7 +448,7 @@ class PassengerControllerTest {
         @Test
         void delete_whenVerifyingRequestMatching_thenReturn401() throws Exception {
             mockMvc.perform(delete(URL_WITH_ID, DEFAULT_ID)
-                            .with(csrf()))
+                            .with(jwt().authorities(new SimpleGrantedAuthority(DataUtil.SECURITY_ADMIN_ROLE))))
                     .andExpect(status().isNoContent());
 
             verify(passengerService, times(1)).safeDelete(DEFAULT_ID);

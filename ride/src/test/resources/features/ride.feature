@@ -5,8 +5,8 @@ Feature: Ride API
     And request body to create or update ride
       """
         {
-          "driverId": 1,
-          "passengerId": 1,
+          "driverId": 2,
+          "passengerId": 2,
           "addressFrom": "Minsk",
           "addressTo": "Gomel"
         }
@@ -17,8 +17,8 @@ Feature: Ride API
       """
         {
           "id": 3,
-          "driverId": 1,
-          "passengerId": 1,
+          "driverId": 2,
+          "passengerId": 2,
           "addressFrom": "Minsk",
           "addressTo": "Gomel",
           "driverRideStatus": "CREATED",
@@ -34,8 +34,8 @@ Feature: Ride API
       """
         {
           "id": 3,
-          "driverId": 1,
-          "passengerId": 1,
+          "driverId": 2,
+          "passengerId": 2,
           "addressFrom": "Minsk",
           "addressTo": "Gomel",
           "driverRideStatus": "CREATED",
@@ -48,8 +48,8 @@ Feature: Ride API
     And request body to create or update ride
       """
         {
-          "driverId": 1,
-          "passengerId": 1,
+          "driverId": 2,
+          "passengerId": 2,
           "addressFrom": "Gomel",
           "addressTo": "Minsk"
         }
@@ -60,8 +60,8 @@ Feature: Ride API
       """
         {
           "id": 3,
-          "driverId": 1,
-          "passengerId": 1,
+          "driverId": 2,
+          "passengerId": 2,
           "addressFrom": "Gomel",
           "addressTo": "Minsk",
           "driverRideStatus": "CREATED",
@@ -83,8 +83,8 @@ Feature: Ride API
       """
         {
           "id": 3,
-          "driverId": 1,
-          "passengerId": 1,
+          "driverId": 2,
+          "passengerId": 2,
           "addressFrom": "Gomel",
           "addressTo": "Minsk",
           "driverRideStatus": "ACCEPTED",

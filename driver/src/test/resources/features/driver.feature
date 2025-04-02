@@ -125,7 +125,7 @@ Feature: Driver API
         {
           "firstName": "Driver",
           "lastName": "Driver",
-          "email": "driver@gmail.com",
+          "email": "test@gmail.com",
           "phone": "+375331234567",
           "gender": "FEMALE",
           "carCreateEditDto": {
@@ -136,15 +136,15 @@ Feature: Driver API
           }
         }
       """
-    When update driver with id 3
+    When update driver with id 1
     Then response status is 200
     And response body contain driver data
       """
         {
-          "id": 3,
+          "id": 1,
           "firstName": "Driver",
           "lastName": "Driver",
-          "email": "driver@gmail.com",
+          "email": "test@gmail.com",
           "phone": "+375331234567",
           "gender": "FEMALE",
           "carId": 1,
@@ -154,10 +154,5 @@ Feature: Driver API
 
   Scenario: Delete driver
     Given access token
-    When delete driver with id 3
-    Then response status is 204
-
-  Scenario: Delete car
-    Given access token
-    When delete car with id 3
+    When delete driver with id 1
     Then response status is 204

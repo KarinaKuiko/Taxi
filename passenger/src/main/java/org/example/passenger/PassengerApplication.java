@@ -9,7 +9,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableCaching
-@EnableMethodSecurity
+@EnableMethodSecurity(proxyTargetClass = true)
 public class PassengerApplication {
 
     public static void main(String[] args) {

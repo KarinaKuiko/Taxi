@@ -1,6 +1,7 @@
 package org.example.driver.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dasniko.testcontainers.keycloak.KeycloakContainer;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.example.driver.dto.create.CarCreateEditDto;
 import org.example.driver.dto.create.DriverCreateEditDto;
@@ -29,9 +30,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import java.io.IOException;
-
-import static org.example.driver.util.DataUtil.ACCESS_TOKEN;
 import static org.example.driver.util.DataUtil.AUTHORIZATION;
 import static org.example.driver.util.DataUtil.BEARER;
 import static org.example.driver.util.DataUtil.DEFAULT_EMAIL;
@@ -41,6 +39,8 @@ import static org.example.driver.util.DataUtil.DEFAULT_PHONE;
 import static org.example.driver.util.DataUtil.DRIVER_DUPLICATED_EMAIL;
 import static org.example.driver.util.DataUtil.DRIVER_ENTITY;
 import static org.example.driver.util.DataUtil.DRIVER_NOT_FOUND;
+import static org.example.driver.util.DataUtil.JWT_ISSUER_URI;
+import static org.example.driver.util.DataUtil.JWT_ISSUER_URI_VALUE;
 import static org.example.driver.util.DataUtil.LIMIT;
 import static org.example.driver.util.DataUtil.LIMIT_VALUE;
 import static org.example.driver.util.DataUtil.MESSAGE;
@@ -53,6 +53,7 @@ import static org.example.driver.util.DataUtil.getDriverCreateEditDtoBuilder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -62,7 +63,8 @@ public class DriverControllerIntegrationTest {
 
     @DynamicPropertySource
     static void disableEureka(DynamicPropertyRegistry registry) {
-        registry.add("eureka.client.enabled", () -> "false");}
+        registry.add("eureka.client.enabled", () -> "false");
+    }
 
     @Container
     public static PostgreSQLContainer postgreSQLContainer =
@@ -90,6 +92,15 @@ public class DriverControllerIntegrationTest {
     @DynamicPropertySource
     static void kafkaProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.kafka.bootstrap-servers", kafkaContainer::getBootstrapServers);
+    }
+
+    @Container
+    static final KeycloakContainer keycloakContainer = new KeycloakContainer();
+
+    @DynamicPropertySource
+    static void keycloakProperties(DynamicPropertyRegistry registry) {
+        registry.add(JWT_ISSUER_URI, () -> String.format(JWT_ISSUER_URI_VALUE,
+                keycloakContainer.getMappedPort(8080)));
     }
 
     @Autowired
@@ -127,7 +138,9 @@ public class DriverControllerIntegrationTest {
 
     @BeforeEach
     void init() {
-        RestAssuredMockMvc.mockMvc(MockMvcBuilders.webAppContextSetup(webApplicationContext).build());
+        RestAssuredMockMvc.mockMvc(MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .apply(springSecurity())
+                .build());
     }
 
     @AfterEach
@@ -139,7 +152,7 @@ public class DriverControllerIntegrationTest {
     void findAll_whenCorrectParams_thenReturn200() {
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .param(PAGE, PAGE_VALUE)
                 .param(LIMIT, LIMIT_VALUE)
                 .when()
@@ -153,7 +166,7 @@ public class DriverControllerIntegrationTest {
     void findById_whenDriverIsFound_thenReturn200AndDriverReadDto() {
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .when()
                 .get(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID.toString())
                 .then()
@@ -171,7 +184,7 @@ public class DriverControllerIntegrationTest {
     void findById_whenDriverIsNotFound_thenReturn404() {
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .when()
                 .get(URL_WITH_ID, DRIVER_ENTITY, "10")
                 .then()
@@ -187,7 +200,7 @@ public class DriverControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .multiPart("dto", objectMapper.writeValueAsString(createDriver), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(URL, DRIVER_ENTITY)
@@ -202,7 +215,7 @@ public class DriverControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .multiPart("dto", objectMapper.writeValueAsString(createDriver), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(URL, DRIVER_ENTITY)
@@ -223,7 +236,7 @@ public class DriverControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .multiPart("dto", objectMapper.writeValueAsString(createDriver), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(URL, DRIVER_ENTITY)
@@ -241,7 +254,7 @@ public class DriverControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .multiPart("dto", objectMapper.writeValueAsString(updateDriver), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID.toString())
@@ -262,7 +275,7 @@ public class DriverControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .multiPart("dto", objectMapper.writeValueAsString(updateDriver), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(URL_WITH_ID, DRIVER_ENTITY, "10")
@@ -280,7 +293,7 @@ public class DriverControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .multiPart("dto", objectMapper.writeValueAsString(updateDriver), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID.toString())
@@ -300,7 +313,7 @@ public class DriverControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .multiPart("dto", objectMapper.writeValueAsString(updateDriver), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID.toString())
@@ -313,7 +326,7 @@ public class DriverControllerIntegrationTest {
     void safeDelete_whenDriverIsFound_thenReturn204() {
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .when()
                 .delete(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID.toString())
                 .then()
@@ -327,11 +340,18 @@ public class DriverControllerIntegrationTest {
     void safeDelete_whenDriverIsNotFound_thenReturn404() {
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .when()
                 .delete(URL_WITH_ID, DRIVER_ENTITY, "10")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .body(MESSAGE, equalTo(DRIVER_NOT_FOUND));
+    }
+
+    private String keycloakAuthorization() {
+        return keycloakContainer.getKeycloakAdminClient()
+                .tokenManager()
+                .getAccessToken()
+                .getToken();
     }
 }

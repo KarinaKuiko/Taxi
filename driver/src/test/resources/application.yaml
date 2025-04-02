@@ -1,0 +1,95 @@
+spring:
+  application:
+    name: driver
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5436/drivers}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        batch_size: 50
+        fetch_size: 50
+        show_sql: true
+        format_sql: true
+        hdm2ddl:
+          auto: validate
+        check_nullability: true
+    open-in-view: false
+  liquibase:
+    change-log: db/changelog/db.changelog-master.xml
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: taxi_client
+            scope:
+              - openid
+        provider:
+          keycloak:
+            issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8484/realms/taxi_realm}
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8484/realms/taxi_realm}
+  cache:
+    type: redis
+    redis:
+      time-to-live: 60000
+  data:
+    redis:
+      host: ${REDIS_URL:localhost}
+      port: ${REDIS_PORT:6380}
+
+
+server:
+  port: 8081
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+  instance:
+    metadataMap:
+      "prometheus.scrape": "true"
+      "prometheus.path": "/actuator/prometheus"
+      "prometheus.port": "8081"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  metrics:
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true
+  tracing:
+    sampling:
+      probability: 1
+  zipkin:
+    tracing:
+      endpoint: ${ZIPKIN_TRACING_ENDPOINT:http://localhost:9411/api/v2/spans}
+
+logging:
+  config: classpath:logback.xml
+
+minio:
+  access-key: ${MINIO_ACCESS_KEY:access-key}
+  secret-key: ${MINIO_SECRET_KEY:secret-key}
+  url: ${MINIO_URL:http://localhost:9000}
+  bucket-name: ${MINIO_BUCKET_NAME:bucket}
+
+openapi:
+  service:
+    title: driver
+    version: 1.0.0
+    url: http://localhost:8080
+
+springdoc:
+  api-docs:
+    path: /driver/v3/api-docs
+  swagger-ui:
+    path: /driver/swagger-ui.html

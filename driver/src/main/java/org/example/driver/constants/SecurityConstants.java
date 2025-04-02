@@ -13,4 +13,6 @@ public class SecurityConstants {
     public static final String PREFIX_ROLE = "ROLE_";
     public static final String ROLE_ADMIN = "ADMIN";
     public static final String EMAIL_CLAIM = "email";
+    public static final String AZP_CLAIM = "azp";
+    public static final String AZP_CLAIM_VALUE = "admin-cli";
 }
