@@ -25,6 +25,7 @@ import com.example.exceptionhandlerstarter.keycloak.ClientException;
 import com.example.exceptionhandlerstarter.keycloak.KeycloakException;
 import com.example.exceptionhandlerstarter.keycloak.UnauthorizedException;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -38,6 +39,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(CarNotFoundException.class)
@@ -178,7 +180,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionDto handleRuntimeException(RuntimeException exception) {
-        exception.printStackTrace();
+        log.error("Unexpected exception", exception);
         return new ExceptionDto(HttpStatus.INTERNAL_SERVER_ERROR, ExceptionConstants.INTERNAL_SERVER_ERROR, LocalDateTime.now());
     }
 
