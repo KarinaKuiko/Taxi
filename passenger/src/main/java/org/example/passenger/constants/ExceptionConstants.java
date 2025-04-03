@@ -14,4 +14,5 @@ public final class ExceptionConstants {
     public static final String AVATAR_NOT_FOUND = "avatar.not.found";
     public static final String FILE_UPLOAD_EXCEPTION = "file.upload.exception";
     public static final String FILE_DELETE_EXCEPTION = "file.delete.exception";
+    public static final String ACCESS_DENIED_EXCEPTION = "access.denied";
 }

@@ -20,6 +20,9 @@ public class DataUtil {
     public static final String BASE_URL = HOST_PORT + URL;
     public static final String BASE_URL_WITH_ID = HOST_PORT + URL_WITH_ID;
     public static final String AUTH_URL = "http://localhost:8085/api/v1/taxi/sign-in";
+    public static final String SECURITY_ADMIN_ROLE = "ROLE_ADMIN";
+    public static final String JWT_ISSUER_URI = "spring.security.oauth2.resourceserver.jwt.issuer-uri";
+    public static final String JWT_ISSUER_URI_VALUE = "http://localhost:%d/realms/master";
 
     //Exception
     public static final String PASSENGER_NOT_FOUND_EXCEPTION_MESSAGE = "Passenger was not found";

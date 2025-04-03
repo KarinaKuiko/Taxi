@@ -1,6 +1,7 @@
 package org.example.passenger.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dasniko.testcontainers.keycloak.KeycloakContainer;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.example.passenger.dto.create.PassengerCreateEditDto;
 import org.example.passenger.entity.Passenger;
@@ -37,6 +38,8 @@ import static org.example.passenger.util.DataUtil.DEFAULT_EMAIL;
 import static org.example.passenger.util.DataUtil.DEFAULT_ID;
 import static org.example.passenger.util.DataUtil.DEFAULT_NAME;
 import static org.example.passenger.util.DataUtil.DEFAULT_PHONE;
+import static org.example.passenger.util.DataUtil.JWT_ISSUER_URI;
+import static org.example.passenger.util.DataUtil.JWT_ISSUER_URI_VALUE;
 import static org.example.passenger.util.DataUtil.LIMIT;
 import static org.example.passenger.util.DataUtil.LIMIT_VALUE;
 import static org.example.passenger.util.DataUtil.MESSAGE;
@@ -51,6 +54,7 @@ import static org.example.passenger.util.DataUtil.getPassengerCreateEditDtoBuild
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -89,6 +93,15 @@ public class PassengerControllerIntegrationTest {
         registry.add("spring.kafka.bootstrap-servers", kafkaContainer::getBootstrapServers);
     }
 
+    @Container
+    static final KeycloakContainer keycloakContainer = new KeycloakContainer();
+
+    @DynamicPropertySource
+    static void keycloakProperties(DynamicPropertyRegistry registry) {
+        registry.add(JWT_ISSUER_URI, () -> String.format(JWT_ISSUER_URI_VALUE,
+                keycloakContainer.getMappedPort(8080)));
+    }
+
     @Autowired
     private PassengerRepository passengerRepository;
 
@@ -124,7 +137,9 @@ public class PassengerControllerIntegrationTest {
 
     @BeforeEach
     void init() {
-        RestAssuredMockMvc.mockMvc(MockMvcBuilders.webAppContextSetup(webApplicationContext).build());
+        RestAssuredMockMvc.mockMvc(MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                        .apply(springSecurity())
+                .build());
     }
 
     @AfterEach
@@ -136,7 +151,7 @@ public class PassengerControllerIntegrationTest {
     void findAll_whenCorrectParams_thenReturn200() {
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .param(PAGE, PAGE_VALUE)
                 .param(LIMIT, LIMIT_VALUE)
                 .when()
@@ -150,7 +165,7 @@ public class PassengerControllerIntegrationTest {
     void findById_whenPassengerIsFound_thenReturn200AndPassengerReadDto() {
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .when()
                 .get(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
@@ -166,7 +181,7 @@ public class PassengerControllerIntegrationTest {
     void findById_whenPassengerIsNotFound_thenReturn404() {
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .when()
                 .get(URL_WITH_ID, "2")
                 .then()
@@ -182,7 +197,7 @@ public class PassengerControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .multiPart("dto", objectMapper.writeValueAsString(createPassenger), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(URL)
@@ -197,7 +212,7 @@ public class PassengerControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .multiPart("dto", objectMapper.writeValueAsString(createPassenger), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(URL)
@@ -214,7 +229,7 @@ public class PassengerControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .multiPart("dto", objectMapper.writeValueAsString(updatePassenger), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(URL_WITH_ID, DEFAULT_ID.toString())
@@ -242,7 +257,7 @@ public class PassengerControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .multiPart("dto", objectMapper.writeValueAsString(updatePassenger), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(URL_WITH_ID, DEFAULT_ID.toString())
@@ -257,7 +272,7 @@ public class PassengerControllerIntegrationTest {
 
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .multiPart("dto", objectMapper.writeValueAsString(updatePassenger), MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(URL_WITH_ID, "2")
@@ -270,7 +285,7 @@ public class PassengerControllerIntegrationTest {
     void safeDelete_whenCarIsFound_thenReturn204() {
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .when()
                 .delete(URL_WITH_ID, DEFAULT_ID.toString())
                 .then()
@@ -284,11 +299,18 @@ public class PassengerControllerIntegrationTest {
     void safeDelete_whenCarIsNotFound_thenReturn404() {
         RestAssuredMockMvc
                 .given()
-                .header(AUTHORIZATION, BEARER + ACCESS_TOKEN)
+                .header(AUTHORIZATION, BEARER + keycloakAuthorization())
                 .when()
                 .delete(URL_WITH_ID,"2")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND.value())
                 .body(MESSAGE, equalTo(PASSENGER_NOT_FOUND_EXCEPTION_MESSAGE));
+    }
+
+    private String keycloakAuthorization() {
+        return keycloakContainer.getKeycloakAdminClient()
+                .tokenManager()
+                .getAccessToken()
+                .getToken();
     }
 }

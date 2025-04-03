@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Min;
 import org.example.driver.dto.create.DriverCreateEditDto;
 import org.example.driver.dto.read.DriverReadDto;
 import org.example.driver.dto.read.PageResponse;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -89,7 +90,8 @@ public interface DriverController {
     })
     DriverReadDto update(@PathVariable("id") Long id,
                          @RequestPart @Valid DriverCreateEditDto dto,
-                         @RequestPart(required = false) MultipartFile file);
+                         @RequestPart(required = false) MultipartFile file,
+                         JwtAuthenticationToken token);
 
     @Operation(summary = "Create a new driver",
             description = """
@@ -134,5 +136,6 @@ public interface DriverController {
             @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Driver was not found")
     })
-    void delete(@PathVariable("id") Long id);
+    void delete(@PathVariable("id") Long id,
+                JwtAuthenticationToken token);
 }

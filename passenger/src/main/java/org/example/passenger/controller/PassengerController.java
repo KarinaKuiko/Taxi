@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Min;
 import org.example.passenger.dto.create.PassengerCreateEditDto;
 import org.example.passenger.dto.read.PageResponse;
 import org.example.passenger.dto.read.PassengerReadDto;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -94,7 +95,8 @@ public interface PassengerController {
     })
     PassengerReadDto update(@PathVariable("id") Long id,
                             @RequestPart @Valid PassengerCreateEditDto dto,
-                            @RequestPart(required = false) MultipartFile file);
+                            @RequestPart(required = false) MultipartFile file,
+                            JwtAuthenticationToken token);
 
     @Operation(summary = "Soft deleting passenger by ID",
             description = "Mark passenger as deleted without removing it from the database")
@@ -104,5 +106,6 @@ public interface PassengerController {
             @ApiResponse(responseCode = "403", description = "Forbidden"),
             @ApiResponse(responseCode = "404", description = "Passenger was not found")
     })
-    void delete(@PathVariable("id") Long id);
+    void delete(@PathVariable("id") Long id,
+                JwtAuthenticationToken token);
 }

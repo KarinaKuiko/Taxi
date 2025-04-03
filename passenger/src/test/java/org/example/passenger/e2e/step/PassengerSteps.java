@@ -10,6 +10,7 @@ import io.restassured.response.Response;
 import org.example.passenger.dto.create.PassengerCreateEditDto;
 import org.example.passenger.dto.read.PassengerReadDto;
 import org.example.passenger.util.TokenReadDto;
+import org.springframework.http.MediaType;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,10 +46,10 @@ public class PassengerSteps {
     }
 
     @When("create passenger")
-    public void createPassenger() {
+    public void createPassenger() throws Exception {
         response = given()
-                .contentType(ContentType.JSON)
-                .body(passengerRequestDto)
+                .multiPart("dto", objectMapper.writeValueAsString(passengerRequestDto),
+                        MediaType.APPLICATION_JSON_VALUE)
                 .header(AUTHORIZATION, BEARER + accessToken)
                 .when()
                 .post(BASE_URL);
@@ -76,11 +77,11 @@ public class PassengerSteps {
     }
 
     @When("update passenger with id {int}")
-    public void updatePassengerWithId(int id) {
+    public void updatePassengerWithId(int id) throws Exception {
         response = given()
                 .header(AUTHORIZATION, BEARER + accessToken)
-                .contentType(ContentType.JSON)
-                .body(passengerRequestDto)
+                .multiPart("dto", objectMapper.writeValueAsString(passengerRequestDto),
+                        MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(BASE_URL_WITH_ID, id);
     }

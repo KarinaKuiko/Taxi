@@ -6,10 +6,12 @@ import com.example.exceptionhandlerstarter.dto.Violation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.driver.config.MessageSourceConfig;
 import org.example.driver.controller.DriverController;
+import org.example.driver.controller.impl.DriverControllerImpl;
 import org.example.driver.dto.create.DriverCreateEditDto;
 import org.example.driver.dto.read.DriverReadDto;
 import org.example.driver.entity.enumeration.Gender;
 import org.example.driver.service.DriverService;
+import org.example.driver.util.DataUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -26,6 +28,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockPart;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -52,6 +55,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -310,7 +314,7 @@ class DriverControllerTest {
             mockMvc.perform(multipart(HttpMethod.PUT, URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
                             .part(part)
                             .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                            .with(csrf()))
+                            .with(jwt().authorities(new SimpleGrantedAuthority(DataUtil.SECURITY_ADMIN_ROLE))))
                     .andExpect(status().isOk());
 
             verify(driverService, times(1)).update(DEFAULT_ID, createDriver, null);
@@ -325,7 +329,7 @@ class DriverControllerTest {
             mockMvc.perform(multipart(HttpMethod.PUT, URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
                             .part(part)
                             .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                            .with(csrf()))
+                            .with(jwt().authorities(new SimpleGrantedAuthority(DataUtil.SECURITY_ADMIN_ROLE))))
                     .andExpect(status().isOk());
 
             ArgumentCaptor<DriverCreateEditDto> driverCaptor = ArgumentCaptor.forClass(DriverCreateEditDto.class);
@@ -353,7 +357,7 @@ class DriverControllerTest {
             MvcResult mvcResult = mockMvc.perform(multipart(HttpMethod.PUT, URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
                             .part(part)
                             .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                            .with(csrf()))
+                            .with(jwt().authorities(new SimpleGrantedAuthority(DataUtil.SECURITY_ADMIN_ROLE))))
                     .andExpect(status().isOk())
                     .andReturn();
 
@@ -449,7 +453,7 @@ class DriverControllerTest {
         @Test
         void delete_whenVerifyingRequestMatching_thenReturn401() throws Exception {
             mockMvc.perform(delete(URL_WITH_ID, DRIVER_ENTITY, DEFAULT_ID)
-                            .with(csrf()))
+                            .with(jwt().authorities(new SimpleGrantedAuthority(DataUtil.SECURITY_ADMIN_ROLE))))
                     .andExpect(status().isNoContent());
 
             verify(driverService, times(1)).safeDelete(DEFAULT_ID);

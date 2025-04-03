@@ -48,19 +48,19 @@ Feature: Passenger API
         {
           "firstName": "passenger",
           "lastName": "Test",
-          "email": "test@gmail.com",
+          "email": "passenger@gmail.com",
           "phone": "80441234567"
         }
       """
-    When update passenger with id 2
+    When update passenger with id 1
     Then response status is 200
     And response body contain passenger data
       """
         {
-          "id": 2,
+          "id": 1,
           "firstName": "passenger",
           "lastName": "Test",
-          "email": "test@gmail.com",
+          "email": "passenger@gmail.com",
           "phone": "80441234567",
           "rating": 5.0
         }
@@ -68,5 +68,5 @@ Feature: Passenger API
 
   Scenario: Delete passenger
     Given access token
-    When delete passenger with id 2
+    When delete passenger with id 1
     Then response status is 204

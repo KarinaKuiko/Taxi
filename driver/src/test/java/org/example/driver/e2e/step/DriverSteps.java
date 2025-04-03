@@ -7,12 +7,12 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import lombok.extern.slf4j.Slf4j;
 import org.example.driver.dto.create.CarCreateEditDto;
 import org.example.driver.dto.create.DriverCreateEditDto;
 import org.example.driver.dto.read.CarReadDto;
 import org.example.driver.dto.read.DriverReadDto;
 import org.example.driver.util.TokenReadDto;
+import org.springframework.http.MediaType;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,8 +25,6 @@ import static org.example.driver.util.DataUtil.CAR_ENTITY;
 import static org.example.driver.util.DataUtil.DRIVER_ENTITY;
 import static org.example.driver.util.DataUtil.signInUserDto;
 
-
-@Slf4j
 public class DriverSteps {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -107,11 +105,11 @@ public class DriverSteps {
     }
 
     @When("create driver")
-    public void createDriver() {
+    public void createDriver() throws Exception {
         response = given()
                 .header(AUTHORIZATION, BEARER + accessToken)
-                .contentType(ContentType.JSON)
-                .body(driverRequestDto)
+                .multiPart("dto", objectMapper.writeValueAsString(driverRequestDto),
+                        MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .post(BASE_URL, DRIVER_ENTITY);
     }
@@ -131,11 +129,11 @@ public class DriverSteps {
     }
 
     @When("update driver with id {int}")
-    public void updateDriverWithId(int id) {
+    public void updateDriverWithId(int id) throws Exception {
         response = given()
                 .header(AUTHORIZATION, BEARER + accessToken)
-                .contentType(ContentType.JSON)
-                .body(driverRequestDto)
+                .multiPart("dto", objectMapper.writeValueAsString(driverRequestDto),
+                        MediaType.APPLICATION_JSON_VALUE)
                 .when()
                 .put(BASE_URL_WITH_ID, DRIVER_ENTITY, id);
     }
